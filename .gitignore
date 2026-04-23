@@ -1,3 +1,5 @@
 node_modules/
 dist/
 *.pdf
+.idea/
+.claude/settings.local.json
