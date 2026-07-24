@@ -8,7 +8,7 @@ A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Qu
 
 ---
 
-![Version](https://img.shields.io/badge/version-1.12.1-8b0000?style=flat-square)
+![Version](https://img.shields.io/badge/version-1.12.2-8b0000?style=flat-square)
 ![Vue](https://img.shields.io/badge/Vue-3.5.13-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-6.3.1-646CFF?style=flat-square&logo=vite&logoColor=white)
