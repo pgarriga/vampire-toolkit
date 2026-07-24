@@ -1,7 +1,7 @@
 {
   "name": "vampire-toolkit",
   "version": "1.12.1",
-  "description": "Herramienta de soporte para partidas de Vampiro: La Mascarada 5ª Edición",
+  "description": "A toolkit to speed up your Vampire: The Masquerade 5th Edition sessions — look up disciplines and powers, save the ones your character has, and more.",
   "scripts": {
     "dev": "node node_modules/vite/bin/vite.js",
     "build": "node node_modules/vite/bin/vite.js build",
