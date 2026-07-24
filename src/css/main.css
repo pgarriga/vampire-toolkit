@@ -646,6 +646,7 @@ a { text-decoration: none; color: inherit; }
   cursor: pointer;
   transition: all var(--transition);
   min-height: 44px;
+  text-decoration: none;
 }
 .settings-option:hover {
   color: var(--parchment);

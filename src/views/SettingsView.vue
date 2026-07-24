@@ -87,11 +87,33 @@ const langOptions = computed(() => [
         </div>
       </section>
 
+      <div class="ornament-divider my-5">✦ ✦ ✦</div>
+
+      <!-- Repository -->
+      <section class="settings-section">
+        <div class="settings-section-head">
+          <h2 class="settings-section-title font-title">{{ t.settings.repo }}</h2>
+          <p class="settings-section-desc">{{ t.settings.repoDesc }}</p>
+        </div>
+        <div class="settings-options" role="group">
+          <a
+            class="settings-option"
+            href="https://github.com/pgarriga/vampire-toolkit"
+            target="_blank"
+            rel="noopener"
+          >
+            <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18" aria-hidden="true">
+              <path d="M12 .5C5.65.5.5 5.65.5 12c0 5.08 3.29 9.39 7.86 10.91.58.1.79-.25.79-.55v-2.02c-3.2.7-3.87-1.37-3.87-1.37-.52-1.32-1.28-1.67-1.28-1.67-1.05-.72.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.71 1.26 3.37.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.7 0-1.26.45-2.29 1.19-3.1-.12-.29-.51-1.47.11-3.07 0 0 .97-.31 3.18 1.18.92-.26 1.9-.39 2.88-.39s1.96.13 2.88.39c2.21-1.49 3.18-1.18 3.18-1.18.62 1.6.23 2.78.11 3.07.74.81 1.19 1.84 1.19 3.1 0 4.43-2.7 5.4-5.27 5.69.41.35.77 1.05.77 2.12v3.14c0 .3.21.66.8.55C20.21 21.39 23.5 17.08 23.5 12 23.5 5.65 18.35.5 12 .5z"/>
+            </svg>
+            {{ t.settings.repoButton }}
+          </a>
+        </div>
+      </section>
+
     </div>
 
     <footer class="text-center pb-5 opacity-50" style="font-size: 1.05rem; font-weight: 600;">
-      v{{ version }} &nbsp;·&nbsp;
-      <a href="https://github.com/pgarriga/vampire-toolkit" target="_blank" rel="noopener">GitHub</a>
+      v{{ version }}
     </footer>
   </div>
 </template>

@@ -71,6 +71,9 @@ const es = {
     langEs:      'Español',
     langEn:      'English',
     langCa:      'Català',
+    repo:        'Repositorio',
+    repoDesc:    'Toolkit de código abierto. Cualquier aportación es bienvenida — abre un issue o una pull request.',
+    repoButton:  'Ver en GitHub',
   },
 }
 
@@ -144,6 +147,9 @@ const en: typeof es = {
     langEs:     'Español',
     langEn:     'English',
     langCa:     'Català',
+    repo:       'Repository',
+    repoDesc:   'Open-source toolkit. Contributions are welcome — open an issue or pull request.',
+    repoButton: 'View on GitHub',
   },
 }
 
@@ -217,6 +223,9 @@ const ca: typeof es = {
     langEs:     'Español',
     langEn:     'English',
     langCa:     'Català',
+    repo:       'Repositori',
+    repoDesc:   'Toolkit de codi obert. Qualsevol aportació és benvinguda — obre una issue o una pull request.',
+    repoButton: 'Veure a GitHub',
   },
 }
 
