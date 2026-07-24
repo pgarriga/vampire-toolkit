@@ -67,7 +67,7 @@ const langOptions = computed(() => [
         </div>
       </section>
 
-      <div class="ornament-divider my-5">✦ ✦ ✦</div>
+      <div class="ornament-divider my-3">✦ ✦ ✦</div>
 
       <!-- Language -->
       <section class="settings-section">
@@ -87,7 +87,7 @@ const langOptions = computed(() => [
         </div>
       </section>
 
-      <div class="ornament-divider my-5">✦ ✦ ✦</div>
+      <div class="ornament-divider my-3">✦ ✦ ✦</div>
 
       <!-- Repository -->
       <section class="settings-section">
