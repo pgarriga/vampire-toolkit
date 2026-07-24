@@ -15,8 +15,9 @@ const themeOptions = computed(() => [
 
 const langOptions = computed(() => [
   { value: 'auto' as Lang, label: t.value.settings.langAuto },
-  { value: 'es'   as Lang, label: t.value.settings.langEs   },
+  { value: 'ca'   as Lang, label: t.value.settings.langCa   },
   { value: 'en'   as Lang, label: t.value.settings.langEn   },
+  { value: 'es'   as Lang, label: t.value.settings.langEs   },
 ])
 </script>
 

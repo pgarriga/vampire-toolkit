@@ -25,13 +25,14 @@ Vampire Toolkit/
     ├── types.ts                 # Interfaces: Discipline, Power, DisciplinesData
     ├── data.ts                  # DISCIPLINES_DATA: 11 disciplines and ~96 powers (Spanish source)
     ├── translations-en.ts       # English translations overlay for all disciplines and powers
+    ├── translations-ca.ts       # Catalan translations overlay for all disciplines and powers
     ├── icons.ts                 # DISCIPLINE_ICONS: inline SVGs per discipline
     ├── helpers.ts               # levelDots, disciplineById, powerById, shortCost, shortDuration, artGradient
     ├── composables/
     │   ├── useFavorites.ts      # My Powers singleton state — persists in localStorage
-    │   ├── useSettings.ts       # Theme (auto/dark/light) and language (auto/es/en) preferences
+    │   ├── useSettings.ts       # Theme (auto/dark/light) and language (auto/es/en/ca) preferences
     │   ├── useI18n.ts           # UI string translations based on resolved language
-    │   └── useData.ts           # Localized discipline/power data — applies EN overlay when needed
+    │   └── useData.ts           # Localized discipline/power data — applies EN or CA overlay when needed
     ├── css/
     │   └── main.css             # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
@@ -68,18 +69,20 @@ In `DisciplineView.vue` each power card has a star button (`.star-btn`) in the t
 
 ## Settings (`composables/useSettings.ts`)
 
-Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es | en`) and `resolvedLang` (`es | en`).
+Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es | en | ca`) and `resolvedLang` (`es | en | ca`).
 
 - Theme `auto` follows `window.matchMedia('(prefers-color-scheme: dark)')`.
-- Language `auto` detects the browser language: Iberian Peninsula languages (`/^(es|ca|gl|eu|pt)/i`) resolve to `es`, everything else to `en`.
+- Language `auto` detects the browser language: Catalan (`/^ca\b/i`) resolves to `ca`, other Iberian Peninsula languages (`/^(es|gl|eu|pt)/i`) resolve to `es`, everything else to `en`.
 - Both preferences persist in `localStorage` (`v5-theme`, `v5-lang`).
 - Theme is applied via `data-theme` attribute on `<html>`.
 
-## Internationalisation (`composables/useI18n.ts` + `src/translations-en.ts`)
+## Internationalisation (`composables/useI18n.ts` + `src/translations-en.ts` + `src/translations-ca.ts`)
 
 UI strings (nav labels, section headings, field labels) are translated in `useI18n.ts` and selected via `resolvedLang`.
 
-Power and discipline content (names, descriptions, costs, dice pools, durations) is translated in `translations-en.ts`. The `useData.ts` composable applies this overlay over the Spanish base data when `resolvedLang === 'en'`. All views consume `useData()` instead of importing `DISCIPLINES_DATA` directly.
+Power and discipline content (names, descriptions, costs, dice pools, durations) is translated in `translations-en.ts` and `translations-ca.ts`. The `useData.ts` composable applies the appropriate overlay over the Spanish base data when `resolvedLang === 'en'` or `resolvedLang === 'ca'`. All views consume `useData()` instead of importing `DISCIPLINES_DATA` directly.
+
+To add a language: create a `translations-<lang>.ts` overlay, add the language code to `Lang`/`VALID_LANGS` in `useSettings.ts`, extend `resolvedLang`, add a `<lang>` block plus `lang<Lang>` label to `useI18n.ts`, wire the overlay in `useData.ts`, and add the option to `SettingsView.vue`.
 
 ## Data (`src/data.ts`)
 
@@ -119,7 +122,7 @@ Each power:
 }
 ```
 
-To add or edit a power, edit `src/data.ts` directly, keeping the types defined in `src/types.ts`. Add the English translation in `src/translations-en.ts` using the same power `id` as key.
+To add or edit a power, edit `src/data.ts` directly, keeping the types defined in `src/types.ts`. Add the English translation in `src/translations-en.ts` and the Catalan one in `src/translations-ca.ts`, both using the same power `id` as key.
 
 ## Icons (`src/icons.ts`)
 

@@ -70,6 +70,7 @@ const es = {
     langAuto:    'Automático',
     langEs:      'Español',
     langEn:      'English',
+    langCa:      'Català',
   },
 }
 
@@ -142,10 +143,84 @@ const en: typeof es = {
     langAuto:   'Auto',
     langEs:     'Español',
     langEn:     'English',
+    langCa:     'Català',
   },
 }
 
-const dict = { es, en }
+const ca: typeof es = {
+  nav: {
+    disciplines: 'Disciplines',
+    myPowers:    'Els Meus Poders',
+    settings:    'Ajustaments',
+  },
+  home: {
+    title:             'Disciplines',
+    searchPlaceholder: 'Cerca disciplina, clan o tipus…',
+    searchAriaLabel:   'Cerca disciplina, clan o tipus',
+    resonance:         'Ressonància',
+    powers:            'poders',
+    noResults:         'No s\'han trobat disciplines per a',
+  },
+  discipline: {
+    back:          'Disciplines',
+    type:          'Tipus',
+    threat:        'Amenaça',
+    resonance:     'Ressonància',
+    clans:         'Clans',
+    powers:        'Poders',
+    available:     'disponibles',
+    level:         'Nivell',
+    cost:          'Cost',
+    duration:      'Durada',
+    addToFav:      'Afegir als Meus Poders',
+    removeFromFav: 'Treure dels Meus Poders',
+    notFound:      'Disciplina no trobada.',
+    backHome:      'Tornar a l\'inici',
+  },
+  power: {
+    cost:             'Cost',
+    dicePool:         'Reserva de daus',
+    duration:         'Durada',
+    type:             'Tipus',
+    level:            'Nivell',
+    amalgam:          'Poder Amalgama',
+    notFound:         'Poder no trobat.',
+    backHome:         'Tornar a l\'inici',
+    notes:            'Notes',
+    notesPlaceholder: 'Les teves notes sobre aquest poder (houserules, recordatoris…)',
+    notesHint:        'Es desen automàticament',
+  },
+  myPowers: {
+    title:         'Els Meus Poders',
+    empty:         'Encara no tens cap poder desat.',
+    emptyHint:     'Fes servir l\'estrella a les cartes de poder per afegir-los aquí.',
+    power:         'poder',
+    powers:        'poders',
+    removeFromFav: 'Treure dels Meus Poders',
+    cost:          'Cost',
+    copy:          'Copiar llista',
+    copied:        'Copiat!',
+    clearAll:      'Buidar-ho tot',
+    confirmClear:  'Segur?',
+    cancel:        'Cancel·lar',
+  },
+  settings: {
+    title:      'Ajustaments',
+    theme:      'Tema',
+    themeDesc:  'Controla l\'aspecte visual de l\'aplicació.',
+    themeAuto:  'Automàtic',
+    themeDark:  'Fosc',
+    themeLight: 'Clar',
+    language:   'Idioma',
+    langDesc:   'Detecta automàticament l\'idioma del sistema operatiu.',
+    langAuto:   'Automàtic',
+    langEs:     'Español',
+    langEn:     'English',
+    langCa:     'Català',
+  },
+}
+
+const dict = { es, en, ca }
 
 export function useI18n() {
   const { resolvedLang } = useSettings()

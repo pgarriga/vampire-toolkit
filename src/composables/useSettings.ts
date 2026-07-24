@@ -1,11 +1,12 @@
 import { ref, computed, watch } from 'vue'
 
 export type Theme = 'auto' | 'dark' | 'light'
-export type Lang  = 'auto' | 'es'  | 'en'
+export type Lang  = 'auto' | 'es'  | 'en' | 'ca'
 
 const VALID_THEMES: Theme[] = ['auto', 'dark', 'light']
-const VALID_LANGS:  Lang[]  = ['auto', 'es', 'en']
-const IBERIAN = /^(es|ca|gl|eu|pt)/i
+const VALID_LANGS:  Lang[]  = ['auto', 'es', 'en', 'ca']
+const CATALAN = /^ca\b/i
+const IBERIAN = /^(es|gl|eu|pt)/i
 
 // ── localStorage with availability guard ──────────────────
 function storageGet(key: string): string | null {
@@ -26,11 +27,12 @@ function validateLang(value: string | null): Lang {
 const theme = ref<Theme>(validateTheme(storageGet('v5-theme')))
 const lang  = ref<Lang> (validateLang (storageGet('v5-lang')))
 
-const resolvedLang = computed<'es' | 'en'>(() =>
-  lang.value !== 'auto'
-    ? lang.value
-    : IBERIAN.test(navigator.language) ? 'es' : 'en'
-)
+const resolvedLang = computed<'es' | 'en' | 'ca'>(() => {
+  if (lang.value !== 'auto') return lang.value
+  if (CATALAN.test(navigator.language)) return 'ca'
+  if (IBERIAN.test(navigator.language)) return 'es'
+  return 'en'
+})
 
 function applyTheme(t: Theme) {
   const resolved = t === 'auto'
