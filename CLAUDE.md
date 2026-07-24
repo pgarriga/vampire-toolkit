@@ -1,4 +1,4 @@
-# V5 Support Tool — Vampire: The Masquerade 5th Edition
+# Vampire Toolkit — Vampire: The Masquerade 5th Edition
 
 A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static web app with no backend, designed to look up disciplines and powers and manage a character's powers at the table. No registration required.
 
@@ -13,7 +13,7 @@ A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Pu
 ## File Structure
 
 ```
-V5 Support Tool/
+Vampire Toolkit/
 ├── index.html                   # Vite entry point
 ├── vite.config.ts               # base: './', vue plugin
 ├── tsconfig.json
@@ -58,7 +58,7 @@ Sticky top Bootstrap navbar with `navbar-expand-md`:
 - Collapses to hamburger on mobile
 - Closes automatically on navigation (watch on `route.path`)
 - Red badge on "My Powers" / "Mis Poderes" showing the number of saved powers
-- Brand: "V5 Support Tool"
+- Brand: "Vampire Toolkit"
 
 ## My Powers (`composables/useFavorites.ts`)
 

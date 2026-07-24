@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import { VitePWA } from 'vite-plugin-pwa'
 
-const base = process.env.GITHUB_ACTIONS ? '/v5-support-tool/' : './'
+const base = process.env.GITHUB_ACTIONS ? '/vampire-toolkit/' : './'
 
 export default defineConfig({
   plugins: [
@@ -36,8 +36,8 @@ export default defineConfig({
         ],
       },
       manifest: {
-        name: 'V5 Support Tool',
-        short_name: 'V5 Support',
+        name: 'Vampire Toolkit',
+        short_name: 'Vampire',
         description: 'Vampire: The Masquerade 5th Edition discipline reference',
         theme_color: '#8b0000',
         background_color: '#0d0b14',

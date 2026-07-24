@@ -1,8 +1,8 @@
-# V5 Support Tool · Vampire: The Masquerade
+# Vampire Toolkit · Vampire: The Masquerade
 
 A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Quickly browse disciplines and powers, save your character's powers for easy reference at the table — no registration or account required.
 
-**🌐 Live:** https://pgarriga.github.io/v5-support-tool/
+**🌐 Live:** https://pgarriga.github.io/vampire-toolkit/
 
 > For detailed rules and lore, always refer to the official **Vampire: The Masquerade 5th Edition** rulebook.
 
@@ -41,7 +41,7 @@ A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Qu
 ## Project Structure
 
 ```
-V5 Support Tool/
+Vampire Toolkit/
 ├── index.html                 # Vite entry point
 ├── vite.config.ts
 ├── tsconfig.json

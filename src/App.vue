@@ -29,7 +29,7 @@ watch(() => route.path, () => {
 
       <!-- Brand -->
       <a class="navbar-brand app-navbar-brand font-title" href="#/" @click.prevent="router.push('/')">
-        V5 Support Tool
+        Vampire Toolkit
       </a>
 
       <!-- Toggler -->
