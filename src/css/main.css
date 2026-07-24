@@ -24,6 +24,9 @@
   --page-header-from:   #1a0808;
   --page-header-to:     #0d0b14;
   --page-header-border: #3a1010;
+  /* Tool accents (dark) */
+  --tool-disciplines:  #c94a4a;
+  --tool-my-powers:    #b371e0;
 }
 
 /* ─── Tema claro ─── */
@@ -41,6 +44,9 @@
   --page-header-from:   #e0d4c0;
   --page-header-to:     #f0ebe0;
   --page-header-border: #c5a888;
+  /* Tool accents (light) */
+  --tool-disciplines:  #8b0000;
+  --tool-my-powers:    #6a2a8a;
 }
 
 /* ─── Base ─── */
@@ -548,7 +554,15 @@ a { text-decoration: none; color: inherit; }
 
 /* ─── App navbar ─── */
 .app-navbar {
-  background: var(--navbar-bg) !important;
+  position: sticky;
+  top: 0;
+  z-index: 1030;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 56px;
+  padding: 0 1rem;
+  background: var(--navbar-bg);
   border-bottom: 1px solid var(--void-border);
   backdrop-filter: blur(8px);
 }
@@ -556,51 +570,154 @@ a { text-decoration: none; color: inherit; }
   font-size: 1rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #fff !important;
+  color: #fff;
   text-shadow: 0 0 16px rgba(139,0,0,0.6);
   text-decoration: none;
 }
 [data-theme="light"] .app-navbar-brand {
-  color: var(--parchment) !important;
+  color: var(--parchment);
   text-shadow: 0 0 16px rgba(139,0,0,0.3);
 }
-.app-navbar-toggler {
-  border-color: var(--void-border) !important;
-  padding: 0.3rem 0.5rem;
-}
-.app-navbar-toggler .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%28212,201,184,0.75%29' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
-}
-[data-theme="light"] .app-navbar-toggler .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='rgba%2842,31,18,0.75%29' stroke-width='2' stroke-linecap='round' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E") !important;
-}
-.app-nav-link {
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  letter-spacing: 0.08em;
-  color: var(--parchment-dim) !important;
-  padding: 0.45rem 0.85rem !important;
+.app-menu-toggler {
+  background: transparent;
+  border: 1px solid var(--void-border);
   border-radius: 6px;
-  transition: color var(--transition), background var(--transition);
+  color: var(--parchment-dim);
+  padding: 0.35rem 0.5rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
+}
+.app-menu-toggler:hover { color: var(--parchment); background: var(--void-card2); border-color: var(--gold-dim); }
+.app-menu-toggler:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.app-menu-overlay {
+  position: fixed;
+  inset: 56px 0 0 0;
+  background: rgba(13,11,20,0.92);
+  backdrop-filter: blur(10px);
+  z-index: 1020;
+  padding: 1rem;
+  overflow-y: auto;
+}
+[data-theme="light"] .app-menu-overlay {
+  background: rgba(244,236,222,0.94);
+}
+.app-menu-panel {
+  max-width: 28rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.app-menu-item {
+  font-family: var(--font-body);
+  font-size: 1.05rem;
+  letter-spacing: 0.06em;
+  color: var(--parchment-dim);
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 8px;
+  padding: 0.85rem 1rem;
+  min-height: 52px;
   display: flex;
   align-items: center;
-  text-decoration: none;
+  gap: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+  transition: color var(--transition), background var(--transition), border-color var(--transition);
 }
-.app-nav-link:hover  { color: var(--parchment) !important; background: var(--void-card2); }
-.app-nav-link.active { color: var(--gold) !important; }
-
-.app-nav-badge {
+.app-menu-item:hover {
+  color: var(--parchment);
+  background: var(--void-card2);
+  border-color: var(--gold-dim);
+}
+.app-menu-item.active {
+  color: var(--gold);
+  border-color: var(--gold-dim);
+  background: var(--void-card2);
+}
+.app-menu-badge {
+  margin-left: auto;
   background: #8b0000;
   color: #fff;
-  font-size: 0.65rem;
+  font-size: 0.7rem;
   font-weight: 700;
-  min-width: 18px; height: 18px;
-  border-radius: 9px;
+  min-width: 20px; height: 20px;
+  border-radius: 10px;
   display: inline-flex; align-items: center; justify-content: center;
-  padding: 0 4px;
-  line-height: 1;
-  font-family: var(--font-body);
+  padding: 0 6px;
   letter-spacing: 0;
+}
+
+/* ─── Home tool cards ─── */
+.tools-wrap {
+  max-width: 44rem;
+}
+.tools-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 640px) {
+  .tools-grid { grid-template-columns: repeat(2, 1fr); }
+}
+.tool-card {
+  --tool-accent: #8b0000;
+  text-align: left;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-left: 4px solid var(--tool-accent);
+  border-radius: 12px;
+  padding: 1.25rem 1.35rem;
+  color: var(--parchment);
+  font-family: var(--font-body);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  transition: transform 0.12s ease, border-color 0.12s ease, background var(--transition);
+}
+.tool-card:hover {
+  transform: translateY(-2px);
+  border-color: var(--tool-accent);
+  background: var(--void-card2);
+}
+.tool-card:focus-visible {
+  outline: 2px solid var(--tool-accent);
+  outline-offset: 2px;
+}
+.tool-card-head {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  color: var(--tool-accent);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.tool-card-title { flex: 1; }
+.tool-card-badge {
+  background: var(--blood);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 700;
+  min-width: 26px; height: 26px;
+  border-radius: 13px;
+  display: inline-flex; align-items: center; justify-content: center;
+  padding: 0 8px;
+  letter-spacing: 0;
+  font-family: var(--font-body);
+  line-height: 1;
+}
+.tool-card-desc {
+  font-size: 0.95rem;
+  color: var(--parchment-dim);
+  line-height: 1.45;
+  margin: 0;
 }
 
 /* ─── Settings view ─── */

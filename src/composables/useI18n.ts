@@ -3,11 +3,22 @@ import { useSettings } from './useSettings'
 
 const es = {
   nav: {
+    home:        'Inicio',
     disciplines: 'Disciplinas',
     myPowers:    'Mis Poderes',
     settings:    'Ajustes',
+    openMenu:    'Abrir menú',
+    closeMenu:   'Cerrar menú',
   },
   home: {
+    title:             'Vampire Toolkit',
+    subtitle:          'Herramientas para Vampiro: La Mascarada 5ª Edición',
+    disciplinesTitle:  'Disciplinas',
+    disciplinesDesc:   'Explora las 11 disciplinas de V5 y sus más de 96 poderes: coste, reserva de dados, duración y descripción.',
+    myPowersTitle:     'Mis Poderes',
+    myPowersDesc:      'Guarda los poderes de tu personaje para tenerlos siempre a mano durante la partida.',
+  },
+  disciplinesList: {
     title:             'Disciplinas',
     searchPlaceholder: 'Buscar disciplina, clan o tipo…',
     searchAriaLabel:   'Buscar disciplina, clan o tipo',
@@ -79,11 +90,22 @@ const es = {
 
 const en: typeof es = {
   nav: {
+    home:        'Home',
     disciplines: 'Disciplines',
     myPowers:    'My Powers',
     settings:    'Settings',
+    openMenu:    'Open menu',
+    closeMenu:   'Close menu',
   },
   home: {
+    title:             'Vampire Toolkit',
+    subtitle:          'Tools for Vampire: The Masquerade 5th Edition',
+    disciplinesTitle:  'Disciplines',
+    disciplinesDesc:   'Browse all 11 V5 disciplines and 96+ powers: cost, dice pool, duration and description.',
+    myPowersTitle:     'My Powers',
+    myPowersDesc:      'Save your character\'s powers for quick lookup at the table.',
+  },
+  disciplinesList: {
     title:             'Disciplines',
     searchPlaceholder: 'Search discipline, clan or type…',
     searchAriaLabel:   'Search discipline, clan or type',
@@ -155,11 +177,22 @@ const en: typeof es = {
 
 const ca: typeof es = {
   nav: {
+    home:        'Inici',
     disciplines: 'Disciplines',
     myPowers:    'Els Meus Poders',
     settings:    'Ajustaments',
+    openMenu:    'Obrir menú',
+    closeMenu:   'Tancar menú',
   },
   home: {
+    title:             'Vampire Toolkit',
+    subtitle:          'Eines per a Vampire: The Masquerade 5a Edició',
+    disciplinesTitle:  'Disciplines',
+    disciplinesDesc:   'Explora les 11 disciplines de V5 i els seus més de 96 poders: cost, reserva de daus, durada i descripció.',
+    myPowersTitle:     'Els Meus Poders',
+    myPowersDesc:      'Desa els poders del teu personatge per tenir-los sempre a mà durant la partida.',
+  },
+  disciplinesList: {
     title:             'Disciplines',
     searchPlaceholder: 'Cerca disciplina, clan o tipus…',
     searchAriaLabel:   'Cerca disciplina, clan o tipus',

@@ -20,8 +20,8 @@ Vampire Toolkit/
 ├── package.json                 # Scripts: dev / build / preview
 └── src/
     ├── main.ts                  # Imports Bootstrap CSS+JS, main.css, mounts app
-    ├── App.vue                  # Collapsible Bootstrap navbar + <router-view> with transition
-    ├── router.ts                # Hash routes: /, /disciplina/:id, /disciplina/:id/poder/:powerId, /mis-poderes, /ajustes
+    ├── App.vue                  # Sticky navbar with hamburger + full-screen overlay menu + <router-view> with transition
+    ├── router.ts                # Hash routes: /, /disciplines, /discipline/:id, /discipline/:id/power/:powerId, /my-powers, /settings
     ├── types.ts                 # Interfaces: Discipline, Power, DisciplinesData
     ├── data.ts                  # DISCIPLINES_DATA: 11 disciplines and ~96 powers (Spanish source)
     ├── translations-en.ts       # English translations overlay for all disciplines and powers
@@ -36,36 +36,40 @@ Vampire Toolkit/
     ├── css/
     │   └── main.css             # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
-        ├── HomeView.vue         # Discipline grid with search
+        ├── HomeView.vue         # Landing page — grid of tool cards (Disciplines, My Powers)
+        ├── DisciplinesView.vue  # Discipline grid with search (the previous HomeView content)
         ├── DisciplineView.vue   # Power grid + star to save to My Powers
         ├── PowerView.vue        # Power detail card
-        ├── MisPoderesView.vue   # Saved powers grouped by discipline and sorted by level
-        └── SettingsView.vue     # Theme and language settings
+        ├── MyPowersView.vue     # Saved powers grouped by discipline and sorted by level
+        └── SettingsView.vue     # Theme, language and repository info
 ```
 
 ## Routes
 
 | Hash | View | Description |
 |------|------|-------------|
-| `#/` | `HomeView` | Grid of all 11 disciplines with search |
-| `#/disciplina/:id` | `DisciplineView` | Power grid for the discipline |
-| `#/disciplina/:id/poder/:powerId` | `PowerView` | Detail card for a specific power |
-| `#/mis-poderes` | `MisPoderesView` | User's saved powers |
-| `#/ajustes` | `SettingsView` | Theme and language settings |
+| `#/` | `HomeView` | Landing page — tool card grid |
+| `#/disciplines` | `DisciplinesView` | Grid of all 11 disciplines with search |
+| `#/discipline/:id` | `DisciplineView` | Power grid for the discipline |
+| `#/discipline/:id/power/:powerId` | `PowerView` | Detail card for a specific power |
+| `#/my-powers` | `MyPowersView` | User's saved powers |
+| `#/settings` | `SettingsView` | Theme, language and repository info |
 
 ## Navigation (`App.vue`)
 
-Sticky top Bootstrap navbar with `navbar-expand-md`:
-- Collapses to hamburger on mobile
-- Closes automatically on navigation (watch on `route.path`)
-- Red badge on "My Powers" / "Mis Poderes" showing the number of saved powers
-- Brand: "Vampire Toolkit"
+Custom sticky top bar (56px) instead of Bootstrap's navbar:
+- Left: "Vampire Toolkit" brand — clicking it goes home
+- Right: hamburger button (always visible, not only mobile)
+- Clicking the hamburger opens a full-screen overlay menu below the bar with all nav items (Home, Disciplines, My Powers, Settings) as full-width buttons
+- Menu closes on route change, on Escape, and on click outside the panel
+- Body scroll is locked while the menu is open
+- Red badge on "My Powers" showing the number of saved powers
 
 ## My Powers (`composables/useFavorites.ts`)
 
-Reactive singleton using `ref<string[]>`. Each favourite is stored as `"disciplineId:powerId"` in `localStorage` under the key `v5-mis-poderes`. Exposes `toggle`, `isFavorite` and the `favorites` ref.
+Reactive singleton using `ref<string[]>`. Each favourite is stored as `"disciplineId:powerId"` in `localStorage` under the key `v5-my-powers` (with a one-time migration from the older `v5-mis-poderes`). Exposes `toggle`, `isFavorite`, `clearAll`, `favorites` and `favoriteCount`.
 
-In `DisciplineView.vue` each power card has a star button (`.star-btn`) in the top-right corner that calls `toggle`. In `MisPoderesView.vue` powers are grouped by discipline (in the order from `data.ts`) and sorted by level within each group.
+In `DisciplineView.vue` each power card has a star button (`.star-btn`) in the top-right corner that calls `toggle`. In `MyPowersView.vue` powers are grouped by discipline (in the order from `data.ts`) and sorted by level within each group.
 
 ## Settings (`composables/useSettings.ts`)
 

@@ -15,7 +15,7 @@ const { disciplineById } = useData()
 const discipline = computed(() => disciplineById(route.params['id'] as string))
 const { isFavorite, toggle } = useFavorites()
 
-function goBack():            void { router.push('/') }
+function goBack():            void { router.push('/disciplines') }
 function goPower(pid: string): void { router.push(`/discipline/${route.params['id']}/power/${pid}`) }
 </script>
 
