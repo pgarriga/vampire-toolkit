@@ -1,6 +1,6 @@
 {
   "name": "vampire-toolkit",
-  "version": "1.10.2",
+  "version": "1.11.0",
   "description": "Herramienta de soporte para partidas de Vampiro: La Mascarada 5ª Edición",
   "scripts": {
     "dev": "node node_modules/vite/bin/vite.js",
