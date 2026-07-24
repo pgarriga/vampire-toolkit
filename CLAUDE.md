@@ -1,13 +1,14 @@
 # Vampire Toolkit — Vampire: The Masquerade 5th Edition
 
-A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static web app with no backend, designed to look up disciplines and powers and manage a character's powers at the table. No registration required.
+A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 11 disciplines and ~96 powers, and save the ones your character has for quick lookup at the table. No account required, works offline once loaded.
 
 ## Stack
 
 - **Vue 3** + **TypeScript** — SFCs with Composition API (`<script setup>`)
-- **Vue Router 4** with hash history (`#/route`)
-- **Bootstrap 5** — navbar, responsive grid and CSS utilities (CSS + JS bundle)
-- **Vite 6** — bundler and dev server
+- **Vue Router 5** with hash history (`#/route`)
+- **Bootstrap 5** — responsive grid and CSS utilities (Bootstrap's navbar JS is **not** used any more; see Navigation)
+- **Vite 7** — bundler and dev server
+- **vite-plugin-pwa** — service worker + `manifest.webmanifest`
 - **Google Fonts**: Cinzel Decorative (headings) + Cormorant Garamond (body)
 
 ## File Structure
@@ -15,9 +16,11 @@ A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Pu
 ```
 Vampire Toolkit/
 ├── index.html                   # Vite entry point
-├── vite.config.ts               # base: './', vue plugin
+├── vite.config.ts               # base: './' locally, '/vampire-toolkit/' on GH Actions; PWA plugin
 ├── tsconfig.json
 ├── package.json                 # Scripts: dev / build / preview
+├── scripts/
+│   └── generate-icons.mjs       # Regenerates PWA PNGs from public/favicon.svg (sharp)
 └── src/
     ├── main.ts                  # Imports Bootstrap CSS+JS, main.css, mounts app
     ├── App.vue                  # Sticky navbar with hamburger + full-screen overlay menu + <router-view> with transition
@@ -36,10 +39,10 @@ Vampire Toolkit/
     ├── css/
     │   └── main.css             # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
-        ├── HomeView.vue         # Landing page — grid of tool cards (Disciplines, My Powers)
-        ├── DisciplinesView.vue  # Discipline grid with search (the previous HomeView content)
+        ├── HomeView.vue         # Landing page — tool-card grid (Disciplines, My Powers)
+        ├── DisciplinesView.vue  # Discipline grid with search
         ├── DisciplineView.vue   # Power grid + star to save to My Powers
-        ├── PowerView.vue        # Power detail card
+        ├── PowerView.vue        # Power detail card + notes
         ├── MyPowersView.vue     # Saved powers grouped by discipline and sorted by level
         └── SettingsView.vue     # Theme, language and repository info
 ```
@@ -57,9 +60,9 @@ Vampire Toolkit/
 
 ## Navigation (`App.vue`)
 
-Custom sticky top bar (56px) instead of Bootstrap's navbar:
+Custom sticky top bar (56px) — Bootstrap's navbar collapse is no longer used:
 - Left: "Vampire Toolkit" brand — clicking it goes home
-- Right: hamburger button (always visible, not only mobile)
+- Right: hamburger button (always visible, on every viewport)
 - Clicking the hamburger opens a full-screen overlay menu below the bar with all nav items (Home, Disciplines, My Powers, Settings) as full-width buttons
 - Menu closes on route change, on Escape, and on click outside the panel
 - Body scroll is locked while the menu is open
@@ -79,14 +82,13 @@ Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es 
 - Language `auto` detects the browser language: Catalan (`/^ca\b/i`) resolves to `ca`, other Iberian Peninsula languages (`/^(es|gl|eu|pt)/i`) resolve to `es`, everything else to `en`.
 - Both preferences persist in `localStorage` (`v5-theme`, `v5-lang`).
 - Theme is applied via `data-theme` attribute on `<html>`.
+- `SettingsView` also has a Repository section that links to the GitHub repo.
 
 ## Internationalisation (`composables/useI18n.ts` + `src/translations-en.ts` + `src/translations-ca.ts`)
 
-UI strings (nav labels, section headings, field labels) are translated in `useI18n.ts` and selected via `resolvedLang`.
+UI strings (nav labels, section headings, field labels) are translated in `useI18n.ts` and selected via `resolvedLang`. The Spanish block is the shape source (`typeof es`) — every other language must match its keys exactly, which the TypeScript compiler enforces.
 
 Power and discipline content (names, descriptions, costs, dice pools, durations) is translated in `translations-en.ts` and `translations-ca.ts`. The `useData.ts` composable applies the appropriate overlay over the Spanish base data when `resolvedLang === 'en'` or `resolvedLang === 'ca'`. All views consume `useData()` instead of importing `DISCIPLINES_DATA` directly.
-
-To add a language: create a `translations-<lang>.ts` overlay, add the language code to `Lang`/`VALID_LANGS` in `useSettings.ts`, extend `resolvedLang`, add a `<lang>` block plus `lang<Lang>` label to `useI18n.ts`, wire the overlay in `useData.ts`, and add the option to `SettingsView.vue`.
 
 ## Data (`src/data.ts`)
 
@@ -126,8 +128,6 @@ Each power:
 }
 ```
 
-To add or edit a power, edit `src/data.ts` directly, keeping the types defined in `src/types.ts`. Add the English translation in `src/translations-en.ts` and the Catalan one in `src/translations-ca.ts`, both using the same power `id` as key.
-
 ## Icons (`src/icons.ts`)
 
 `DISCIPLINE_ICONS` is an object `{ [iconType]: svgString }`. Each SVG uses `currentColor`. ViewBox `0 0 100 100`.
@@ -148,18 +148,54 @@ To add or edit a power, edit `src/data.ts` directly, keeping the types defined i
 
 ## CSS (`src/css/main.css`)
 
-Custom gothic styles on top of Bootstrap. CSS custom properties (`--void`, `--parchment`, `--card-color`, `--card-glow`, etc.) drive both dark (default) and light themes via `[data-theme="light"]` overrides.
+Custom gothic styles on top of Bootstrap's grid + utilities. CSS custom properties (`--void`, `--parchment`, `--gold`, `--tool-disciplines`, `--tool-my-powers`, `--card-color`, `--card-glow`, etc.) drive both dark (default) and light themes via `[data-theme="light"]` overrides.
 
 Relevant classes:
 
-- `.app-navbar` / `.app-nav-link` / `.app-nav-badge` — custom navbar
-- `.discipline-card` / `.power-card` — cards using CSS vars `--card-color` and `--card-glow`
+- `.app-navbar` / `.app-menu-toggler` / `.app-menu-overlay` / `.app-menu-panel` / `.app-menu-item` / `.app-menu-badge` — custom top bar and overlay menu
+- `.tool-card` / `.tool-card-head` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`)
+- `.discipline-card` / `.power-card` — cards driven by `--card-color` and `--card-glow`
 - `.star-btn` / `.star-btn--filled` — favourites star button
-- `.disc-group-icon` — discipline icon in MisPoderesView
+- `.disc-group-icon` — discipline icon in MyPowersView
 - `.power-detail-card` / `.pst` — power detail view
-- `.settings-section` / `.settings-btn` — settings page
+- `.settings-section` / `.settings-option` / `.ornament-divider` — settings page
 
-`--card-color` and `--card-glow` are injected inline from Vue.
+`--card-color` and `--card-glow` are injected inline from Vue; `--tool-accent` is set inline per tool card while the underlying accent value is read from the theme vars `--tool-disciplines` / `--tool-my-powers`.
+
+---
+
+## Rules
+
+These are non-negotiable for any change to the codebase.
+
+### Accessibility (a11y)
+
+1. **Every interactive element must be keyboard-operable.** Buttons/anchors handle this natively; when a non-interactive element (`div`, `article`) acts as a control, add `role="button"`, `tabindex="0"`, and Enter+Space `@keydown` handlers (see `discipline-card` in `DisciplinesView.vue` for the pattern).
+2. **Icons must be labelled.** Decorative SVGs get `aria-hidden="true"`. Meaningful icon-only buttons get an `aria-label` (see `.app-menu-toggler` and `.star-btn`).
+3. **Never remove focus outlines** without providing a replacement. `:focus-visible` is styled explicitly where the default outline is suppressed (e.g. `.app-menu-toggler`, `.tool-card`).
+4. **Color contrast must meet WCAG AA** (4.5:1 for body text, 3:1 for large/bold text ≥ 18.66px). Verify accents against **both** dark and light theme backgrounds. When an accent is too light for a badge with white text, give the badge a stable dark background (`--blood`) rather than reusing the accent.
+5. **Overlays are dismissible.** The menu closes on Escape, click outside, and route change. Body scroll is locked while the overlay is open and restored on close.
+6. **ARIA state matches reality.** `aria-expanded`, `aria-controls`, and dynamic `aria-label` on the hamburger toggler must stay in sync with the menu state. `active` classes on nav items must reflect the current route.
+7. **Touch targets ≥ 44×44 CSS pixels.** The menu items enforce `min-height: 52px`; smaller controls must not fall below the 44px floor.
+
+### Translations
+
+1. **No hardcoded UI strings in views.** Every user-visible label, placeholder, aria-label and empty-state message comes from `useI18n().t.value.<section>.<key>`.
+2. **All three languages stay in sync.** When adding a UI string, add it to `es`, `en` **and** `ca` blocks in `useI18n.ts` in the same commit. TypeScript will fail the build if `en` or `ca` drift from `es`'s shape.
+3. **Discipline and power content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature.
+4. **Language `auto` order matters.** `CATALAN` (`/^ca\b/i`) is checked before the general `IBERIAN` regex; keep it that way so `ca-*` browsers don't fall into the `es` bucket.
+5. **To add a language:** create `translations-<lang>.ts` mirroring the EN structure, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, add a `<lang>` dict block plus `lang<Lang>` label to every language block in `useI18n.ts`, wire the overlay in `useData.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
+
+### Responsive
+
+1. **Mobile-first.** Base styles target small screens; wider layouts are additive via `@media (min-width: …)` or Bootstrap's `sm/md/lg/xl` utility classes. The `.tools-grid` and `row row-cols-2 row-cols-sm-3 …` patterns show the direction.
+2. **No horizontal scroll on the page body.** `html`/`body` set `overflow-x: hidden`. Wide content (long dice-pool strings, tables) scrolls inside its own container instead of pushing the page.
+3. **Use `clamp()` for headline sizes** so they scale between mobile and desktop without a wall of media queries (see the home subtitle and the `page-title-main`).
+4. **Test at ≥ 320px width.** The menu overlay, tool cards, settings section, and search input must all remain usable at that width — nothing gets cut off, nothing overlaps.
+5. **The overlay menu is full-screen** on every viewport and its `.app-menu-panel` caps at `28rem` so it stays comfortable on wide displays.
+6. **Both themes must be readable.** Any new component defines its colours through the theme CSS vars (or per-theme values in `:root` / `[data-theme="light"]`) — never hardcode a hex that only works in one theme.
+
+---
 
 ## Local Development
 
@@ -177,4 +213,7 @@ npm run build
 
 # Preview build
 npm run preview
+
+# Regenerate PWA icons from public/favicon.svg (only when the favicon changes)
+node scripts/generate-icons.mjs
 ```

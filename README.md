@@ -1,6 +1,6 @@
 # Vampire Toolkit · Vampire: The Masquerade
 
-A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Quickly browse disciplines and powers, save your character's powers for easy reference at the table — no registration or account required.
+A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sessions — browse the 11 disciplines and every power, and save the ones your character has for quick lookup at the table. Pure static PWA, no account required, works offline.
 
 **🌐 Live:** https://pgarriga.github.io/vampire-toolkit/
 
@@ -9,76 +9,84 @@ A support tool for **Vampire: The Masquerade 5th Edition** tabletop sessions. Qu
 ---
 
 ![Version](https://img.shields.io/badge/version-2.0.2-8b0000?style=flat-square)
-![Vue](https://img.shields.io/badge/Vue-3.5.13-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
-![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-6.3.1-646CFF?style=flat-square&logo=vite&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-5.7.3-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
+![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=flat-square&logo=vite&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?style=flat-square)
 
 ---
 
 ## Features
 
-- **11 disciplines** with gothic SVG iconography
-- **~96 powers** with dice pool, cost, duration and description
-- **Search** by discipline name, clan or type
-- **My Powers** — bookmark your character's powers with a star; persists in `localStorage`
-- **No registration required** — pure static web app, no server, works offline
-- **Bilingual** — Spanish and English (auto-detected from browser language)
-- **Theming** — dark, light and auto (follows system preference)
-- Responsive with Bootstrap 5 (2 → 5 columns depending on screen size)
-- Accessible: keyboard navigation, ARIA labels
+- **Tools-list home** — landing page with a card per tool (Disciplines browser, My Powers), ready to grow with more.
+- **11 disciplines** with gothic SVG iconography and per-discipline theme colours.
+- **~96 powers** with dice pool, cost, duration, description and per-power notes.
+- **Search** the discipline catalogue by name, clan or type.
+- **My Powers** — bookmark your character's powers with a star; persists in `localStorage` and shows a live count badge in the menu.
+- **Trilingual UI and content** — Spanish, English and Catalan, both for the interface and for every discipline/power. Auto-detects the browser language.
+- **Theming** — dark, light and auto (follows system preference).
+- **Installable PWA** — service worker + web manifest via `vite-plugin-pwa`; usable offline after the first load.
+- **Accessible** — keyboard navigation on every control, ARIA labels on icon-only buttons, WCAG AA contrast in both themes, dismissible menu overlay.
+- **Responsive** — mobile-first layout, 1 → 5 columns on the discipline grid depending on viewport, full-screen overlay menu that stays comfortable on any width.
 
 ## Tech Stack
 
 | Technology | Version | Role |
 |------------|---------|------|
-| Vue 3 | 3.5.13 | Reactive framework (SFCs + Composition API + TypeScript) |
-| Vue Router | 4.5.0 | Hash navigation (`#/route`) |
-| Bootstrap | 5.3.3 | Navbar, responsive grid and CSS utilities |
-| Vite | 6.3.1 | Bundler and dev server |
-| TypeScript | 5.7.3 | Static typing |
+| Vue 3 | 3.5 | Reactive framework (SFCs + Composition API + TypeScript) |
+| Vue Router | 5 | Hash navigation (`#/route`) |
+| Bootstrap | 5.3 | Responsive grid and CSS utilities |
+| Vite | 7.3 | Bundler and dev server |
+| vite-plugin-pwa | 1.2 | Service worker + web manifest |
+| TypeScript | 6.0 | Static typing |
 
 ## Project Structure
 
 ```
 Vampire Toolkit/
-├── index.html                 # Vite entry point
+├── index.html                # Vite entry point
 ├── vite.config.ts
 ├── tsconfig.json
 ├── package.json
+├── scripts/
+│   └── generate-icons.mjs    # Regenerates PWA PNGs from public/favicon.svg (sharp)
 └── src/
-    ├── main.ts                # Bootstrap CSS/JS + Vue app
-    ├── App.vue                # Bootstrap navbar + page transitions
-    ├── router.ts              # Hash routes
-    ├── types.ts               # TypeScript interfaces (Discipline, Power)
-    ├── data.ts                # The 11 disciplines and ~96 powers (Spanish source)
-    ├── translations-en.ts     # English translations overlay
-    ├── icons.ts               # Gothic SVGs per discipline
-    ├── helpers.ts             # Pure functions (shortCost, artGradient…)
+    ├── main.ts               # Bootstrap CSS/JS + Vue app
+    ├── App.vue               # Custom sticky navbar + hamburger overlay menu + page transitions
+    ├── router.ts             # Hash routes
+    ├── types.ts              # TypeScript interfaces (Discipline, Power)
+    ├── data.ts               # The 11 disciplines and ~96 powers (Spanish source)
+    ├── translations-en.ts    # English translations overlay (disciplines + powers)
+    ├── translations-ca.ts    # Catalan translations overlay (disciplines + powers)
+    ├── icons.ts              # Gothic SVGs per discipline
+    ├── helpers.ts            # Pure functions (shortCost, artGradient…)
     ├── composables/
-    │   ├── useFavorites.ts    # My Powers state (localStorage)
-    │   ├── useSettings.ts     # Theme and language preferences
-    │   ├── useI18n.ts         # UI string translations
-    │   └── useData.ts         # Localized discipline/power data
+    │   ├── useFavorites.ts   # My Powers state (localStorage)
+    │   ├── useSettings.ts    # Theme and language preferences
+    │   ├── useI18n.ts        # UI string translations
+    │   └── useData.ts        # Localized discipline/power data
     ├── css/
-    │   └── main.css           # Custom gothic styles + Bootstrap overrides
+    │   └── main.css          # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
-        ├── HomeView.vue       # Discipline grid with search
-        ├── DisciplineView.vue # Power grid for a discipline
-        ├── PowerView.vue      # Power detail card
-        ├── MyPowersView.vue   # Saved powers grouped by discipline and level
-        └── SettingsView.vue   # Theme and language settings
+        ├── HomeView.vue      # Landing page — tool card grid
+        ├── DisciplinesView.vue # Discipline grid with search
+        ├── DisciplineView.vue  # Power grid for a discipline
+        ├── PowerView.vue     # Power detail card + notes
+        ├── MyPowersView.vue  # Saved powers grouped by discipline and level
+        └── SettingsView.vue  # Theme, language and repository info
 ```
 
 ## Routes
 
 | Hash | View | Description |
 |------|------|-------------|
-| `#/` | HomeView | Grid of all 11 disciplines with search |
+| `#/` | HomeView | Landing page — tool card grid |
+| `#/disciplines` | DisciplinesView | Grid of all 11 disciplines with search |
 | `#/discipline/:id` | DisciplineView | Power grid with star to save |
-| `#/discipline/:id/power/:powerId` | PowerView | Power detail card |
+| `#/discipline/:id/power/:powerId` | PowerView | Power detail card + notes |
 | `#/my-powers` | MyPowersView | Saved powers by discipline and level |
-| `#/settings` | SettingsView | Theme and language settings |
+| `#/settings` | SettingsView | Theme, language and repository info |
 
 ## Local Development
 
@@ -96,15 +104,31 @@ npm run build
 
 # Preview build
 npm run preview
+
+# Regenerate PWA icons from public/favicon.svg (only when the favicon changes)
+node scripts/generate-icons.mjs
 ```
 
 > **WSL2 note:** Scripts use `node node_modules/vite/bin/vite.js` instead of the `vite` binary to avoid file system permission issues on Windows.
 
-## Data
+## Data and translations
 
 Source: official Spanish PDF *Vampiro La Mascarada 5ª Edición — Disciplinas*.
 
-Data lives in `src/data.ts`. English translations are in `src/translations-en.ts`. To add or edit a power, update those files directly, following the types defined in `src/types.ts`.
+- The Spanish content lives in `src/data.ts`.
+- English translations are in `src/translations-en.ts`, Catalan in `src/translations-ca.ts`. Both are overlays keyed by the same power `id` — the `useData` composable picks the right one based on the resolved language.
+- To add or edit a power, update all three files in the same commit (types are defined in `src/types.ts`).
+- UI strings (nav, headings, buttons) live in `src/composables/useI18n.ts`; every string must exist in the `es`, `en` and `ca` blocks — TypeScript enforces the shape.
+
+## Contributing
+
+Contributions are welcome — open an issue or a pull request. Before submitting a change, please keep the project's baseline promises intact:
+
+- **Accessibility** — keyboard-operable controls, ARIA labels on icon-only buttons, visible focus outlines, WCAG AA contrast in both themes.
+- **Translations** — no hardcoded UI strings in views; every new label is added to Spanish, English and Catalan. New disciplines or powers ship with EN and CA overlays.
+- **Responsive** — mobile-first, no horizontal page scroll, comfortable at ≥ 320px width, both themes readable.
+
+See [`CLAUDE.md`](./CLAUDE.md) for the full, prescriptive version of these rules and for the project's architecture notes.
 
 ## Icons
 
