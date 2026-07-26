@@ -54,6 +54,9 @@ const es = {
     notes:            'Notas',
     notesPlaceholder: 'Tus notas sobre este poder (houserules, recordatorios…)',
     notesHint:        'Se guardan automáticamente',
+    share:            'Compartir',
+    shareText:        'Poder de Vampiro: La Mascarada 5ª Edición',
+    shareError:       'No se pudo compartir la carta.',
   },
   myPowers: {
     title:         'Mis Poderes',
@@ -141,6 +144,9 @@ const en: typeof es = {
     notes:            'Notes',
     notesPlaceholder: 'Your notes about this power (houserules, reminders…)',
     notesHint:        'Saved automatically',
+    share:            'Share',
+    shareText:        'Vampire: The Masquerade 5th Edition power',
+    shareError:       'The card could not be shared.',
   },
   myPowers: {
     title:         'My Powers',
@@ -228,6 +234,9 @@ const ca: typeof es = {
     notes:            'Notes',
     notesPlaceholder: 'Les teves notes sobre aquest poder (houserules, recordatoris…)',
     notesHint:        'Es desen automàticament',
+    share:            'Compartir',
+    shareText:        'Poder de Vampire: The Masquerade 5a Edició',
+    shareError:       'No s\'ha pogut compartir la carta.',
   },
   myPowers: {
     title:         'Els Meus Poders',
