@@ -21,12 +21,13 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 
 - **Tools-list home** — landing page with a card per tool (Disciplines browser, My Powers), ready to grow with more.
 - **11 disciplines** with gothic SVG iconography and per-discipline theme colours.
-- **~96 powers** with dice pool, cost, duration, description and per-power notes.
+- **~96 powers** with dice pool, cost, duration, description and (when present) the amalgam requirement.
 - **Search** the discipline catalogue by name, clan or type.
 - **My Powers** — bookmark your character's powers with a star; persists in `localStorage` and shows a live count badge in the menu.
+- **Share a power as an image** — on mobile browsers with the Web Share API, a share button renders the power card as a PNG and hands it off to WhatsApp, Mail, Messages, etc.
 - **Trilingual UI and content** — Spanish, English and Catalan, both for the interface and for every discipline/power. Auto-detects the browser language.
 - **Theming** — dark, light and auto (follows system preference).
-- **Installable PWA** — service worker + web manifest via `vite-plugin-pwa`; usable offline after the first load.
+- **Installable PWA** — service worker + web manifest via `vite-plugin-pwa`; usable offline after the first load, installs on iOS and Android home screens under the full "Vampire Toolkit" name.
 - **Accessible** — keyboard navigation on every control, ARIA labels on icon-only buttons, WCAG AA contrast in both themes, dismissible menu overlay.
 - **Responsive** — mobile-first layout, 1 → 5 columns on the discipline grid depending on viewport, full-screen overlay menu that stays comfortable on any width.
 
@@ -61,6 +62,7 @@ Vampire Toolkit/
     ├── translations-ca.ts    # Catalan translations overlay (disciplines + powers)
     ├── icons.ts              # Gothic SVGs per discipline
     ├── helpers.ts            # Pure functions (shortCost, artGradient…)
+    ├── renderPowerCard.ts    # Canvas renderer — draws a power card to a PNG Blob for sharing
     ├── composables/
     │   ├── useFavorites.ts   # My Powers state (localStorage)
     │   ├── useSettings.ts    # Theme and language preferences
@@ -72,7 +74,7 @@ Vampire Toolkit/
         ├── HomeView.vue      # Landing page — tool card grid
         ├── DisciplinesView.vue # Discipline grid with search
         ├── DisciplineView.vue  # Power grid for a discipline
-        ├── PowerView.vue     # Power detail card + notes
+        ├── PowerView.vue     # Power detail card + mobile Share button
         ├── MyPowersView.vue  # Saved powers grouped by discipline and level
         └── SettingsView.vue  # Theme, language and repository info
 ```
@@ -84,7 +86,7 @@ Vampire Toolkit/
 | `#/` | HomeView | Landing page — tool card grid |
 | `#/disciplines` | DisciplinesView | Grid of all 11 disciplines with search |
 | `#/discipline/:id` | DisciplineView | Power grid with star to save |
-| `#/discipline/:id/power/:powerId` | PowerView | Power detail card + notes |
+| `#/discipline/:id/power/:powerId` | PowerView | Power detail card + mobile Share button |
 | `#/my-powers` | MyPowersView | Saved powers by discipline and level |
 | `#/settings` | SettingsView | Theme, language and repository info |
 
