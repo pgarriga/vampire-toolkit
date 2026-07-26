@@ -37,7 +37,7 @@ export default defineConfig({
       },
       manifest: {
         name: 'Vampire Toolkit',
-        short_name: 'Vampire',
+        short_name: 'Vampire Toolkit',
         description: 'Vampire: The Masquerade 5th Edition discipline reference',
         theme_color: '#8b0000',
         background_color: '#0d0b14',
