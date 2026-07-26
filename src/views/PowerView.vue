@@ -24,14 +24,20 @@ const canShare   = ref(false)
 const isSharing  = ref(false)
 
 onMounted(() => {
+  if (typeof navigator.share !== 'function') return
   const nav = navigator as Navigator & { canShare?: (data: ShareData) => boolean }
-  if (!nav.share || !nav.canShare) return
-  const probe = new File([new Blob([''], { type: 'image/png' })], 'probe.png', { type: 'image/png' })
-  try {
-    canShare.value = nav.canShare({ files: [probe] })
-  } catch {
-    canShare.value = false
+  if (typeof nav.canShare === 'function') {
+    try {
+      const probe = new File(
+        [new Uint8Array([137, 80, 78, 71, 13, 10, 26, 10])],
+        'p.png',
+        { type: 'image/png' },
+      )
+      canShare.value = nav.canShare({ files: [probe] })
+      return
+    } catch { /* fall through */ }
   }
+  canShare.value = true
 })
 
 async function sharePower() {
