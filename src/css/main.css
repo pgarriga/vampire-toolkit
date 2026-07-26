@@ -812,48 +812,6 @@ a { text-decoration: none; color: inherit; }
   box-shadow: 0 0 12px rgba(201,168,76,0.15);
 }
 
-/* ─── Power notes (PowerView) ─── */
-.power-notes {
-  margin-top: 1.5rem;
-}
-.power-notes-label {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.78rem;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gold);
-  margin-bottom: 0.5rem;
-}
-.power-notes-hint {
-  font-size: 0.75rem;
-  color: var(--parchment-faint);
-  font-style: italic;
-  margin-left: auto;
-}
-.power-notes-textarea {
-  width: 100%;
-  background: var(--void-card2);
-  border: 1px solid var(--void-border);
-  border-radius: 6px;
-  padding: 0.65rem 0.85rem;
-  color: var(--parchment);
-  font-family: var(--font-body);
-  font-size: 0.95rem;
-  line-height: 1.5;
-  resize: vertical;
-  min-height: 80px;
-  outline: none;
-  transition: border-color var(--transition), box-shadow var(--transition);
-}
-.power-notes-textarea:focus {
-  border-color: var(--gold-dim);
-  box-shadow: 0 0 0 2px rgba(201,168,76,0.12);
-}
-.power-notes-textarea::placeholder { color: var(--parchment-faint); }
-
 /* ─── Amalgam link ─── */
 .amalgama-link {
   color: var(--gold);

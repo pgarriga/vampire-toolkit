@@ -1,11 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
 import { powerById, levelDots, artGradient, parseAmalgama } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
-import { useNotes } from '../composables/useNotes'
 import { useFavorites } from '../composables/useFavorites'
 import { renderPowerCard } from '../renderPowerCard'
 
@@ -13,13 +12,11 @@ const route  = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { disciplineById, disciplines } = useData()
-const { getNote, setNote } = useNotes()
 const { isFavorite, toggle } = useFavorites()
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
 const power      = computed(() => powerById(discipline.value, route.params['powerId'] as string))
 
-const noteText   = ref('')
 const canShare   = ref(false)
 const isSharing  = ref(false)
 
@@ -64,22 +61,6 @@ async function sharePower() {
     alert(t.value.power.shareError)
   } finally {
     isSharing.value = false
-  }
-}
-
-watch(
-  [discipline, power],
-  ([disc, pow]) => {
-    if (disc && pow) noteText.value = getNote(disc.id, pow.id)
-  },
-  { immediate: true },
-)
-
-function onNoteInput(e: Event) {
-  const text = (e.target as HTMLTextAreaElement).value
-  noteText.value = text
-  if (discipline.value && power.value) {
-    setNote(discipline.value.id, power.value.id, text)
   }
 }
 
@@ -212,25 +193,6 @@ function goBack(): void {
               >{{ seg.text }}</router-link>
               <span v-else>{{ seg.text }}</span>
             </template>
-          </div>
-
-          <!-- Notes -->
-          <div class="power-notes">
-            <div class="power-notes-label">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
-                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
-              </svg>
-              {{ t.power.notes }}
-              <span class="power-notes-hint">{{ t.power.notesHint }}</span>
-            </div>
-            <textarea
-              class="power-notes-textarea"
-              :placeholder="t.power.notesPlaceholder"
-              :value="noteText"
-              @input="onNoteInput"
-              rows="3"
-            ></textarea>
           </div>
 
         </div>
