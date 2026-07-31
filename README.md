@@ -8,7 +8,7 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 
 ---
 
-![Version](https://img.shields.io/badge/version-2.0.9-8b0000?style=flat-square)
+![Version](https://img.shields.io/badge/version-2.0.10-8b0000?style=flat-square)
 ![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-7.3-646CFF?style=flat-square&logo=vite&logoColor=white)
