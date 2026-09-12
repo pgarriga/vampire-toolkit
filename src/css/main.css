@@ -524,22 +524,52 @@ a { text-decoration: none; color: inherit; }
   width: 28px; height: 28px;
   display: flex; align-items: center; justify-content: center;
   cursor: pointer;
-  color: var(--parchment-faint);
-  font-size: 0.85rem;
+  color: var(--parchment-dim);
   line-height: 1;
   padding: 0;
-  transition: color var(--transition), border-color var(--transition), background var(--transition);
+  transition: color var(--transition), border-color var(--transition),
+              background var(--transition), box-shadow var(--transition);
 }
+
+/* The two states differ by SHAPE as well as colour — hollow outline when off, solid gold
+   when on — because a colour-only shift was hard to read at a glance (and invisible to
+   anyone who cannot separate the two hues). */
+.star-btn svg { width: 15px; height: 15px; display: block; }
+
+/* 44px hit area without growing the visible chip (a11y rule 7). */
+.star-btn::before {
+  content: '';
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+}
+
 .star-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
-.star-btn--filled { color: var(--gold); border-color: var(--gold-dim); }
+
+.star-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
+}
+
+.star-btn--filled {
+  color: var(--gold);
+  border-color: var(--gold);
+  background: rgba(0,0,0,0.8);
+  box-shadow: 0 0 10px rgba(201,168,76,0.55);
+}
+
 [data-theme="light"] .star-btn { background: rgba(255,255,255,0.75); }
+[data-theme="light"] .star-btn--filled {
+  background: rgba(255,255,255,0.95);
+  box-shadow: 0 0 10px rgba(122,78,8,0.45);
+}
 
 /* Larger star in PowerView detail art */
 .star-btn--detail {
-  width: 40px; height: 40px;
-  font-size: 1.1rem;
+  width: 44px; height: 44px;
   top: 0.75rem; right: 0.75rem;
 }
+.star-btn--detail svg { width: 22px; height: 22px; }
 
 /* ─── Share button (PowerView) ─── */
 .share-btn {
@@ -678,6 +708,13 @@ a { text-decoration: none; color: inherit; }
   border-color: var(--gold-dim);
   background: var(--void-card2);
 }
+/* The star fills in when My Powers is the current route. Only the favourites icon is
+   drawn with a <polygon>, so this cannot touch the other nav icons. */
+.app-menu-item.active .app-menu-icon svg polygon { fill: currentColor; }
+
+.app-menu-icon { display: flex; flex-shrink: 0; }
+.app-menu-icon svg { width: 20px; height: 20px; display: block; }
+
 .app-menu-badge {
   margin-left: auto;
   background: #8b0000;
@@ -700,9 +737,8 @@ a { text-decoration: none; color: inherit; }
   grid-template-columns: 1fr;
   gap: 1rem;
 }
-@media (min-width: 640px) {
-  .tools-grid { grid-template-columns: repeat(2, 1fr); }
-}
+/* One tool per row at every width — the list reads as a menu of tools rather than a
+   grid of tiles, and each row has space for its icon plus the description. */
 .tool-card {
   --tool-accent: #8b0000;
   text-align: left;
@@ -739,6 +775,13 @@ a { text-decoration: none; color: inherit; }
   text-transform: uppercase;
 }
 .tool-card-title { flex: 1; }
+
+/* Same line icon the tool's entry uses in the overlay menu (see src/nav-icons.ts). */
+.tool-card-icon {
+  display: flex;
+  flex-shrink: 0;
+}
+.tool-card-icon svg { width: 22px; height: 22px; display: block; }
 .tool-card-badge {
   background: var(--blood);
   color: #fff;

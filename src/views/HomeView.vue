@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { NAV_ICONS } from '../nav-icons'
 import { useI18n } from '../composables/useI18n'
 import { useFavorites } from '../composables/useFavorites'
 
@@ -11,6 +12,7 @@ const { favoriteCount } = useFavorites()
 const tools = computed(() => [
   {
     key: 'clans',
+    icon: NAV_ICONS.clans,
     title: t.value.home.clansTitle,
     description: t.value.home.clansDesc,
     accent: 'var(--tool-clans)',
@@ -18,6 +20,7 @@ const tools = computed(() => [
   },
   {
     key: 'disciplines',
+    icon: NAV_ICONS.disciplines,
     title: t.value.home.disciplinesTitle,
     description: t.value.home.disciplinesDesc,
     accent: 'var(--tool-disciplines)',
@@ -25,6 +28,7 @@ const tools = computed(() => [
   },
   {
     key: 'my-powers',
+    icon: NAV_ICONS.myPowers,
     title: t.value.home.myPowersTitle,
     description: t.value.home.myPowersDesc,
     accent: 'var(--tool-my-powers)',
@@ -59,6 +63,7 @@ const tools = computed(() => [
           @click="tool.onClick"
         >
           <div class="tool-card-head">
+            <span class="tool-card-icon" v-html="tool.icon" aria-hidden="true"></span>
             <span class="tool-card-title font-title">{{ tool.title }}</span>
             <span v-if="tool.badge" class="tool-card-badge">{{ tool.badge }}</span>
           </div>

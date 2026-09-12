@@ -177,9 +177,15 @@ function copyList() {
                 </div>
                 <div class="art-overlay" :style="{ background: 'linear-gradient(180deg, transparent 30%, var(--void-card) 100%)' }"></div>
                 <button class="star-btn star-btn--filled"
+                        aria-pressed="true"
                         @click.stop="toggle(group.discipline.id, power.id)"
                         :title="t.myPowers.removeFromFav"
-                        :aria-label="t.myPowers.removeFromFav">★</button>
+                        :aria-label="t.myPowers.removeFromFav">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="currentColor"
+                       stroke="currentColor" stroke-width="2" stroke-linejoin="round">
+                    <polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/>
+                  </svg>
+                </button>
               </div>
               <!-- Body -->
               <div class="d-flex flex-column gap-1 p-2 p-sm-3 flex-fill">

@@ -140,9 +140,12 @@ function goBack(): void {
 
         <button class="star-btn star-btn--detail"
                 :class="{ 'star-btn--filled': isFavorite(discipline.id, power.id) }"
+                :aria-pressed="isFavorite(discipline.id, power.id)"
                 @click="toggle(discipline.id, power.id)"
                 :title="isFavorite(discipline.id, power.id) ? t.discipline.removeFromFav : t.discipline.addToFav"
-                :aria-label="isFavorite(discipline.id, power.id) ? t.discipline.removeFromFav : t.discipline.addToFav">★</button>
+                :aria-label="isFavorite(discipline.id, power.id) ? t.discipline.removeFromFav : t.discipline.addToFav">
+          <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="2" stroke-linejoin="round" :fill="isFavorite(discipline.id, power.id) ? 'currentColor' : 'none'"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
+        </button>
 
         <!-- Content -->
         <div class="px-3 px-sm-4 px-md-5 py-4 py-sm-5">

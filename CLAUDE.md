@@ -67,6 +67,7 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is no longer used:
 - Left: "Vampire Toolkit" brand — clicking it goes home
 - Right: hamburger button (always visible, on every viewport)
 - Clicking the hamburger opens a full-screen overlay menu below the bar with all nav items (Home, Clans, Disciplines, My Powers, Settings) as full-width buttons
+- Menu and home-card icons both come from `src/nav-icons.ts`, so a tool's card always shows the same icon as its menu entry. The star fills in on the active My Powers entry via `.app-menu-item.active .app-menu-icon svg polygon`, which is safe because only that icon is drawn with a `<polygon>`
 - Menu closes on route change, on Escape, and on click outside the panel
 - Body scroll is locked while the menu is open
 - Red badge on "My Powers" showing the number of saved powers
@@ -247,9 +248,14 @@ Relevant classes:
 
 - `.app-navbar` / `.app-menu-toggler` / `.app-menu-overlay` / `.app-menu-panel` / `.app-menu-item` / `.app-menu-badge` — custom top bar and overlay menu
 - `.clan-sigil` / `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-disc-chip` / `.clan-trait` / `.clan-trait-name` — Clans tool
-- `.tool-card` / `.tool-card-head` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`)
+- `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
 - `.discipline-card` / `.power-card` — cards driven by `--card-color` and `--card-glow`
-- `.star-btn` / `.star-btn--filled` — favourites star button (top-right on the power detail art)
+- `.star-btn` / `.star-btn--filled` — favourites star button (top-right on the power art).
+  The two states differ by **shape as well as colour** — a hollow outlined star when off, a
+  solid gold one with a glow when on — because a colour-only shift was hard to tell apart
+  and unreadable for anyone who cannot separate the two hues. The glyph is an inline SVG
+  whose `fill` toggles between `none` and `currentColor`; the button carries `aria-pressed`.
+  The visible chip stays 28px but `::before { inset: -8px }` gives it a 44px hit area
 - `.share-btn` / `.share-btn--detail` / `.share-btn-spinner` — Share button + loading spinner (top-left on the power detail art)
 - `.disc-group-icon` — discipline icon in MyPowersView
 - `.power-detail-card` / `.pst` — power detail view
