@@ -1,6 +1,6 @@
 # Vampire Toolkit — Vampire: The Masquerade 5th Edition
 
-A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 11 disciplines and ~96 powers, and save the ones your character has for quick lookup at the table. No account required, works offline once loaded.
+A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 11 disciplines and ~96 powers, look up the 14 clans, and save the powers your character has for quick lookup at the table. No account required, works offline once loaded.
 
 ## Stack
 
@@ -30,7 +30,7 @@ Vampire Toolkit/
     ├── translations-en.ts       # English translations overlay for all disciplines and powers
     ├── translations-ca.ts       # Catalan translations overlay for all disciplines and powers
     ├── icons.ts                 # DISCIPLINE_ICONS: inline SVGs per discipline
-    ├── helpers.ts               # levelDots, disciplineById, powerById, shortCost, shortDuration, artGradient, parseAmalgama
+    ├── helpers.ts               # levelDots, disciplineById, powerById, shortCost, shortDuration, artGradient, colorGradient, parseAmalgama
     ├── renderPowerCard.ts       # Canvas 2D renderer — draws a power card and returns a PNG Blob for sharing
     ├── composables/
     │   ├── useFavorites.ts      # My Powers singleton state — persists in localStorage
@@ -52,10 +52,12 @@ Vampire Toolkit/
 
 | Hash | View | Description |
 |------|------|-------------|
-| `#/` | `HomeView` | Landing page — tool card grid |
+| `#/` | `HomeView` | Landing page — tool card grid (Clans, Disciplines, My Powers) |
 | `#/disciplines` | `DisciplinesView` | Grid of all 11 disciplines with search |
 | `#/discipline/:id` | `DisciplineView` | Power grid for the discipline |
 | `#/discipline/:id/power/:powerId` | `PowerView` | Detail card for a specific power |
+| `#/clans` | `ClansView` | Grid of all 14 clans with search |
+| `#/clan/:id` | `ClanView` | Clan detail — description, in-clan Disciplines, Bane, Compulsion |
 | `#/my-powers` | `MyPowersView` | User's saved powers |
 | `#/settings` | `SettingsView` | Theme, language and repository info |
 
@@ -64,7 +66,7 @@ Vampire Toolkit/
 Custom sticky top bar (56px) — Bootstrap's navbar collapse is no longer used:
 - Left: "Vampire Toolkit" brand — clicking it goes home
 - Right: hamburger button (always visible, on every viewport)
-- Clicking the hamburger opens a full-screen overlay menu below the bar with all nav items (Home, Disciplines, My Powers, Settings) as full-width buttons
+- Clicking the hamburger opens a full-screen overlay menu below the bar with all nav items (Home, Clans, Disciplines, My Powers, Settings) as full-width buttons
 - Menu closes on route change, on Escape, and on click outside the panel
 - Body scroll is locked while the menu is open
 - Red badge on "My Powers" showing the number of saved powers
@@ -74,6 +76,46 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is no longer used:
 Reactive singleton using `ref<string[]>`. Each favourite is stored as `"disciplineId:powerId"` in `localStorage` under the key `v5-my-powers` (with a one-time migration from the older `v5-mis-poderes`). Exposes `toggle`, `isFavorite`, `clearAll`, `favorites` and `favoriteCount`.
 
 In `DisciplineView.vue` each power card has a star button (`.star-btn`) in the top-right corner that calls `toggle`. In `MyPowersView.vue` powers are grouped by discipline (in the order from `data.ts`) and sorted by level within each group.
+
+## Clans (`src/clans.ts` + `src/clan-icons.ts` + `composables/useClans.ts`)
+
+`CLANS_DATA.clans` holds the 14 V5 clans, each with `nickname`, `verbs`, `description`,
+`disciplines` (discipline **ids**), `bane`, `compulsion` and its own colour triplet.
+
+- **Icons are traced from the official *Hoja de Clanes* sheet**, not drawn by hand, so
+  each sigil is the clan's real symbol. Pipeline: crop the glyph out of the sheet →
+  threshold to a bitmap → vectorise with potrace → normalise into `0 0 100 100` through
+  the wrapping `<g transform="translate(tx,ty) scale(s)">`. If a sigil ever needs
+  redoing, re-trace from the sheet — do not redraw it freehand.
+  `CLAN_ICONS` is keyed by clan `id` (the `id` doubles as the icon key — unlike
+  `iconType` for disciplines there is no indirection). Same conventions as `icons.ts`:
+  `viewBox="0 0 100 100"`, `currentColor`, `fill-rule="evenodd"` for the interior holes.
+  The traced paths are detailed, which is why `clan-icons.ts` is ~150 KB.
+- `disciplines` stores ids so `ClanView` can render each one as a `.disc-mini-card`
+  (badge, name, type, power count) that navigates to its discipline page.
+  **`oblivion` is deliberately not a discipline in this app** — `ClanView` renders it as a
+  dashed, non-interactive card carrying the `olvido` badge and `t.clan.oblivionNote` as its
+  meta line. Hecata and Lasombra are the two clans affected.
+- Bane and Compulsion rules text comes from the V5 corebook / Camarilla / Anarch /
+  Companion; the sheet only supplies their names.
+- **Grid card art uses `colorGradient()` from `helpers.ts`** (shared with `artGradient`).
+  Its mid stop is the accent at 33% alpha (`${c}55`) on purpose — at full strength the
+  backdrop swallows the sigil. The clan *sheet* uses `.clan-medallion` instead.
+- **Emblem contrast is handled by two rules — don't paint the sigil inline.**
+  The trap: a glyph in the raw clan colour on a backdrop mixed from that *same* colour
+  can't contrast, whatever the clan colour is (Lasombra measured 1.71:1, Salubri 1.63:1).
+  - `.clan-sigil` pushes the glyph to near-white on dark / near-black on light with
+    `color-mix()`, keeping a hint of the clan hue.
+  - `.clan-medallion` (the clan sheet's disc) tints `--void-card` with ~12–26% clan
+    colour instead of using the plain clan gradient, which sits at mid luminance and
+    muddies the emblem.
+  Together they measure 10–12:1 (dark) and 6–9:1 (light), and reproduce the source
+  sheet's look: a white emblem on a dark band, with the clan colour in the ring and glow.
+- **Contrast:** the clan palette is saturated mid-tones, so no clan colour clears 4.5:1 on
+  *both* theme backgrounds (Lasombra bottoms out at 2.04:1 on dark). Clan colour is
+  therefore used only for sigils, gradients and borders — never as body text. Text uses
+  `--gold`, `--parchment` and the per-theme `--bane-accent` (`--blood` is #8b0000 in
+  *both* themes and only reaches 1.79:1 on the dark panel, so it cannot be used as text).
 
 ## Settings (`composables/useSettings.ts`)
 
@@ -146,27 +188,51 @@ Each power:
 }
 ```
 
-## Icons (`src/icons.ts`)
+## Icons (`src/icons.ts` + `src/clan-icons.ts`)
 
-`DISCIPLINE_ICONS` is an object `{ [iconType]: svgString }`. Each SVG uses `currentColor` (bound inline in views to `discipline.color`) with `fill-rule="evenodd"` for genuine transparent holes. ViewBox `0 0 100 100`.
+Both icon sets are **traced from the official sheet, not drawn freehand**. Pipeline for
+each glyph: crop it out of the sheet → upscale the *source* crop with lanczos (thresholding
+at native resolution leaves stair-stepping) → threshold → vectorise with potrace → normalise
+into `0 0 100 100` through a wrapping `<g transform="translate(tx,ty) scale(s)">`. If a glyph
+ever needs redoing, re-trace it — do not redraw it by hand.
 
-Style: flat silhouettes inspired by common iconography (paw, eye, ankh, bolt, hierarchy bars, diamond, hooded figure, fist, 4-point burst, drop, flask) with layered vampiric touches — vertical slit pupils, crimson glow inside the hood, blood drop under the ankh, blood-red potion in the flask.
+`DISCIPLINE_ICONS` comes from the sheet's *"LEYENDA DE LAS DISCIPLINAS"* panel: a filled
+diamond with the glyph knocked out via `fill-rule="evenodd"`. Notes:
 
-The `iconType` keys are kept even though many no longer describe the visual literally (e.g. `wolf` is now a paw slash, `crown` is a hierarchy pyramid), because `data.ts` addresses icons by that key and renaming would be a data-model change with no user-visible benefit.
+- **Obfuscation's badge is blank on the sheet** — an empty diamond. That is the symbol.
+- **Thin-Blood Alchemy has no symbol in the legend.** The panel carries Oblivion instead,
+  which this app has no discipline for, so the previous hand-drawn flask was set inside the
+  same diamond frame to keep the set consistent.
+- The Oblivion glyph was traced and is available if Oblivion is ever added as a discipline.
+- The `iconType` keys are unchanged (`wolf`, `crown`, …) so `data.ts` still addresses icons
+  by the same key, even though the keys describe the old artwork rather than the new.
 
-| iconType | Discipline |
-|----------|-----------|
-| `wolf`   | Animalism |
-| `eye`    | Auspex |
-| `bolt`   | Celerity |
-| `crown`  | Dominate |
-| `shield` | Fortitude |
-| `ghost`  | Obfuscation |
-| `fist`   | Potence |
-| `rose`   | Presence |
-| `claws`  | Protean |
-| `blood`  | Blood Sorcery |
-| `flask`  | Thin-Blood Alchemy |
+`CLAN_ICONS` is keyed by clan `id` (no indirection) and holds the 14 clan sigils from the
+clan bands of the same sheet.
+
+Both files are large (~120 KB and ~150 KB) because the traced paths carry real detail.
+
+### Emblem contrast — `.sigil`
+
+Every icon sits on a backdrop built from its own accent colour, so painting the glyph in
+that raw colour cannot contrast with it, whatever the accent is (measured 1.6–3.0:1 before
+the fix). **Never set the icon colour inline.** Views pass the accent as `--card-color` and
+add the `.sigil` class, which shifts the glyph towards white on dark and black on light with
+`color-mix()`, keeping the hue. `@supports` carries a flat fallback for engines without
+`color-mix()` — it must stay a feature query, because a duplicate `color:` on the same rule
+is stripped by the CSS minifier.
+
+Measured after the fix: disciplines 8.7–10.2:1 (dark) and 5.5–6.4:1 (light); clans
+10–12:1 and 6–9:1.
+
+`renderPowerCard.ts` draws to canvas and cannot use the class, so it mirrors the same
+maths in `sigilColor()`.
+
+**Do not use `artGradient()` behind a small sigil.** Its end stops are the fixed
+`colorDark`, so it stays dark on the light theme while `.sigil` flips the glyph to
+near-black — dark on dark. The big discipline cards are fine because they are tall enough
+that the glyph sits over the light middle of the gradient; anything small (`.clan-medallion`,
+`.disc-mini-art`) uses the theme-following tinted card surface instead.
 
 ## CSS (`src/css/main.css`)
 
@@ -175,6 +241,7 @@ Custom gothic styles on top of Bootstrap's grid + utilities. CSS custom properti
 Relevant classes:
 
 - `.app-navbar` / `.app-menu-toggler` / `.app-menu-overlay` / `.app-menu-panel` / `.app-menu-item` / `.app-menu-badge` — custom top bar and overlay menu
+- `.clan-sigil` / `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-disc-chip` / `.clan-trait` / `.clan-trait-name` — Clans tool
 - `.tool-card` / `.tool-card-head` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`)
 - `.discipline-card` / `.power-card` — cards driven by `--card-color` and `--card-glow`
 - `.star-btn` / `.star-btn--filled` — favourites star button (top-right on the power detail art)
@@ -183,7 +250,7 @@ Relevant classes:
 - `.power-detail-card` / `.pst` — power detail view
 - `.settings-section` / `.settings-option` / `.ornament-divider` — settings page
 
-`--card-color` and `--card-glow` are injected inline from Vue; `--tool-accent` is set inline per tool card while the underlying accent value is read from the theme vars `--tool-disciplines` / `--tool-my-powers`.
+`--card-color` and `--card-glow` are injected inline from Vue; `--tool-accent` is set inline per tool card while the underlying accent value is read from the theme vars `--tool-disciplines` / `--tool-clans` / `--tool-my-powers`.
 
 ## PWA / Home-screen install (`vite.config.ts` + `index.html`)
 
@@ -213,7 +280,7 @@ These are non-negotiable for any change to the codebase.
 
 1. **No hardcoded UI strings in views.** Every user-visible label, placeholder, aria-label and empty-state message comes from `useI18n().t.value.<section>.<key>`.
 2. **All three languages stay in sync.** When adding a UI string, add it to `es`, `en` **and** `ca` blocks in `useI18n.ts` in the same commit. TypeScript will fail the build if `en` or `ca` drift from `es`'s shape.
-3. **Discipline and power content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature.
+3. **Discipline, power and clan content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`; whenever `clans.ts` changes, do the same in `translations-clans-en.ts` **and** `translations-clans-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature. Clan names that differ by language (`El Ministerio` / `The Ministry` / `El Ministeri`, `Hécata` / `Hecata`) also need `clanes` overrides in the discipline overlays.
 4. **Language `auto` order matters.** `CATALAN` (`/^ca\b/i`) is checked before the general `IBERIAN` regex; keep it that way so `ca-*` browsers don't fall into the `es` bucket.
 5. **To add a language:** create `translations-<lang>.ts` mirroring the EN structure, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, add a `<lang>` dict block plus `lang<Lang>` label to every language block in `useI18n.ts`, wire the overlay in `useData.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
 

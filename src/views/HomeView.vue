@@ -10,6 +10,13 @@ const { favoriteCount } = useFavorites()
 
 const tools = computed(() => [
   {
+    key: 'clans',
+    title: t.value.home.clansTitle,
+    description: t.value.home.clansDesc,
+    accent: 'var(--tool-clans)',
+    onClick: () => router.push('/clans'),
+  },
+  {
     key: 'disciplines',
     title: t.value.home.disciplinesTitle,
     description: t.value.home.disciplinesDesc,

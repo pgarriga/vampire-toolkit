@@ -118,6 +118,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Mental',
     amenaza: 'Low. Auspex never manifests visibly to the naked eye or causes effects that cannot be rationalized.',
     resonancia: 'Phlegmatic. Artists (especially photographers) and visionaries, certain schizophrenics, users of psychoactive substances, detectives.',
+    clanes: ['Hecata', 'Malkavian', 'Salubri', 'Toreador', 'Tremere'],
     powers: {
       'heightened-senses': {
         name: 'Heightened Senses',
@@ -343,6 +344,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Physical',
     amenaza: 'Low to medium. Fortitude\'s passive effects are invisible and the active ones easy to rationalize as adrenaline or toughness.',
     resonancia: 'Phlegmatic. Stubborn or stoic individuals, soldiers, abuse survivors, the deeply principled.',
+    clanes: ['Gangrel', 'Hecata', 'Salubri', 'Ventrue'],
     powers: {
       'unswayable-mind': {
         name: 'Unswayable Mind',
@@ -418,6 +420,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Mental',
     amenaza: 'Low to medium. When used subtly, Obfuscation is essentially undetectable by mundane means.',
     resonancia: 'Phlegmatic. Shy, introverted, or easily overlooked people; spies, private investigators, and the deeply secretive.',
+    clanes: ['Banu Haqim', 'Malkavian', 'Nosferatu', 'Ravnos', 'The Ministry'],
     powers: {
       'cloak-of-shadows': {
         name: 'Cloak of Shadows',
@@ -568,6 +571,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Mental',
     amenaza: 'Low to medium. Being a subtle power, people rarely realize they have been affected by Presence.',
     resonancia: 'Sanguine. The beautiful and lustful, those completely infatuated with the vampire, models, actors and movie stars, convincing public speakers, YouTube stars and Instagram influencers.',
+    clanes: ['Brujah', 'Ravnos', 'The Ministry', 'Toreador', 'Ventrue'],
     powers: {
       daunt: {
         name: 'Daunt',
@@ -643,6 +647,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Physical',
     amenaza: 'High. Physical transformation is difficult to explain away under any circumstances.',
     resonancia: 'Varies. Gangrel and other feral types; those deeply connected to nature.',
+    clanes: ['Gangrel', 'The Ministry', 'Tzimisce'],
     powers: {
       'eyes-of-the-beast': {
         name: 'Eyes of the Beast',

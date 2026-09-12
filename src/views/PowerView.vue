@@ -109,8 +109,8 @@ function goBack(): void {
           </div>
 
           <div v-html="DISCIPLINE_ICONS[discipline.iconType]"
-               :style="{ color: discipline.color }"
-               class="power-detail-icon"></div>
+               :style="{ '--card-color': discipline.color }"
+               class="power-detail-icon sigil"></div>
 
           <div class="power-detail-discipline-tag">
             <span>{{ discipline.name }}</span>

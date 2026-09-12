@@ -1,6 +1,8 @@
 export type IconType =
   | 'wolf' | 'eye' | 'bolt' | 'crown' | 'shield'
   | 'ghost' | 'fist' | 'rose' | 'claws' | 'blood' | 'flask'
+  /** Oblivion. No discipline in this app uses it; ClanView shows it for Hecata/Lasombra. */
+  | 'olvido'
 
 export interface Power {
   id: string
@@ -37,4 +39,34 @@ export interface AlchemyMethod {
 
 export interface DisciplinesData {
   disciplines: Discipline[]
+}
+
+export type ClanIconType =
+  | 'banu-haqim' | 'brujah'  | 'gangrel'  | 'hecata' | 'lasombra' | 'malkavian'
+  | 'ministry'   | 'nosferatu' | 'ravnos' | 'salubri' | 'toreador' | 'tremere'
+  | 'tzimisce'   | 'ventrue'
+
+/** A Bane or a Compulsion: a named clan trait with its rules text. */
+export interface ClanTrait {
+  name: string
+  description: string
+}
+
+export interface Clan {
+  id: ClanIconType
+  name: string
+  nickname: string
+  verbs: string[]
+  description: string
+  /** Discipline ids — `oblivion` has no page in this app and renders as plain text. */
+  disciplines: string[]
+  bane: ClanTrait
+  compulsion: ClanTrait
+  color: string
+  colorDark: string
+  colorGlow: string
+}
+
+export interface ClansData {
+  clans: Clan[]
 }

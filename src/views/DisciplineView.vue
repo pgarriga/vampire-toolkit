@@ -45,8 +45,8 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
            :style="{ background: artGradient(discipline) }"
            aria-hidden="true">
         <div v-html="DISCIPLINE_ICONS[discipline.iconType]"
-             :style="{ color: discipline.color }"
-             class="disc-icon-inner"></div>
+             :style="{ '--card-color': discipline.color }"
+             class="disc-icon-inner sigil"></div>
       </div>
 
       <!-- Info -->
@@ -105,8 +105,8 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
             <div class="power-card-art"
                  :style="{ background: artGradient(discipline) }" aria-hidden="true">
               <div v-html="DISCIPLINE_ICONS[discipline.iconType]"
-                   :style="{ color: discipline.color }"
-                   class="power-art-icon"></div>
+                   :style="{ '--card-color': discipline.color }"
+                   class="power-art-icon sigil"></div>
 
               <div class="power-level-badge">{{ t.discipline.level }} {{ power.level }}</div>
 

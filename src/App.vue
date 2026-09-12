@@ -13,6 +13,7 @@ const menuOpen = ref(false)
 
 const isHome        = computed(() => route.path === '/')
 const isDisciplines = computed(() => route.path === '/disciplines' || route.path.startsWith('/discipline'))
+const isClans       = computed(() => route.path === '/clans' || route.path.startsWith('/clan/'))
 const isMyPowers    = computed(() => route.path === '/my-powers')
 const isSettings    = computed(() => route.path === '/settings')
 
@@ -85,6 +86,19 @@ watch(menuOpen, (open) => {
           <path d="M5 10v10h14V10"/>
         </svg>
         {{ t.nav.home }}
+      </button>
+
+      <button
+        class="app-menu-item"
+        :class="{ active: isClans }"
+        role="menuitem"
+        @click="go('/clans')"
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="20" height="20" aria-hidden="true">
+          <path d="M12 2l8 4v6c0 4.5-3.2 8.6-8 10-4.8-1.4-8-5.5-8-10V6z"/>
+          <path d="M12 8v6M9 11h6"/>
+        </svg>
+        {{ t.nav.clans }}
       </button>
 
       <button

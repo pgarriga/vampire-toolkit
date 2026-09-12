@@ -1,6 +1,6 @@
 # Vampire Toolkit · Vampire: The Masquerade
 
-A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sessions — browse the 11 disciplines and every power, and save the ones your character has for quick lookup at the table. Pure static PWA, no account required, works offline.
+A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sessions — browse the 11 disciplines and every power, look up the 14 clans, and save the powers your character has for quick lookup at the table. Pure static PWA, no account required, works offline.
 
 **🌐 Live:** https://pgarriga.github.io/vampire-toolkit/
 
@@ -19,13 +19,14 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 
 ## Features
 
-- **Tools-list home** — landing page with a card per tool (Disciplines browser, My Powers), ready to grow with more.
-- **11 disciplines** with gothic SVG iconography and per-discipline theme colours.
+- **Tools-list home** — landing page with a card per tool (Clans, Disciplines browser, My Powers), ready to grow with more.
+- **11 disciplines** with their official diamond badges (traced from the clan sheet's discipline legend) and per-discipline theme colours.
 - **~96 powers** with dice pool, cost, duration, description and (when present) the amalgam requirement.
-- **Search** the discipline catalogue by name, clan or type.
+- **14 clans** — each with its real clan sigil (traced from the official clan sheet, not redrawn), archetype, description, in-clan Disciplines (linked through to the discipline pages), Bane and Compulsion.
+- **Search** the discipline catalogue by name, clan or type, and the clan catalogue by name, archetype or Discipline. Accent-insensitive, so `hecata` finds Hécata.
 - **My Powers** — bookmark your character's powers with a star; persists in `localStorage` and shows a live count badge in the menu.
 - **Share a power as an image** — on mobile browsers with the Web Share API, a share button renders the power card as a PNG and hands it off to WhatsApp, Mail, Messages, etc.
-- **Trilingual UI and content** — Spanish, English and Catalan, both for the interface and for every discipline/power. Auto-detects the browser language.
+- **Trilingual UI and content** — Spanish, English and Catalan, both for the interface and for every discipline, power and clan. Auto-detects the browser language.
 - **Theming** — dark, light and auto (follows system preference).
 - **Installable PWA** — service worker + web manifest via `vite-plugin-pwa`; usable offline after the first load, installs on iOS and Android home screens under the full "Vampire Toolkit" name.
 - **Accessible** — keyboard navigation on every control, ARIA labels on icon-only buttons, WCAG AA contrast in both themes, dismissible menu overlay.
@@ -56,22 +57,29 @@ Vampire Toolkit/
     ├── main.ts               # Bootstrap CSS/JS + Vue app
     ├── App.vue               # Custom sticky navbar + hamburger overlay menu + page transitions
     ├── router.ts             # Hash routes
-    ├── types.ts              # TypeScript interfaces (Discipline, Power)
+    ├── types.ts              # TypeScript interfaces (Discipline, Power, Clan)
     ├── data.ts               # The 11 disciplines and ~96 powers (Spanish source)
+    ├── clans.ts              # The 14 clans (Spanish source)
     ├── translations-en.ts    # English translations overlay (disciplines + powers)
     ├── translations-ca.ts    # Catalan translations overlay (disciplines + powers)
-    ├── icons.ts              # Gothic SVGs per discipline
+    ├── translations-clans-en.ts # English translations overlay (clans)
+    ├── translations-clans-ca.ts # Catalan translations overlay (clans)
+    ├── icons.ts              # Discipline badges traced from the official legend
+    ├── clan-icons.ts         # SVG sigil per clan
     ├── helpers.ts            # Pure functions (shortCost, artGradient…)
     ├── renderPowerCard.ts    # Canvas renderer — draws a power card to a PNG Blob for sharing
     ├── composables/
     │   ├── useFavorites.ts   # My Powers state (localStorage)
     │   ├── useSettings.ts    # Theme and language preferences
     │   ├── useI18n.ts        # UI string translations
-    │   └── useData.ts        # Localized discipline/power data
+    │   ├── useData.ts        # Localized discipline/power data
+    │   └── useClans.ts       # Localized clan data
     ├── css/
     │   └── main.css          # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
         ├── HomeView.vue      # Landing page — tool card grid
+        ├── ClansView.vue     # Clan grid with search
+        ├── ClanView.vue      # Clan detail (disciplines, Bane, Compulsion)
         ├── DisciplinesView.vue # Discipline grid with search
         ├── DisciplineView.vue  # Power grid for a discipline
         ├── PowerView.vue     # Power detail card + mobile Share button
@@ -87,6 +95,8 @@ Vampire Toolkit/
 | `#/disciplines` | DisciplinesView | Grid of all 11 disciplines with search |
 | `#/discipline/:id` | DisciplineView | Power grid with star to save |
 | `#/discipline/:id/power/:powerId` | PowerView | Power detail card + mobile Share button |
+| `#/clans` | ClansView | Grid of all 14 clans with search |
+| `#/clan/:id` | ClanView | Clan detail — Disciplines, Bane and Compulsion |
 | `#/my-powers` | MyPowersView | Saved powers by discipline and level |
 | `#/settings` | SettingsView | Theme, language and repository info |
 
@@ -115,7 +125,9 @@ node scripts/generate-icons.mjs
 
 ## Data and translations
 
-Source: official Spanish PDF *Vampiro La Mascarada 5ª Edición — Disciplinas*.
+Disciplines and powers: official Spanish PDF *Vampiro La Mascarada 5ª Edición — Disciplinas*.
+
+Clans: the official *Hoja de Clanes* reference sheet (archetype, verbs, Disciplines, Bane and Compulsion names), with the Bane and Compulsion mechanics from the V5 corebook, Camarilla, Anarch and Companion.
 
 - The Spanish content lives in `src/data.ts`.
 - English translations are in `src/translations-en.ts`, Catalan in `src/translations-ca.ts`. Both are overlays keyed by the same power `id` — the `useData` composable picks the right one based on the resolved language.

@@ -85,8 +85,16 @@ export function shortDuration(dur: string | undefined | null): string | null {
 }
 
 export function artGradient(discipline: Discipline): string {
-  const c = discipline.color || '#4a2a6a'
-  const cd = discipline.colorDark || '#1a0a2a'
+  return colorGradient(discipline.color, discipline.colorDark)
+}
+
+/**
+ * Card art backdrop. The mid stop is the accent at 33% alpha (`55`) on purpose:
+ * at full strength it swallows the icon, which is painted in that same colour.
+ */
+export function colorGradient(color?: string, colorDark?: string): string {
+  const c = color || '#4a2a6a'
+  const cd = colorDark || '#1a0a2a'
   return `linear-gradient(145deg, ${cd} 0%, ${c}55 50%, ${cd} 100%)`
 }
 

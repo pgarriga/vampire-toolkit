@@ -12,13 +12,18 @@ const router  = useRouter()
 const { t } = useI18n()
 const { disciplines: allDisciplines } = useData()
 
+// Strips diacritics so "hecata" matches "Hécata" and "dominacion" matches "Dominación"
+function norm(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+}
+
 const disciplines = computed<Discipline[]>(() => {
-  const q = search.value.toLowerCase().trim()
+  const q = norm(search.value).trim()
   if (!q) return allDisciplines.value
   return allDisciplines.value.filter(d =>
-    d.name.toLowerCase().includes(q) ||
-    d.clanes.some(c => c.toLowerCase().includes(q)) ||
-    d.tipo.toLowerCase().includes(q)
+    norm(d.name).includes(q) ||
+    d.clanes.some(c => norm(c).includes(q)) ||
+    norm(d.tipo).includes(q)
   )
 })
 
@@ -73,8 +78,8 @@ function goTo(id: string) {
             <div class="discipline-card-art"
                  :style="{ background: artGradient(d) }" aria-hidden="true">
               <div v-html="DISCIPLINE_ICONS[d.iconType]"
-                   :style="{ color: d.color }"
-                   class="art-icon"></div>
+                   :style="{ '--card-color': d.color }"
+                   class="art-icon sigil"></div>
               <div class="art-overlay"></div>
             </div>
 

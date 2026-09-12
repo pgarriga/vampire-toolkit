@@ -400,6 +400,7 @@ export const CA: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Mental',
     amenaza: 'Baixa. Evitar la detecció és l\'objectiu d\'aquesta Disciplina.',
     resonancia: 'Melancòlica. Els ignorats i invisibles, els sense sostre, oblidats i deprimits; espies, carteristes, servents excel·lents, encarregats de material i tramoistes.',
+    clanes: ['Banu Haqim', 'El Ministeri', 'Malkavian', 'Nosferatu', 'Ravnos'],
     powers: {
       'cloak-of-shadows': {
         name: 'Capa d\'Ombres',
@@ -550,6 +551,7 @@ export const CA: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Mental',
     amenaza: 'Baixa-Mitjana. En ser un poder subtil, la gent rarament s\'adona que ha estat afectada per Presència.',
     resonancia: 'Sanguínia. Els bells i luxuriosos, aquells completament enamorats del vampir, models, actors i estrelles de cinema, oradors públics i privats convincents, estrelles de YouTube i influencers d\'Instagram.',
+    clanes: ['Brujah', 'El Ministeri', 'Ravnos', 'Toreador', 'Ventrue'],
     powers: {
       daunt: {
         name: 'Atemorir',
@@ -625,6 +627,7 @@ export const CA: Record<DisciplineId, DisciplineTranslation> = {
     tipo: 'Físic',
     amenaza: 'Alta. Tots els Poders de Protean, una de les Disciplines més descarades dels vampirs, poden violar la Mascarada per si mateixos.',
     resonancia: 'Sang animal, especialment d\'aquells que coincideixen amb la forma adoptada; la sang d\'homes llop, changelings i altres quimeres sobrenaturals d\'homes i bèsties.',
+    clanes: ['El Ministeri', 'Gangrel', 'Tzimisce'],
     powers: {
       'eyes-of-the-beast': {
         name: 'Ulls de la Bèstia',

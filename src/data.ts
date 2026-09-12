@@ -99,7 +99,8 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "clanes": [
         "Gangrel",
         "Nosferatu",
-        "Hecata"
+        "Ravnos",
+        "Tzimisce"
       ],
       "iconType": "wolf"
     },
@@ -197,9 +198,11 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#4a1a70",
       "colorGlow": "rgba(123,63,160,0.4)",
       "clanes": [
-        "Tremere",
+        "Hécata",
         "Malkavian",
-        "Toreador"
+        "Salubri",
+        "Toreador",
+        "Tremere"
       ],
       "iconType": "eye"
     },
@@ -297,9 +300,9 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#0a5a7a",
       "colorGlow": "rgba(26,138,170,0.4)",
       "clanes": [
+        "Banu Haqim",
         "Brujah",
-        "Toreador",
-        "Banu Haqim"
+        "Toreador"
       ],
       "iconType": "bolt"
     },
@@ -397,9 +400,12 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#152575",
       "colorGlow": "rgba(42,90,170,0.4)",
       "clanes": [
-        "Ventrue",
+        "Lasombra",
+        "Malkavian",
+        "Salubri",
         "Tremere",
-        "Malkavian"
+        "Tzimisce",
+        "Ventrue"
       ],
       "iconType": "crown"
     },
@@ -497,9 +503,10 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#6a5010",
       "colorGlow": "rgba(154,122,26,0.4)",
       "clanes": [
-        "Ventrue",
-        "Hecata",
-        "Salubri"
+        "Gangrel",
+        "Hécata",
+        "Salubri",
+        "Ventrue"
       ],
       "iconType": "shield"
     },
@@ -597,9 +604,11 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#2a2a4a",
       "colorGlow": "rgba(90,90,122,0.4)",
       "clanes": [
-        "Nosferatu",
+        "Banu Haqim",
+        "El Ministerio",
         "Malkavian",
-        "Banu Haqim"
+        "Nosferatu",
+        "Ravnos"
       ],
       "iconType": "ghost"
     },
@@ -698,8 +707,8 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorGlow": "rgba(154,26,26,0.4)",
       "clanes": [
         "Brujah",
-        "Nosferatu",
-        "Gangrel"
+        "Lasombra",
+        "Nosferatu"
       ],
       "iconType": "fist"
     },
@@ -797,9 +806,11 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#6a1a4a",
       "colorGlow": "rgba(154,58,106,0.4)",
       "clanes": [
+        "Brujah",
+        "El Ministerio",
+        "Ravnos",
         "Toreador",
-        "Ventrue",
-        "Brujah"
+        "Ventrue"
       ],
       "iconType": "rose"
     },
@@ -888,7 +899,9 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#1a4a2a",
       "colorGlow": "rgba(58,122,74,0.4)",
       "clanes": [
-        "Gangrel"
+        "El Ministerio",
+        "Gangrel",
+        "Tzimisce"
       ],
       "iconType": "claws"
     },
@@ -977,8 +990,8 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "colorDark": "#7a0a10",
       "colorGlow": "rgba(170,26,42,0.4)",
       "clanes": [
-        "Tremere",
-        "Banu Haqim"
+        "Banu Haqim",
+        "Tremere"
       ],
       "iconType": "blood"
     },

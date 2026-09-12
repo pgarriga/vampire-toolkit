@@ -137,7 +137,8 @@ function copyList() {
                :style="{ background: artGradient(group.discipline), border: '1px solid ' + group.discipline.color + '66' }"
                aria-hidden="true">
             <div v-html="DISCIPLINE_ICONS[group.discipline.iconType]"
-                 :style="{ color: group.discipline.color }"
+                 class="sigil"
+                 :style="{ '--card-color': group.discipline.color }"
                  style="width:1.4rem;height:1.4rem;display:flex;align-items:center;justify-content:center;"></div>
           </div>
           <h2 class="font-title fw-bold text-white mb-0"
@@ -167,8 +168,8 @@ function copyList() {
                    :style="{ background: artGradient(group.discipline) }"
                    aria-hidden="true">
                 <div v-html="DISCIPLINE_ICONS[group.discipline.iconType]"
-                     :style="{ color: group.discipline.color }"
-                     class="power-art-icon"></div>
+                     :style="{ '--card-color': group.discipline.color }"
+                     class="power-art-icon sigil"></div>
                 <div class="power-level-badge">{{ t.discipline.level }} {{ power.level }}</div>
                 <div class="power-level-dots-card">
                   <span v-for="(filled, i) in levelDots(power.level)" :key="i"

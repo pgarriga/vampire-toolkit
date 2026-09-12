@@ -27,6 +27,19 @@ const COLOR_GOLD_TINT       = 'rgba(201,168,76,0.10)'
 const FONT_TITLE = "'Cinzel Decorative', serif"
 const FONT_BODY  = "'Cormorant Garamond', serif"
 
+/**
+ * Mirrors the `.sigil` CSS rule for the canvas card: the badge sits on a gradient built
+ * from the same discipline colour, so painting it in that raw colour leaves it muddy.
+ * The card is pinned to the dark palette, so always lighten.
+ */
+function sigilColor(hex: string, toWhite = 0.8): string {
+  const m = /^#?([\da-f]{2})([\da-f]{2})([\da-f]{2})$/i.exec(hex.trim())
+  if (!m) return '#f4efe6'
+  const mix = (c: number) => Math.round(c + (255 - c) * toWhite)
+  const [r, g, b] = [1, 2, 3].map(i => mix(parseInt(m[i]!, 16)))
+  return `rgb(${r}, ${g}, ${b})`
+}
+
 function loadIcon(svg: string, color: string): Promise<HTMLImageElement> {
   const themed = svg.replace(/currentColor/g, color)
   const blob   = new Blob([themed], { type: 'image/svg+xml' })
@@ -100,7 +113,7 @@ export async function renderPowerCard(
 ): Promise<Blob> {
   await ensureFonts()
 
-  const icon = await loadIcon(DISCIPLINE_ICONS[discipline.iconType], discipline.color)
+  const icon = await loadIcon(DISCIPLINE_ICONS[discipline.iconType], sigilColor(discipline.color))
 
   const contentX = PADDING
   const contentW = WIDTH - PADDING * 2

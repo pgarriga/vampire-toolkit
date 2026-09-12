@@ -25,7 +25,9 @@
   --page-header-to:     #0d0b14;
   --page-header-border: #3a1010;
   /* Tool accents (dark) */
+  --bane-accent:       #d9635b;
   --tool-disciplines:  #c94a4a;
+  --tool-clans:        #d08a3c;
   --tool-my-powers:    #b371e0;
 }
 
@@ -45,7 +47,9 @@
   --page-header-to:     #f0ebe0;
   --page-header-border: #c5a888;
   /* Tool accents (light) */
+  --bane-accent:       #8b0000;
   --tool-disciplines:  #8b0000;
+  --tool-clans:        #8a4a08;
   --tool-my-powers:    #6a2a8a;
 }
 
@@ -845,3 +849,182 @@ a { text-decoration: none; color: inherit; }
 .copy-btn.copied { color: var(--gold); border-color: var(--gold-dim); }
 .copy-btn--danger { color: #c0392b; border-color: #7a1a1a; }
 .copy-btn--danger:hover { color: #fff; border-color: #c0392b; background: #7a1a1a; }
+
+/* ─── Clanes ─── */
+
+/* Shared by clan sigils and discipline badges. Both sit on a backdrop mixed from the
+   same accent colour, so painting the glyph in that raw colour only reaches 1.6–3:1.
+   Push it away from the backdrop per theme — towards white on dark, towards black on
+   light — keeping the hue. Callers pass the accent as --card-color.
+   `data-theme` is always resolved to dark|light by useSettings, so no media query. */
+/* Base values are the fallback for engines without color-mix() (Safari < 16.2,
+   Chrome < 111, Firefox < 113). They must live outside the @supports block: a
+   duplicate `color:` on the same rule gets stripped by the CSS minifier, so the
+   feature query is what actually survives the build. */
+.sigil { color: #f4efe6; }
+[data-theme="light"] .sigil { color: #17120b; }
+
+@supports (color: color-mix(in srgb, red 50%, blue)) {
+  .sigil { color: color-mix(in srgb, var(--card-color) 20%, #ffffff); }
+  [data-theme="light"] .sigil { color: color-mix(in srgb, var(--card-color) 32%, #000000); }
+}
+
+/* Backdrops for a sigil. Deliberately NOT artGradient(): that one is theme-independent
+   (its end stops are the fixed `colorDark`), so on light theme it stays dark while
+   .sigil flips the glyph to near-black — dark on dark. Tinting the card surface instead
+   follows the theme, and mirrors how the source sheet prints white emblems on a dark band.
+   The big discipline cards keep artGradient() because they are tall enough that the glyph
+   sits over the light middle of the gradient rather than the dark corners. */
+.clan-medallion,
+.disc-mini-art {
+  background: linear-gradient(145deg, var(--void-card2) 0%, var(--void-card) 55%, var(--void-card2) 100%);
+}
+
+@supports (background: color-mix(in srgb, red 50%, blue)) {
+  .clan-medallion,
+  .disc-mini-art {
+    background: linear-gradient(145deg,
+      color-mix(in srgb, var(--card-color) 26%, var(--void-card)) 0%,
+      color-mix(in srgb, var(--card-color) 12%, var(--void-card)) 55%,
+      color-mix(in srgb, var(--card-color) 26%, var(--void-card)) 100%);
+  }
+}
+
+
+/* Grid card: the three signature verbs under the bane line */
+.clan-card-verbs {
+  color: var(--parchment-dim);
+  font-style: italic;
+  line-height: 1.3;
+}
+
+/* Detail header: the clan's archetype, e.g. "Los Jueces".
+   Uses --gold rather than the clan colour: the saturated clan palette drops as
+   low as 2.0:1 on the page background (Lasombra), well under the 4.5:1 floor.
+   The clan colour still carries identity via the sigil and the card border. */
+.clan-nickname {
+  color: var(--gold);
+  font-size: 0.95rem;
+  letter-spacing: 0.18em;
+}
+
+.clan-verbs { gap: 0.5rem; }
+
+/* --parchment-dim lands exactly on 4.5:1 here, so use the full parchment and
+   let size and the pill shape carry the de-emphasis instead. */
+.clan-verb {
+  background: var(--void-card2);
+  border: 1px solid var(--void-border);
+  border-radius: 999px;
+  color: var(--parchment);
+  font-size: 0.8rem;
+  padding: 0.25rem 0.7rem;
+}
+
+.clan-section { margin-bottom: 2.25rem; }
+
+.clan-section-title {
+  color: var(--gold);
+  font-size: 0.82rem;
+  letter-spacing: 0.2em;
+  margin-bottom: 0.85rem;
+}
+
+/* In-clan Discipline cards: the badge plus name, type and power count.
+   Linked ones navigate to the discipline page; Oblivion has no page, so its card is
+   rendered as a plain <div> with a dashed edge and the explanatory note as its meta. */
+.disc-mini-card {
+  align-items: center;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-left: 3px solid var(--card-color, var(--void-border));
+  border-radius: 0.55rem;
+  display: flex;
+  gap: 0.75rem;
+  min-height: 64px;
+  padding: 0.55rem 0.8rem;
+  text-align: left;
+  transition: background .2s ease, box-shadow .2s ease, transform .2s ease;
+  width: 100%;
+}
+
+button.disc-mini-card { cursor: pointer; }
+
+button.disc-mini-card:hover {
+  background: var(--void-card2);
+  box-shadow: 0 0 16px var(--card-glow, transparent);
+  transform: translateY(-2px);
+}
+
+button.disc-mini-card:focus-visible {
+  outline: 2px solid var(--card-color, var(--gold));
+  outline-offset: 2px;
+}
+
+.disc-mini-card--plain {
+  border-style: dashed;
+  border-left-style: solid;
+}
+
+.disc-mini-art {
+  align-items: center;
+  border: 1px solid var(--card-color, var(--void-border));
+  border-radius: 0.4rem;
+  display: flex;
+  flex-shrink: 0;
+  height: 46px;
+  justify-content: center;
+  width: 46px;
+}
+
+.disc-mini-icon {
+  display: flex;
+  height: 32px;
+  width: 32px;
+}
+
+.disc-mini-body {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
+}
+
+.disc-mini-name {
+  color: var(--parchment);
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  line-height: 1.2;
+}
+
+.disc-mini-meta {
+  color: var(--parchment-dim);
+  font-size: 0.78rem;
+  line-height: 1.3;
+}
+
+/* Bane / Compulsion panels */
+.clan-trait {
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-left: 4px solid var(--trait-accent, var(--blood));
+  border-radius: 0.5rem;
+  padding: 1rem 1.15rem;
+}
+
+.clan-trait--bane       { --trait-accent: var(--bane-accent); }
+.clan-trait--compulsion { --trait-accent: var(--gold); }
+
+.clan-trait-name {
+  color: var(--trait-accent);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.4rem;
+}
+
+.clan-trait-desc {
+  color: var(--parchment-dim);
+  line-height: 1.6;
+}
