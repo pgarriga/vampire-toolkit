@@ -208,7 +208,12 @@ diamond with the glyph knocked out via `fill-rule="evenodd"`. Notes:
   by the same key, even though the keys describe the old artwork rather than the new.
 
 `CLAN_ICONS` is keyed by clan `id` (no indirection) and holds the 14 clan sigils from the
-clan bands of the same sheet.
+clan bands of the same sheet. When re-tracing those, the crop window must stop just short
+of the clan name — the verbs line starts at ~x132 on the left page and the script name at
+~x1024 on the right — and blobs are then clustered outward from the largest one.
+**Do not split sigil from text by an x-fraction or by blob height:** the first clipped
+Hecata's third mask and Toreador's right-hand petals, the second fails because the clan
+names are set in large display type.
 
 Both files are large (~120 KB and ~150 KB) because the traced paths carry real detail.
 
