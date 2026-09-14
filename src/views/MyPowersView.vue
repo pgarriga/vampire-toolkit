@@ -1,34 +1,19 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
 import { useFavorites } from '../composables/useFavorites'
 import { useI18n } from '../composables/useI18n'
-import { useData } from '../composables/useData'
+import { useMyPowers } from '../composables/useMyPowers'
 import { artGradient, levelDots, shortCost, shortDicePool, shortDuration } from '../helpers'
 
 const router = useRouter()
-const { favorites, isFavorite, toggle, clearAll } = useFavorites()
+const { favorites, toggle, clearAll } = useFavorites()
 const confirmClear = ref(false)
 const { t } = useI18n()
-const { disciplines } = useData()
+const { groupedPowers, totalCount } = useMyPowers()
 
 const copied = ref(false)
-
-const groupedPowers = computed(() => {
-  return disciplines.value
-    .map(disc => ({
-      discipline: disc,
-      powers: disc.powers
-        .filter(p => isFavorite(disc.id, p.id))
-        .sort((a, b) => a.level - b.level),
-    }))
-    .filter(g => g.powers.length > 0)
-})
-
-const totalCount = computed(() =>
-  groupedPowers.value.reduce((sum, g) => sum + g.powers.length, 0)
-)
 
 function goPower(discId: string, powerId: string) {
   router.push(`/discipline/${discId}/power/${powerId}?from=my-powers`)

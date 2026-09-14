@@ -1,11 +1,12 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
 import { powerById, levelDots, artGradient, parseAmalgama, shortDuration } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
 import { useFavorites } from '../composables/useFavorites'
+import { useMyPowers } from '../composables/useMyPowers'
 import { renderPowerCard } from '../renderPowerCard'
 
 const route  = useRoute()
@@ -13,6 +14,7 @@ const router = useRouter()
 const { t } = useI18n()
 const { disciplineById, disciplines } = useData()
 const { isFavorite, toggle } = useFavorites()
+const { flatPowers } = useMyPowers()
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
 const power      = computed(() => powerById(discipline.value, route.params['powerId'] as string))
@@ -70,13 +72,95 @@ const amalgamaSegments = computed(() => {
 })
 
 function goBack(): void {
-  if (route.query['from'] === 'my-powers') router.push('/my-powers')
+  if (fromMyPowers.value) router.push('/my-powers')
   else router.push(`/discipline/${route.params['id']}`)
 }
+
+// ── Swipe / arrow navigation between sibling powers ──────────────────────────
+
+const fromMyPowers = computed(() => route.query['from'] === 'my-powers')
+
+/**
+ * The powers this view can step through, in the order of the list the reader came
+ * from: the discipline's own order, or the flattened My Powers list.
+ */
+const siblings = computed<Array<{ disciplineId: string; powerId: string }>>(() => {
+  const disc = discipline.value
+  const own = disc ? disc.powers.map(p => ({ disciplineId: disc.id, powerId: p.id })) : []
+  if (!fromMyPowers.value) return own
+  const saved = flatPowers.value.map(e => ({ disciplineId: e.disciplineId, powerId: e.power.id }))
+  // Un-starring the power you are reading drops it out of the saved list; fall back
+  // to the discipline so the gesture keeps working instead of going dead.
+  const stillSaved = saved.some(
+    s => s.disciplineId === route.params['id'] && s.powerId === route.params['powerId'],
+  )
+  return stillSaved ? saved : own
+})
+
+const currentIndex = computed(() =>
+  siblings.value.findIndex(
+    s => s.disciplineId === route.params['id'] && s.powerId === route.params['powerId'],
+  ),
+)
+
+/** `step` is +1 for the next power, -1 for the previous one. Stops at both ends. */
+function goSibling(step: number): void {
+  const i = currentIndex.value
+  if (i === -1) return
+  const target = siblings.value[i + step]
+  if (!target) return
+  const query = fromMyPowers.value ? '?from=my-powers' : ''
+  router.push(`/discipline/${target.disciplineId}/power/${target.powerId}${query}`)
+}
+
+/** Travel before a drag counts as a swipe, and how much it must beat the vertical
+ *  component by — without the slope test a diagonal flick while scrolling navigates. */
+const SWIPE_MIN_PX = 60
+const SWIPE_SLOPE  = 1.4
+
+let swipeX = 0
+let swipeY = 0
+let swiping = false
+
+function onTouchStart(e: TouchEvent): void {
+  const touch = e.touches.length === 1 ? e.touches[0] : undefined
+  if (!touch) { swiping = false; return }
+  swipeX = touch.clientX
+  swipeY = touch.clientY
+  swiping = true
+}
+
+function onTouchEnd(e: TouchEvent): void {
+  if (!swiping) return
+  swiping = false
+  const touch = e.changedTouches[0]
+  if (!touch) return
+  const dx = touch.clientX - swipeX
+  const dy = touch.clientY - swipeY
+  if (Math.abs(dx) < SWIPE_MIN_PX) return
+  if (Math.abs(dx) < Math.abs(dy) * SWIPE_SLOPE) return
+  // Carousel convention: dragging left pulls the next power in, dragging right
+  // pushes back to the previous one. The arrow keys keep the opposite mapping,
+  // which is the one a keyboard expects (ArrowRight = forward).
+  goSibling(dx > 0 ? -1 : 1)
+}
+
+/** Same navigation from a keyboard, so the gesture is not the only way in. */
+function onKeydown(e: KeyboardEvent): void {
+  if (e.altKey || e.ctrlKey || e.metaKey || e.shiftKey) return
+  if (e.key === 'ArrowRight')     goSibling(1)
+  else if (e.key === 'ArrowLeft') goSibling(-1)
+  else return
+  e.preventDefault()
+}
+
+onMounted(() => window.addEventListener('keydown', onKeydown))
+onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 </script>
 
 <template>
-  <div class="min-vh-100 bg-void font-body text-parchment" v-if="discipline && power">
+  <div class="min-vh-100 bg-void font-body text-parchment" v-if="discipline && power"
+       @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
 
     <!-- ── Nav ── -->
     <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
