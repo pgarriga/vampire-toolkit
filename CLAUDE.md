@@ -1,6 +1,6 @@
 # Vampire Toolkit — Vampire: The Masquerade 5th Edition
 
-A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 11 disciplines and ~96 powers, look up the 14 clans, and save the powers your character has for quick lookup at the table. No account required, works offline once loaded.
+A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 12 disciplines and ~152 powers, look up the 14 clans, and save the powers your character has for quick lookup at the table. No account required, works offline once loaded.
 
 ## Stack
 
@@ -26,17 +26,18 @@ Vampire Toolkit/
     ├── App.vue                  # Sticky navbar with hamburger + full-screen overlay menu + <router-view> with transition
     ├── router.ts                # Hash routes: /, /disciplines, /discipline/:id, /discipline/:id/power/:powerId, /my-powers, /settings
     ├── types.ts                 # Interfaces: Discipline, Power, DisciplinesData
-    ├── data.ts                  # DISCIPLINES_DATA: 11 disciplines and ~96 powers (Spanish source)
+    ├── data.ts                  # DISCIPLINES_DATA: 12 disciplines and ~152 powers (Spanish source)
     ├── translations-en.ts       # English translations overlay for all disciplines and powers
     ├── translations-ca.ts       # Catalan translations overlay for all disciplines and powers
     ├── icons.ts                 # DISCIPLINE_ICONS: inline SVGs per discipline
-    ├── helpers.ts               # levelDots, disciplineById, powerById, shortCost, shortDuration, artGradient, colorGradient, parseAmalgama
+    ├── helpers.ts               # levelDots, disciplineById, powerById, factHead, shortCost, shortDicePool, shortDuration, artGradient, colorGradient, parseAmalgama
     ├── renderPowerCard.ts       # Canvas 2D renderer — draws a power card and returns a PNG Blob for sharing
     ├── composables/
     │   ├── useFavorites.ts      # My Powers singleton state — persists in localStorage
     │   ├── useSettings.ts       # Theme (auto/dark/light) and language (auto/es/en/ca) preferences
     │   ├── useI18n.ts           # UI string translations based on resolved language
-    │   └── useData.ts           # Localized discipline/power data — applies EN or CA overlay when needed
+    │   ├── useData.ts           # Localized discipline/power data — applies EN or CA overlay when needed
+    │   └── useMyPowers.ts       # Saved powers grouped by discipline + the flat order PowerView swipes through
     ├── css/
     │   └── main.css             # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
@@ -94,9 +95,10 @@ In `DisciplineView.vue` each power card has a star button (`.star-btn`) in the t
   The traced paths are detailed, which is why `clan-icons.ts` is ~150 KB.
 - `disciplines` stores ids so `ClanView` can render each one as a `.disc-mini-card`
   (badge, name, type, power count) that navigates to its discipline page.
-  **`oblivion` is deliberately not a discipline in this app** — `ClanView` renders it as a
-  dashed, non-interactive card carrying the `olvido` badge and `t.clan.oblivionNote` as its
-  meta line. Hecata and Lasombra are the two clans affected.
+  Every id resolves, `oblivion` included, so all of them are ordinary links. (Until the
+  Players Guide powers landed, Oblivion had no page and `ClanView` drew it as a dashed
+  non-interactive card; that fallback, `.disc-mini-card--plain` and `t.clan.oblivionNote`
+  are all gone.)
 - Bane and Compulsion rules text comes from the V5 corebook / Camarilla / Anarch /
   Companion; the sheet only supplies their names.
 - **Grid card art uses `colorGradient()` from `helpers.ts`** (shared with `artGradient`).
@@ -118,6 +120,26 @@ In `DisciplineView.vue` each power card has a star button (`.star-btn`) in the t
   `--gold`, `--parchment` and the per-theme `--bane-accent` (`--blood` is #8b0000 in
   *both* themes and only reaches 1.79:1 on the dark panel, so it cannot be used as text).
 
+## Swiping between powers (`PowerView.vue` + `composables/useMyPowers.ts`)
+
+On the power sheet a horizontal drag steps to a sibling power, carousel-style: **dragging
+left pulls the next power in, dragging right goes back**. The list it steps through is the
+one the reader came
+from — `discipline.powers` in `data.ts` order, or the flattened My Powers list when the route
+carries `?from=my-powers`. It stops at both ends rather than wrapping.
+
+- The ordering lives in `useMyPowers()` because `MyPowersView` renders the groups and
+  `PowerView` walks the flattened version; if they disagreed, swiping would skip powers.
+- A drag counts only past `SWIPE_MIN_PX` (60) **and** when the horizontal component beats
+  the vertical by `SWIPE_SLOPE` (1.4). Without the slope test a diagonal flick during a
+  normal scroll navigates away. The handlers are `.passive` and never `preventDefault`, so
+  vertical scrolling is untouched.
+- `ArrowLeft` / `ArrowRight` do the same thing, so the gesture is not the only way in.
+  They keep the *opposite* mapping to the drag on purpose — ArrowRight moves forward,
+  which is what a keyboard expects, while a drag moves the content, not the cursor.
+- Un-starring the power you are reading drops it out of the My Powers list; `siblings` then
+  falls back to the discipline order instead of going dead.
+
 ## Settings (`composables/useSettings.ts`)
 
 Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es | en | ca`) and `resolvedLang` (`es | en | ca`).
@@ -136,7 +158,7 @@ Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es 
 
 - Waits for Cinzel Decorative + Cormorant Garamond via `document.fonts.load()` before measuring/drawing.
 - Loads the discipline SVG icon (with `currentColor` swapped for the discipline colour) through a blob URL and paints it with a glow.
-- Header: linear gradient using `discipline.color`/`colorDark`, level dots, big icon, discipline · level pill.
+- Header: linear gradient using `discipline.color`/`colorDark`, level dots, big icon, discipline pill.
 - Body: title with a coloured glow shadow, stats table, ornament divider, description, optional amalgama box, "Vampire Toolkit" footer.
 - Colours are pinned to the dark palette (`#0d0b14`, `#d4c9b8`, `#c9a84c`, …) regardless of the user's theme so the shared image always looks the same.
 - Text wrapping is done by `wrapText(ctx, text, maxWidth)` — greedy word-fit with paragraph breaks on `\n`.
@@ -153,7 +175,11 @@ Power and discipline content (names, descriptions, costs, dice pools, durations)
 
 ## Data (`src/data.ts`)
 
-Source: official Spanish PDF *Vampiro La Mascarada 5 edición - Disciplinas.pdf*.
+Sources: the official Spanish PDFs *Vampiro La Mascarada 5 edición - Disciplinas.pdf*
+(corebook Disciplines) and *…Disciplinas 2.pdf* (the Players Guide chapter, which adds 39
+powers to the nine existing Disciplines plus the whole **Oblivion** Discipline, 18 powers).
+The Players Guide's Blood Sorcery Rituals and Oblivion Ceremonies are **not** in the app —
+the data model has no place for them yet.
 
 `DISCIPLINES_DATA.disciplines` is an array where each discipline has:
 
@@ -185,9 +211,58 @@ Each power:
   dicePool: "Resolución + Animalismo contra ...",
   duration: "Pasiva",
   description: "...",
-  amalgama?: "..."            // optional
+  amalgama?: "..."            // optional — the *discipline and dot rating*, e.g. "Ofuscación 2"
 }
 ```
+
+`amalgama` is a real field in **all three** languages and renders as the linked note box in
+`PowerView`. It used to be inline in the Spanish description as a `(Amalgama: X)` prefix and
+duplicated in the EN/CA note box; that is fixed — never put it back in the description.
+
+### Normalised `cost` / `duration`
+
+These two fields are **not** free prose — they come from a fixed short vocabulary so the
+grid cards stay one line and the detail sheet never grows past two. Costs are
+`Ninguno` · `1 Enardecimiento` · `2 Enardecimientos` · `3 Enardecimientos` · `1+ …` ·
+`1-3 …` · `0 o 1 …` · `+1 Enardecimiento` · `El del Poder base`; durations are
+`Pasiva` · `Una escena` · `Un turno` · `Una noche` · `Indefinida` · `Permanente` ·
+`A voluntad` · `La del Poder base` · `N/A` and a handful of one-offs (`Un ataque`,
+`Una acción`, `Una alimentación`, `Un uso`, `Un día o más`, `Hasta la muerte`, …).
+
+Any nuance that survived the squeeze goes in a **trailing parenthetical** —
+`1 Enardecimiento (ninguno con el famulus)`, `Una escena (o hasta cumplir la orden)`,
+`Una noche (vampiros: hasta alimentarse)`. `factHead()` in `helpers.ts` strips it, which
+is what `shortCost`/`shortDuration` hand to the cramped grid cards; `PowerView` and
+`renderPowerCard` print the whole string.
+
+### `dicePool` on the grid cards
+
+`shortDicePool(pool)` derives the card line from the full `dicePool`, by structure rather
+than by vocabulary: it cuts at the opposed pool (` contra ` / ` vs. ` / ` vs `), then the
+parenthetical, then an alternative pool (`, ` / ` o ` / ` or `). **Attribute and skill both
+stay** — "Carisma + Animalismo" is the roll, and half of it is not; only what the player
+does not need mid-roll comes off; skill names are left exactly as written. `N/A` returns
+`null` and the row disappears (37 of the 95 powers need no roll).
+
+Four pools were reworded so they read the same way as the rest: `split-second` and
+`lightning-strike` say `Reserva de … normal` (Spanish said "Pool" in one and not the other),
+and `terminal-decree` / `mass-manipulation` reuse `Como el Poder base` with the detail in a
+parenthetical. The longest pool left is `Resolución + Hechicería de Sangre`, which takes 3
+of the card's 5 reserved fact lines at the narrow breakpoints — the reason `.power-fact-val`
+clamps at 3 and not 2.
+
+Rules for new or edited powers:
+
+1. **Reuse an existing phrase** rather than inventing a synonym — "Una escena o hasta que
+   termine voluntariamente", "No más de una escena" and "Una escena, a menos que uno
+   quiera terminar antes" all collapsed to `Una escena` on purpose.
+2. Keep the head under ~20 characters (Spanish), and put the qualifier in `(…)`. This is
+   load-bearing, not cosmetic: the card reserves 4 fact lines, so a head that wraps where
+   another field already wraps overflows the reserve and breaks the equal card heights.
+   `1 Enardecimiento (por escena)` and `1 minuto (por Enardecimiento; …)` are written that
+   way for exactly this reason — the qualifier used to sit in the head and cost a line.
+3. `N/A` means "this power has no duration"; it is the only value the views hide.
+4. The EN and CA overlays carry the same shape — same head, same parenthetical.
 
 ## Icons (`src/icons.ts` + `src/clan-icons.ts`)
 
@@ -201,10 +276,10 @@ ever needs redoing, re-trace it — do not redraw it by hand.
 diamond with the glyph knocked out via `fill-rule="evenodd"`. Notes:
 
 - **Obfuscation's badge is blank on the sheet** — an empty diamond. That is the symbol.
-- **Thin-Blood Alchemy has no symbol in the legend.** The panel carries Oblivion instead,
-  which this app has no discipline for, so the previous hand-drawn flask was set inside the
-  same diamond frame to keep the set consistent.
-- The Oblivion glyph was traced and is available if Oblivion is ever added as a discipline.
+- **Thin-Blood Alchemy has no symbol in the legend.** The panel carries Oblivion in its
+  place, so the previous hand-drawn flask was set inside the same diamond frame to keep the
+  set consistent.
+- The Oblivion glyph is now in use: `oblivion` is a real discipline (`iconType: 'olvido'`).
 - The `iconType` keys are unchanged (`wolf`, `crown`, …) so `data.ts` still addresses icons
   by the same key, even though the keys describe the old artwork rather than the new.
 
@@ -250,6 +325,33 @@ Relevant classes:
 - `.clan-sigil` / `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-disc-chip` / `.clan-trait` / `.clan-trait-name` — Clans tool
 - `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
 - `.discipline-card` / `.power-card` — cards driven by `--card-color` and `--card-glow`
+- `.power-dot` / `.power-level-dots-card` — **the one and only level indicator.** The grid
+  card used to carry a `NIVEL n` badge *and* the dots, the detail art a `discipline · level`
+  pill *and* the dots; the dots won because they are V5's own notation for a rating and need
+  no translated string on the art. They are painted in `--gold` / `--gold-dim`, not in the
+  discipline accent: as a meaningful graphical object they owe 3:1, and 6 of the 11 accents
+  land between 2.26:1 (Potencia `#9a1a1a`) and 2.84:1 on the dark card — on art mixed from
+  that same accent. `renderPowerCard` mirrors both decisions. Because the art blocks are
+  `aria-hidden`, the level lives in the card `aria-label` and, on the detail page, in a
+  `.visually-hidden` span after the `<h1>`
+- `.power-fact` / `.power-fact-icon` / `.power-fact-val` — the cost, dice pool and duration
+  lines on a grid card. A word label does not fit: at 320px a card has ~122px of text and
+  `Coste: ` alone costs a third of it, so a gold drop (cost), d10 (dice pool) and clock
+  (duration) carry the label and the real wording stays in a `.visually-hidden` span.
+  `.power-fact-val` clamps at two lines
+- `.power-card-title` / `.power-facts` (+ `--solo`) / `.power-card-desc` — **every power card
+  is the same height.** Bootstrap only equalises the cards within one wrapped row, so each
+  block reserves a fixed number of lines: 2 for the title, 4 for the facts, 3 for the
+  description. The fact ceiling is measured — across es/en/ca from 320 to 1200px, cost +
+  dice pool + duration never total more than 4: one of the three may wrap, never two.
+  Several strings were reworded to hold that (see the cost/duration section below); if you
+  edit one, re-measure. The title's 2 is a deliberate trade: a
+  3-line reserve left a visible hole above the cost line on nearly every card, so the title
+  is ellipsised instead, which bites 3-5 of the 280 names at the narrow breakpoints
+  ("Encubrimiento de la Concurrencia", "Fortificar la Fachada Interior" and their Catalan
+  twins). It is vertically centred in its box, so a one-line name splits the leftover
+  half-line evenly above and below. If a power name, cost, pool or duration gets longer, re-check
+  those ceilings before shipping it
 - `.star-btn` / `.star-btn--filled` — favourites star button (top-right on the power art).
   The two states differ by **shape as well as colour** — a hollow outlined star when off, a
   solid gold one with a glow when on — because a colour-only shift was hard to tell apart
