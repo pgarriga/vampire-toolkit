@@ -7,7 +7,6 @@ export interface RenderStrings {
   dicePool: string
   duration: string
   type:     string
-  level:    string
   amalgam:  string
 }
 
@@ -143,7 +142,7 @@ export async function renderPowerCard(
   const rows: Row[] = []
   if (power.cost) rows.push({ key: strings.cost, val: power.cost })
   if (power.dicePool && power.dicePool !== 'N/A') rows.push({ key: strings.dicePool, val: power.dicePool })
-  if (power.duration && power.duration !== 'N/A' && power.duration !== 'Pasiva') {
+  if (power.duration && power.duration !== 'N/A') {
     rows.push({ key: strings.duration, val: power.duration })
   }
   if (discipline.tipo) rows.push({ key: strings.type, val: discipline.tipo })
@@ -212,14 +211,16 @@ export async function renderPowerCard(
   for (const filled of dotsFilled) {
     ctx.beginPath()
     ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2)
+    // Gold, not the discipline accent — see `.power-dot` in main.css: the dots are
+    // the only level indicator and the accent cannot contrast with its own art.
     if (filled) {
-      ctx.fillStyle = discipline.color
+      ctx.fillStyle = COLOR_GOLD
       ctx.fill()
-      ctx.strokeStyle = discipline.color
+      ctx.strokeStyle = COLOR_GOLD
     } else {
       ctx.fillStyle = 'rgba(0,0,0,0.5)'
       ctx.fill()
-      ctx.strokeStyle = COLOR_PARCHMENT_FAINT
+      ctx.strokeStyle = COLOR_GOLD_DIM
     }
     ctx.stroke()
     dotX += dotR * 2 + dotGap
@@ -234,7 +235,7 @@ export async function renderPowerCard(
   ctx.drawImage(icon, iconX, iconY, iconSize, iconSize)
   ctx.restore()
 
-  const tagText = `${discipline.name.toUpperCase()}  ·  ${strings.level.toUpperCase()} ${power.level}`
+  const tagText = discipline.name.toUpperCase()
   ctx.font = `600 28px ${FONT_BODY}`
   const tagPad = 30
   const tagW = ctx.measureText(tagText).width + tagPad * 2

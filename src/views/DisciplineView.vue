@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
-import { levelDots, shortCost, shortDuration, artGradient } from '../helpers'
+import { levelDots, shortCost, shortDicePool, shortDuration, artGradient } from '../helpers'
 import { useFavorites } from '../composables/useFavorites'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
@@ -99,7 +99,7 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
             @keydown.space.prevent="goPower(power.id)"
             tabindex="0"
             role="button"
-            :aria-label="`${power.name}, ${t.discipline.level} ${power.level}${power.cost && power.cost !== 'Ninguno' ? ', ' + t.discipline.cost + ': ' + power.cost : ''}`"
+            :aria-label="`${power.name}, ${t.discipline.level} ${power.level}, ${t.discipline.cost}: ${power.cost}`"
           >
             <!-- Card art -->
             <div class="power-card-art"
@@ -108,7 +108,6 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
                    :style="{ '--card-color': discipline.color }"
                    class="power-art-icon sigil"></div>
 
-              <div class="power-level-badge">{{ t.discipline.level }} {{ power.level }}</div>
 
               <div class="power-level-dots-card">
                 <span v-for="(filled, i) in levelDots(power.level)" :key="i"
@@ -128,17 +127,27 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
 
             <!-- Card body -->
             <div class="d-flex flex-column gap-1 p-2 p-sm-3 flex-fill">
-              <h3 class="font-title fw-bold text-white leading-tight mb-0"
-                  style="font-size:0.88rem;">
-                {{ power.name }}
-              </h3>
-              <p class="small text-parchment-dim mb-0">
-                <strong class="text-gold">{{ t.discipline.cost }}:</strong> {{ shortCost(power.cost) }}
-              </p>
-              <p class="small text-parchment-dim mb-0" v-if="shortDuration(power.duration)">
-                <strong class="text-gold">{{ t.discipline.duration }}:</strong> {{ shortDuration(power.duration) }}
-              </p>
-              <p class="small text-parchment-dim fst-italic leading-snug mt-auto mb-0 d-none d-sm-block line-clamp-3">
+              <div class="power-card-title">
+                <h3 class="font-title fw-bold text-white">{{ power.name }}</h3>
+              </div>
+              <div class="power-facts">
+                <p class="power-fact text-parchment-dim">
+                  <svg class="power-fact-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.6c0 0-6.4 7.3-6.4 11.2a6.4 6.4 0 0 0 12.8 0C18.4 9.9 12 2.6 12 2.6z"/></svg>
+                  <span class="visually-hidden">{{ t.discipline.cost }}:</span>
+                  <span class="power-fact-val">{{ shortCost(power.cost) }}</span>
+                </p>
+                <p class="power-fact text-parchment-dim" v-if="shortDicePool(power.dicePool)">
+                  <svg class="power-fact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.2 3 9.4l9 12.4 9-12.4z"/><path d="M3 9.4 12 13l9-3.6M12 13v8.8"/></svg>
+                  <span class="visually-hidden">{{ t.discipline.dicePool }}:</span>
+                  <span class="power-fact-val">{{ shortDicePool(power.dicePool) }}</span>
+                </p>
+                <p class="power-fact text-parchment-dim" v-if="shortDuration(power.duration)">
+                  <svg class="power-fact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 2"/></svg>
+                  <span class="visually-hidden">{{ t.discipline.duration }}:</span>
+                  <span class="power-fact-val">{{ shortDuration(power.duration) }}</span>
+                </p>
+              </div>
+              <p class="power-card-desc small text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
                 {{ power.description }}
               </p>
             </div>

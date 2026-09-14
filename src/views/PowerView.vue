@@ -2,7 +2,7 @@
 import { computed, onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
-import { powerById, levelDots, artGradient, parseAmalgama } from '../helpers'
+import { powerById, levelDots, artGradient, parseAmalgama, shortDuration } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
 import { useFavorites } from '../composables/useFavorites'
@@ -46,7 +46,6 @@ async function sharePower() {
       dicePool: t.value.power.dicePool,
       duration: t.value.power.duration,
       type:     t.value.power.type,
-      level:    t.value.power.level,
       amalgam:  t.value.power.amalgam,
     })
     const file = new File([blob], `${power.value.id}.png`, { type: 'image/png' })
@@ -114,8 +113,6 @@ function goBack(): void {
 
           <div class="power-detail-discipline-tag">
             <span>{{ discipline.name }}</span>
-            <span style="opacity:.4;">·</span>
-            <span>{{ t.power.level }} {{ power.level }}</span>
           </div>
 
           <div class="power-detail-art-overlay"></div>
@@ -154,6 +151,7 @@ function goBack(): void {
               style="font-size: clamp(1.3rem,4vw,2rem);"
               :style="{ textShadow: '0 0 20px ' + discipline.colorGlow }">
             {{ power.name }}
+            <span class="visually-hidden">— {{ t.power.level }} {{ power.level }}</span>
           </h1>
 
           <!-- Stats table -->
@@ -166,7 +164,7 @@ function goBack(): void {
               <div class="pst-key">{{ t.power.dicePool }}</div>
               <div class="pst-val">{{ power.dicePool }}</div>
             </div>
-            <div v-if="power.duration && power.duration !== 'N/A' && power.duration !== 'Pasiva'" class="pst-row">
+            <div v-if="shortDuration(power.duration)" class="pst-row">
               <div class="pst-key">{{ t.power.duration }}</div>
               <div class="pst-val">{{ power.duration }}</div>
             </div>

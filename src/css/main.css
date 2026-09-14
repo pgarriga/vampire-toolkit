@@ -291,6 +291,84 @@ a { text-decoration: none; color: inherit; }
 }
 @media (min-width: 576px) { .power-card-art { height: 10rem; } }
 
+/* ─── Power card facts (cost / dice pool / duration) ───
+   Cost and duration come from the normalised vocabulary (see `factHead` in
+   helpers.ts) and fit a single line; the dice pool is trimmed to the rolling
+   character's own pool by `shortDicePool`. Word labels would not fit at all: at
+   320px a card only has ~122px of text, and "Coste: " alone eats a third of it.
+   A gold drop (cost), d10 (dice pool) and clock (duration) carry the label
+   instead, with the real wording kept for screen readers. A value wraps to at most two
+   lines; only six Spanish Blood Sorcery pools ever hit that ceiling, and only at 320px. */
+.power-fact {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.35em;
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.3;
+}
+.power-fact-icon {
+  flex: 0 0 auto;
+  width: 0.95em;
+  height: 0.95em;
+  margin-top: 0.18em;
+  color: var(--gold);
+}
+.power-fact-val {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+  min-width: 0;
+}
+
+/* ─── Power card body — every card the same height ───
+   Bootstrap only equalises the cards inside one wrapped row, so each block of the
+   body reserves its own worst case instead. Measured across es/en/ca at 320-1200px:
+   a title never needs more than 3 lines, and cost + dice pool + duration never more
+   than 4 between them — one of the three may wrap, never two. Several cost and duration
+   strings were reworded to hold that ceiling; see CLAUDE.md before editing them. The title
+   gets 2 lines and is ellipsised past that: 3-5 of the 280 names in es/en/ca need a 3rd
+   line at the narrow breakpoints, and a 3-line reserve left a visible hole on every other
+   card.
+
+   The two blocks above the description use a fixed `height`, not `min-height`, and the
+   description does NOT use `mt-auto`: the description has to start at the same y on every
+   card, and `mt-auto` would push it to the bottom of whatever slack the row happened to
+   have. With a fixed height the offset is arithmetic, not a consequence of the content. */
+.power-card-title {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  font-size: clamp(0.82rem, 0.5rem + 1.6vw, 0.86rem);
+  line-height: 1.25;
+  height: calc(2 * 1.25em);
+}
+/* Centred inside that box, so a one-line name splits its slack evenly instead of
+   sitting against the art or against the cost line. */
+.power-card-title h3 {
+  font-size: inherit;
+  line-height: inherit;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  overflow-wrap: break-word;
+}
+.power-facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+  font-size: 0.84rem;
+  line-height: 1.3;
+  height: calc(4 * 1.3em + 2 * 0.25rem);
+  overflow: hidden;
+}
+.power-card-desc { min-height: calc(3 * 1.375em); }
+
 .power-art-icon {
   width: 4rem; height: 4rem;
   display: flex; align-items: center; justify-content: center;
@@ -298,24 +376,6 @@ a { text-decoration: none; color: inherit; }
 }
 @media (min-width: 576px) { .power-art-icon { width: 5rem; height: 5rem; } }
 
-.power-level-badge {
-  position: absolute;
-  top: 0.6rem; left: 0.6rem;
-  z-index: 3;
-  font-size: 0.78rem;
-  font-family: var(--font-body);
-  font-weight: 600;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  padding: 0.2rem 0.5rem;
-  border-radius: 3px;
-  background: rgba(0,0,0,0.75);
-  border: 1px solid var(--card-color, var(--void-border));
-  color: var(--parchment);
-}
-[data-theme="light"] .power-level-badge {
-  background: rgba(255,255,255,0.75);
-}
 .power-level-dots-card {
   position: absolute;
   bottom: 0.7rem; right: 0.7rem;
@@ -323,12 +383,19 @@ a { text-decoration: none; color: inherit; }
   display: flex;
   gap: 0.25rem;
 }
+/* The dots are the *only* level indicator, so they are a meaningful graphical
+   object and owe 3:1. They are painted in gold, not in the discipline accent:
+   6 of the 11 accents sit between 2.26:1 and 2.84:1 on the dark card (Potencia
+   #9a1a1a is the worst), and the art behind them is mixed from that same accent. */
 .power-dot {
-  width: 8px; height: 8px;
+  width: 9px; height: 9px;
   border-radius: 50%;
-  border: 1px solid var(--card-color, #5a3070);
+  border: 1px solid var(--gold-dim);
 }
-.power-dot.filled { background: var(--card-color, #5a3070); }
+.power-dot.filled {
+  background: var(--gold);
+  border-color: var(--gold);
+}
 
 /* ─── Discipline page icon ─── */
 .discipline-page-icon {

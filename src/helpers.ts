@@ -13,75 +13,56 @@ export function powerById(disc: Discipline | undefined, powerId: string): Power 
   return disc?.powers.find(p => p.id === powerId)
 }
 
-export function shortCost(cost: string | undefined | null): string {
-  if (!cost) return '—'
-  const lo = cost.toLowerCase()
-  // Spanish
-  if (lo === 'ninguno' || lo.includes('ninguno')) return 'Ninguno'
-  if (lo.includes('dos controles')) return '2× Enardecimiento'
-  if (lo.includes('un control')) return '1× Enardecimiento'
-  if (lo.includes('uno o más')) return '1+ Enardecimiento'
-  // English
-  if (lo === 'none' || lo.includes('no cost')) return 'None'
-  if (lo.includes('two rouse')) return '2× Rouse'
-  if (lo.includes('one rouse') || lo.includes('rouse check')) return '1× Rouse'
-  if (lo.includes('one or more rouse')) return '1+ Rouse'
-  return cost.length > 60 ? cost.substring(0, 58) + '…' : cost
+/**
+ * Head of a normalised cost/duration value: everything before the parenthetical
+ * qualifier. `data.ts` and both overlays store these facts in a fixed short
+ * vocabulary (`1 Enardecimiento`, `Una escena`, …) with any nuance kept in a
+ * trailing `(…)`. The detail sheet prints the whole string; the small grid cards
+ * print just this head so the line never grows past two rows on a phone.
+ */
+export function factHead(value: string): string {
+  const i = value.indexOf(' (')
+  return i === -1 ? value : value.slice(0, i)
 }
 
+export function shortCost(cost: string | undefined | null): string {
+  return cost ? factHead(cost) : '\u2014'
+}
+
+/** `null` when the power has no meaningful duration, so the row can be dropped. */
 export function shortDuration(dur: string | undefined | null): string | null {
   if (!dur || dur === 'N/A') return null
-  const d = dur.toLowerCase()
-  // Spanish
-  if (d.startsWith('pasiva')) return 'Pasiva'
-  if (d === 'indefinida') return 'Indefinida'
-  if (d.startsWith('una escena') || d.startsWith('no más de una escena') || d.startsWith('una sola escena')) return 'Una escena'
-  if (d.startsWith('el veneno')) return 'Una escena'
-  if (d.startsWith('hasta que concluye la escena') || d.startsWith('hasta fin de')) return 'Hasta fin de escena'
-  if (d.startsWith('un turno, a menos')) return 'Un turno (+sostenido)'
-  if (d.startsWith('un turno')) return 'Un turno'
-  if (d.startsWith('un uso')) return 'Un uso'
-  if (d.startsWith('un solo ataque')) return 'Un ataque'
-  if (d.startsWith('aproximadamente una acción')) return 'Una acción'
-  if (d.startsWith('aproximadamente un minuto')) return '1 min / Enardecimiento'
-  if (d.startsWith('una alimentación') || d.startsWith('una alimentacion')) return 'Una alimentación'
-  if (d.startsWith('una hora')) return 'Una hora (+margen)'
-  if (d.startsWith('una noche')) return 'Una noche'
-  if (d.startsWith('unos minutos')) return 'Minutos / hasta una noche'
-  if (d.startsWith('un día') || d.startsWith('un dia')) return 'Un día o más'
-  if (d.includes('muerte')) return 'Hasta la muerte'
-  if (d.startsWith('el tiempo')) return 'A voluntad'
-  if (d.startsWith('como el poder')) return 'Como el poder base'
-  if (d.startsWith('según') || d.startsWith('segun')) return 'Según el poder'
-  if (d.startsWith('la duración') || d.startsWith('la duracion')) return 'Duración del Frenesí'
-  if (d.startsWith('hasta que se desactive')) return 'Hasta que se desactive'
-  if (d.startsWith('hasta que se resista')) return 'Hasta que se resista'
-  if (d.startsWith('hasta que se ejecuta')) return 'Hasta ejecutarse'
-  if (d.startsWith('hasta que termine')) return 'Hasta que termine'
-  if (d.startsWith('permanente')) return 'Permanente (reversible)'
-  // English
-  if (d.startsWith('passive')) return 'Passive'
-  if (d === 'indefinite') return 'Indefinite'
-  if (d.startsWith('one scene') || d.startsWith('a single scene') || d.startsWith('no more than one scene')) return 'One scene'
-  if (d.startsWith('until the end of the scene') || d.startsWith('until end of')) return 'Until end of scene'
-  if (d.startsWith('one turn, unless')) return 'One turn (+sustained)'
-  if (d.startsWith('one turn')) return 'One turn'
-  if (d.startsWith('one use')) return 'One use'
-  if (d.startsWith('one attack')) return 'One attack'
-  if (d.startsWith('approximately one action') || d.startsWith('about one action')) return 'One action'
-  if (d.startsWith('approximately one minute') || d.startsWith('about one minute')) return '1 min / Rouse'
-  if (d.startsWith('one feeding')) return 'One feeding'
-  if (d.startsWith('one hour')) return 'One hour (+margin)'
-  if (d.startsWith('one night')) return 'One night'
-  if (d.startsWith('a few minutes') || d.startsWith('minutes')) return 'Minutes / up to one night'
-  if (d.startsWith('one day')) return 'One day or more'
-  if (d.includes('death') || d.includes('until killed')) return 'Until death'
-  if (d.startsWith('at will') || d.startsWith('as long as')) return 'At will'
-  if (d.startsWith('as the base power') || d.startsWith('as the power')) return 'As the base power'
-  if (d.startsWith('permanent')) return 'Permanent (reversible)'
-  if (d.startsWith('until deactivated')) return 'Until deactivated'
-  if (d.startsWith('until resisted')) return 'Until resisted'
-  return dur.length > 28 ? dur.substring(0, 26) + '…' : dur
+  return factHead(dur)
+}
+
+/** Separators a dice pool uses before naming the *opposing* pool, per language. */
+const POOL_OPPOSED = [' contra ', ' vs. ', ' vs ']
+/** Separators before an alternative pool ("Astucia + Auspex o Resolución + Auspex"). */
+const POOL_ALT = [' o ', ' or ']
+
+/**
+ * The rolling character's own pool, short enough for a grid card. Only what the
+ * player does not need mid-roll is dropped: the *opposed* pool, the parenthetical
+ * and any alternative pool. The attribute and the skill both stay — "Carisma +
+ * Animalismo" is the roll, and half of it is not.
+ * Returns `null` for powers that need no roll.
+ */
+export function shortDicePool(pool: string | undefined | null): string | null {
+  if (!pool || pool === 'N/A') return null
+  let v = pool
+  for (const sep of POOL_OPPOSED) {
+    const i = v.indexOf(sep)
+    if (i > 0) { v = v.slice(0, i); break }
+  }
+  v = factHead(v)
+  const comma = v.indexOf(', ')
+  if (comma > 0) v = v.slice(0, comma)
+  for (const sep of POOL_ALT) {
+    const i = v.indexOf(sep)
+    if (i > 0) { v = v.slice(0, i); break }
+  }
+  // "Como el Poder base, contra …" loses its clause but keeps the comma
+  return v.replace(/[,;:]\s*$/, '')
 }
 
 export function artGradient(discipline: Discipline): string {
