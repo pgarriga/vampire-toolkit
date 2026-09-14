@@ -1019,6 +1019,15 @@ a { text-decoration: none; color: inherit; }
   border-color: #5a3070;
   background: var(--void-card2);
 }
+.settings-option:disabled {
+  cursor: progress;
+  opacity: 0.6;
+}
+.settings-option:disabled:hover {
+  color: var(--parchment-dim);
+  border-color: var(--void-border);
+  background: var(--void-card);
+}
 .settings-option.active {
   color: var(--gold);
   border-color: var(--gold-dim);

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { version } from '../../package.json'
 import { useSettings, type Theme, type Lang } from '../composables/useSettings'
 import { useI18n } from '../composables/useI18n'
@@ -12,6 +12,36 @@ const themeOptions = computed(() => [
   { value: 'dark'  as Theme, label: t.value.settings.themeDark  },
   { value: 'light' as Theme, label: t.value.settings.themeLight },
 ])
+
+const clearing = ref(false)
+
+/**
+ * Throw away the precached copy of the app and reload onto fresh files.
+ *
+ * This is the *service worker's* cache, not `localStorage`: saved powers, theme
+ * and language live there and are deliberately left alone. Unregistering comes
+ * first — a live worker would just refill the caches it owns — and the reload
+ * runs even when something failed, since a reload is what actually puts the app
+ * back on network files.
+ */
+async function clearAppCache(): Promise<void> {
+  if (clearing.value) return
+  clearing.value = true
+  try {
+    if ('serviceWorker' in navigator) {
+      const regs = await navigator.serviceWorker.getRegistrations()
+      await Promise.all(regs.map(r => r.unregister()))
+    }
+    if ('caches' in window) {
+      const keys = await caches.keys()
+      await Promise.all(keys.map(k => caches.delete(k)))
+    }
+  } catch (err) {
+    console.error('Cache reset failed', err)
+  } finally {
+    location.reload()
+  }
+}
 
 const langOptions = computed(() => [
   { value: 'auto' as Lang, label: t.value.settings.langAuto },
@@ -83,6 +113,26 @@ const langOptions = computed(() => [
             @click="lang = opt.value"
           >
             {{ opt.label }}
+          </button>
+        </div>
+      </section>
+
+      <div class="ornament-divider my-3">✦ ✦ ✦</div>
+
+      <!-- Cache -->
+      <section class="settings-section">
+        <div class="settings-section-head">
+          <h2 class="settings-section-title font-title">{{ t.settings.cache }}</h2>
+          <p class="settings-section-desc">{{ t.settings.cacheDesc }}</p>
+        </div>
+        <div class="settings-options" role="group">
+          <button class="settings-option" :disabled="clearing" @click="clearAppCache">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"
+                 stroke-linecap="round" stroke-linejoin="round" width="18" height="18" aria-hidden="true">
+              <path d="M3 12a9 9 0 0 1 15.3-6.4L21 8"/><path d="M21 3v5h-5"/>
+              <path d="M21 12a9 9 0 0 1-15.3 6.4L3 16"/><path d="M3 21v-5h5"/>
+            </svg>
+            {{ clearing ? t.settings.cacheBusy : t.settings.cacheButton }}
           </button>
         </div>
       </section>

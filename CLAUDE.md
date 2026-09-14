@@ -148,7 +148,16 @@ Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es 
 - Language `auto` detects the browser language: Catalan (`/^ca\b/i`) resolves to `ca`, other Iberian Peninsula languages (`/^(es|gl|eu|pt)/i`) resolve to `es`, everything else to `en`.
 - Both preferences persist in `localStorage` (`v5-theme`, `v5-lang`).
 - Theme is applied via `data-theme` attribute on `<html>`.
-- `SettingsView` also has a Repository section that links to the GitHub repo.
+- `SettingsView` also has a Cache section and a Repository section that links to the GitHub repo.
+
+### Clear cache (`SettingsView.clearAppCache`)
+
+Unregisters every service worker registration, deletes every Cache Storage entry, then
+reloads. It is the **precached app files** that go — `localStorage` is untouched, so saved
+powers, theme and language survive; that is the whole point of the button and the section's
+copy says so. Unregistering comes before deleting, because a live worker would refill the
+caches it owns, and the reload runs from a `finally` so a partial failure still lands the
+app on network files.
 
 ## Share power as image (`src/renderPowerCard.ts` + `PowerView.vue`)
 
