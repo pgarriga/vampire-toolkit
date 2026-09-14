@@ -19,9 +19,9 @@ function norm(s: string): string {
   return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
-/** Localized Discipline names for a clan — Oblivion has no page, so it falls back to a label. */
+/** Localized Discipline names for a clan, for the search index. */
 function disciplineNames(clan: Clan): string[] {
-  return clan.disciplines.map(id => disciplineById(id)?.name ?? t.value.clan.oblivion)
+  return clan.disciplines.flatMap(id => disciplineById(id)?.name ?? [])
 }
 
 const clans = computed<Clan[]>(() => {

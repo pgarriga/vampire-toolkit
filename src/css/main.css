@@ -1004,10 +1004,6 @@ button.disc-mini-card:focus-visible {
   outline-offset: 2px;
 }
 
-.disc-mini-card--plain {
-  border-style: dashed;
-  border-left-style: solid;
-}
 
 .disc-mini-art {
   align-items: center;

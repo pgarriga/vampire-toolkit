@@ -1,7 +1,6 @@
 export type IconType =
   | 'wolf' | 'eye' | 'bolt' | 'crown' | 'shield'
   | 'ghost' | 'fist' | 'rose' | 'claws' | 'blood' | 'flask'
-  /** Oblivion. No discipline in this app uses it; ClanView shows it for Hecata/Lasombra. */
   | 'olvido'
 
 export interface Power {
@@ -58,7 +57,7 @@ export interface Clan {
   nickname: string
   verbs: string[]
   description: string
-  /** Discipline ids — `oblivion` has no page in this app and renders as plain text. */
+  /** Discipline ids, matching `src/data.ts`. */
   disciplines: string[]
   bane: ClanTrait
   compulsion: ClanTrait

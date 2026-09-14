@@ -1,6 +1,6 @@
 # Vampire Toolkit · Vampire: The Masquerade
 
-A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sessions — browse the 11 disciplines and every power, look up the 14 clans, and save the powers your character has for quick lookup at the table. Pure static PWA, no account required, works offline.
+A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sessions — browse the 12 disciplines and every power, look up the 14 clans, and save the powers your character has for quick lookup at the table. Pure static PWA, no account required, works offline.
 
 **🌐 Live:** https://pgarriga.github.io/vampire-toolkit/
 
@@ -20,8 +20,8 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 ## Features
 
 - **Tools-list home** — landing page with a card per tool (Clans, Disciplines browser, My Powers), ready to grow with more.
-- **11 disciplines** with their official diamond badges (traced from the clan sheet's discipline legend) and per-discipline theme colours.
-- **~96 powers** with dice pool, cost, duration, description and (when present) the amalgam requirement.
+- **12 disciplines** with their official diamond badges (traced from the clan sheet's discipline legend) and per-discipline theme colours.
+- **~152 powers** with dice pool, cost, duration, description and (when present) the amalgam requirement.
 - **14 clans** — each with its real clan sigil (traced from the official clan sheet, not redrawn), archetype, description, in-clan Disciplines (linked through to the discipline pages), Bane and Compulsion.
 - **Search** the discipline catalogue by name, clan or type, and the clan catalogue by name, archetype or Discipline. Accent-insensitive, so `hecata` finds Hécata.
 - **My Powers** — bookmark your character's powers with a star; persists in `localStorage` and shows a live count badge in the menu.
@@ -58,7 +58,7 @@ Vampire Toolkit/
     ├── App.vue               # Custom sticky navbar + hamburger overlay menu + page transitions
     ├── router.ts             # Hash routes
     ├── types.ts              # TypeScript interfaces (Discipline, Power, Clan)
-    ├── data.ts               # The 11 disciplines and ~96 powers (Spanish source)
+    ├── data.ts               # The 12 disciplines and ~152 powers (Spanish source)
     ├── clans.ts              # The 14 clans (Spanish source)
     ├── translations-en.ts    # English translations overlay (disciplines + powers)
     ├── translations-ca.ts    # Catalan translations overlay (disciplines + powers)
@@ -92,7 +92,7 @@ Vampire Toolkit/
 | Hash | View | Description |
 |------|------|-------------|
 | `#/` | HomeView | Landing page — tool card grid |
-| `#/disciplines` | DisciplinesView | Grid of all 11 disciplines with search |
+| `#/disciplines` | DisciplinesView | Grid of all 12 disciplines with search |
 | `#/discipline/:id` | DisciplineView | Power grid with star to save |
 | `#/discipline/:id/power/:powerId` | PowerView | Power detail card + mobile Share button |
 | `#/clans` | ClansView | Grid of all 14 clans with search |
@@ -125,7 +125,7 @@ node scripts/generate-icons.mjs
 
 ## Data and translations
 
-Disciplines and powers: official Spanish PDF *Vampiro La Mascarada 5ª Edición — Disciplinas*.
+Disciplines and powers: the official Spanish PDFs *Vampiro La Mascarada 5ª Edición — Disciplinas* (corebook) and *— Disciplinas 2* (Players Guide), the latter adding 39 powers to the existing Disciplines plus the whole **Oblivion** Discipline. Its Blood Sorcery Rituals and Oblivion Ceremonies are not included.
 
 Clans: the official *Hoja de Clanes* reference sheet (archetype, verbs, Disciplines, Bane and Compulsion names), with the Bane and Compulsion mechanics from the V5 corebook, Camarilla, Anarch and Companion.
 

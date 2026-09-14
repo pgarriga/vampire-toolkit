@@ -5,8 +5,7 @@ import type { ClansData } from './types'
 // Anarch and Companion rules for the Bane/Compulsion mechanics.
 //
 // Clans are listed in the sheet's own order (alphabetical in Spanish).
-// Discipline ids match src/data.ts. `oblivion` is deliberately not a
-// discipline in this app — see the ClanView fallback.
+// Discipline ids match src/data.ts, `oblivion` included.
 export const CLANS_DATA: ClansData = {
   clans: [
     {

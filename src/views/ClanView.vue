@@ -6,6 +6,7 @@ import { DISCIPLINE_ICONS } from '../icons'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import { useData } from '../composables/useData'
+import type { Discipline } from '../types'
 
 const route  = useRoute()
 const router = useRouter()
@@ -15,39 +16,19 @@ const { disciplineById } = useData()
 
 const clan = computed(() => clanById(route.params['id'] as string))
 
-/** Oblivion is a real V5 Discipline the clan sheet lists, but this app has no page for
- *  it, so it gets a card that looks the part yet stays non-interactive. */
-const OBLIVION = {
-  color: '#5b5470',
-  colorGlow: 'rgba(91,84,112,0.4)',
-  iconType: 'olvido' as const,
-}
-
 /** Each in-clan Discipline as a card: badge, name, type and power count. */
 const disciplines = computed(() =>
-  (clan.value?.disciplines ?? []).map(id => {
-    const d = disciplineById(id)
-    if (d) {
-      return {
-        id,
-        name: d.name,
-        iconType: d.iconType,
-        color: d.color,
-        colorGlow: d.colorGlow,
-        meta: `${d.tipo} · ${d.powers.length} ${t.value.disciplinesList.powers}`,
-        linked: true,
-      }
-    }
-    return {
-      id,
-      name: t.value.clan.oblivion,
-      iconType: OBLIVION.iconType,
-      color: OBLIVION.color,
-      colorGlow: OBLIVION.colorGlow,
-      meta: t.value.clan.oblivionNote,
-      linked: false,
-    }
-  })
+  (clan.value?.disciplines ?? [])
+    .map(id => disciplineById(id))
+    .filter((d): d is Discipline => !!d)
+    .map(d => ({
+      id: d.id,
+      name: d.name,
+      iconType: d.iconType,
+      color: d.color,
+      colorGlow: d.colorGlow,
+      meta: `${d.tipo} · ${d.powers.length} ${t.value.disciplinesList.powers}`,
+    })),
 )
 
 function goBack():               void { router.push('/clans') }
@@ -113,13 +94,11 @@ function goDiscipline(id: string): void { router.push(`/discipline/${id}`) }
         </h2>
         <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-2 g-sm-3">
           <div class="col" v-for="d in disciplines" :key="d.id">
-            <component
-              :is="d.linked ? 'button' : 'div'"
-              :type="d.linked ? 'button' : undefined"
+            <button
+              type="button"
               class="disc-mini-card"
-              :class="{ 'disc-mini-card--plain': !d.linked }"
               :style="{ '--card-color': d.color, '--card-glow': d.colorGlow }"
-              v-on="d.linked ? { click: () => goDiscipline(d.id) } : {}"
+              @click="goDiscipline(d.id)"
             >
               <span class="disc-mini-art" aria-hidden="true">
                 <span v-html="DISCIPLINE_ICONS[d.iconType]" class="disc-mini-icon sigil"></span>
@@ -128,7 +107,7 @@ function goDiscipline(id: string): void { router.push(`/discipline/${id}`) }
                 <span class="disc-mini-name font-title">{{ d.name }}</span>
                 <span class="disc-mini-meta">{{ d.meta }}</span>
               </span>
-            </component>
+            </button>
           </div>
         </div>
       </section>
