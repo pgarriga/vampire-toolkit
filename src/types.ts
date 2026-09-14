@@ -1,6 +1,6 @@
 export type IconType =
   | 'wolf' | 'eye' | 'bolt' | 'crown' | 'shield'
-  | 'ghost' | 'fist' | 'rose' | 'claws' | 'blood' | 'flask'
+  | 'ghost' | 'fist' | 'rose' | 'claws' | 'blood' | 'alchemy'
   | 'olvido'
 
 export interface Power {

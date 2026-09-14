@@ -6,6 +6,7 @@ import { levelDots, shortCost, shortDicePool, shortDuration, artGradient } from 
 import { useFavorites } from '../composables/useFavorites'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
+import { useClans } from '../composables/useClans'
 
 const route  = useRoute()
 const router = useRouter()
@@ -14,8 +15,27 @@ const { disciplineById } = useData()
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
 const { isFavorite, toggle } = useFavorites()
+const { clanSigil } = useClans()
+
+/** `clanes` holds display names; resolve each to its mark so the chip can carry the
+ *  sigil and, when there is a clan behind it, that clan's colour and a link. The
+ *  Thin-Bloods have a mark but no clan page, so theirs stays a disabled chip rather
+ *  than pretending to lead somewhere. */
+const clanChips = computed(() =>
+  (discipline.value?.clanes ?? []).map(name => {
+    const sigil = clanSigil(name)
+    return {
+      name,
+      svg: sigil?.svg,
+      id: sigil?.clan?.id,
+      color: sigil?.clan?.color,
+      colorGlow: sigil?.clan?.colorGlow,
+    }
+  }),
+)
 
 function goBack():            void { router.push('/disciplines') }
+function goClan(id: string):  void { router.push(`/clan/${id}`) }
 function goPower(pid: string): void { router.push(`/discipline/${route.params['id']}/power/${pid}`) }
 </script>
 
@@ -74,9 +94,21 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
             <span class="text-gold text-uppercase tracking-widest small fw-semibold">{{ t.discipline.resonance }}</span>
             <span class="text-parchment">{{ discipline.resonancia }}</span>
           </div>
-          <div v-if="discipline.clanes.length" class="d-flex flex-column gap-1">
-            <span class="text-gold text-uppercase tracking-widest small fw-semibold">{{ t.discipline.clans }}</span>
-            <span class="text-parchment">{{ discipline.clanes.join(', ') }}</span>
+        </div>
+
+        <!-- Clans get a row of their own: the chips are much taller than the other
+             stats, and inline they dragged the whole row's baseline around. -->
+        <div v-if="discipline.clanes.length" class="d-flex flex-column gap-1 mt-4">
+          <span class="text-gold text-uppercase tracking-widest small fw-semibold">{{ t.discipline.clans }}</span>
+          <div class="d-flex flex-wrap justify-content-center justify-content-sm-start gap-2">
+            <button v-for="c in clanChips" :key="c.name" type="button"
+                    class="clan-chip" :class="{ 'clan-chip--plain': !c.id }"
+                    :disabled="!c.id"
+                    :style="c.color ? { '--card-color': c.color, '--card-glow': c.colorGlow } : undefined"
+                    @click="c.id && goClan(c.id)">
+              <span v-if="c.svg" class="clan-chip-sigil sigil" aria-hidden="true" v-html="c.svg"></span>
+              <span>{{ c.name }}</span>
+            </button>
           </div>
         </div>
       </div>
@@ -147,7 +179,7 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
                   <span class="power-fact-val">{{ shortDuration(power.duration) }}</span>
                 </p>
               </div>
-              <p class="power-card-desc small text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
+              <p class="power-card-desc text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
                 {{ power.description }}
               </p>
             </div>

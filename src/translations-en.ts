@@ -1135,7 +1135,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
   'blood-sorcery': {
     name: 'Blood Sorcery',
     description: 'Blood Sorcery is a Discipline of mystical blood manipulation. Tremere and Banu Haqim practitioners can sense, alter, and weaponize Vitae in ways that defy natural explanation.',
-    tipo: 'Sorcery',
+    tipo: '',
     amenaza: 'High. The effects of Blood Sorcery are visible, unnatural, and undeniably supernatural.',
     resonancia: 'Varies. Occultists, scholars, and those with strong spiritual connections.',
     powers: {
@@ -1216,7 +1216,7 @@ export const EN: Record<DisciplineId, DisciplineTranslation> = {
   'thin-blood-alchemy': {
     name: 'Thin-Blood Alchemy',
     description: 'The Thin Blood of the last Generations has almost no power of its own, but certain Thin-Bloods have learned to use it as a catalyst. By mixing strongly resonant human blood and sometimes other substances with their own Vitae, alchemists can simulate a wide range of powers from other Disciplines and create some unique powers of their own.',
-    tipo: 'Special (Thin-Blood only)',
+    tipo: '',
     amenaza: 'Varies according to the powers it mimics and the method used.',
     resonancia: 'The Resonance required for each formula, so it varies accordingly.',
     clanes: ['Thin-Blood'],

@@ -5,12 +5,27 @@ import { DISCIPLINE_ICONS } from '../icons'
 import { artGradient } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
+import { useClans } from '../composables/useClans'
 import type { Discipline } from '../types'
 
 const search = ref('')
 const router  = useRouter()
 const { t } = useI18n()
 const { disciplines: allDisciplines } = useData()
+const { clanSigil } = useClans()
+
+/** In-clan Disciplines are shown as sigils — the names are long (six of them on
+ *  Dominate) and the marks are already traced. Anything with no mark at all would
+ *  fall back to a text chip; nothing in the data does today. */
+function clanSigils(d: Discipline) {
+  return d.clanes.flatMap(name => {
+    const sigil = clanSigil(name)
+    return sigil ? [{ name, svg: sigil.svg }] : []
+  })
+}
+function clanPlain(d: Discipline): string[] {
+  return d.clanes.filter(name => !clanSigil(name))
+}
 
 // Strips diacritics so "hecata" matches "Hécata" and "dominacion" matches "Dominación"
 function norm(s: string): string {
@@ -72,7 +87,7 @@ function goTo(id: string) {
             @keydown.space.prevent="goTo(d.id)"
             tabindex="0"
             role="button"
-            :aria-label="`${d.name} — ${d.tipo}, ${d.powers.length} ${t.disciplinesList.powers}`"
+            :aria-label="`${d.name}${d.tipo ? ' — ' + d.tipo : ''}, ${d.powers.length} ${t.disciplinesList.powers}${d.clanes.length ? ', ' + t.disciplinesList.clans + ': ' + d.clanes.join(', ') : ''}`"
           >
             <!-- Art -->
             <div class="discipline-card-art"
@@ -85,25 +100,31 @@ function goTo(id: string) {
 
             <!-- Body -->
             <div class="d-flex flex-column gap-1 p-2 p-sm-3 flex-fill">
-              <h2 class="font-title fw-bold tracking-wide text-white leading-tight mb-0"
-                  style="font-size: 0.92rem;">
-                {{ d.name }}
-              </h2>
+              <div class="d-flex align-items-start gap-2">
+                <h2 class="disc-card-title font-title fw-bold tracking-wide text-white leading-tight mb-0 min-w-0">
+                  {{ d.name }}
+                </h2>
+                <span class="badge-tipo badge-tipo--card ms-auto" v-if="d.tipo">{{ d.tipo }}</span>
+              </div>
 
-              <div class="d-flex flex-wrap gap-1 mt-1">
-                <span class="badge-tipo">{{ d.tipo || 'Disciplina' }}</span>
-                <span class="badge-clanes d-none d-sm-inline-block" v-if="d.clanes.length">
-                  {{ d.clanes.join(' · ') }}
+              <div class="d-flex flex-wrap gap-1 mt-1" v-if="clanPlain(d).length">
+                <span class="badge-clanes d-none d-sm-inline-block" v-for="name in clanPlain(d)" :key="name">
+                  {{ name }}
                 </span>
               </div>
 
-              <p class="text-parchment-dim fst-italic leading-snug mt-1 mb-0 d-none d-sm-block"
-                 style="font-size:0.85rem;">
+              <!-- Clan sigils. The names are already in the card's aria-label. -->
+              <div class="disc-clans d-none d-sm-flex" aria-hidden="true" v-if="clanSigils(d).length">
+                <span v-for="c in clanSigils(d)" :key="c.name"
+                      class="disc-clan-sigil" :title="c.name" v-html="c.svg"></span>
+              </div>
+
+              <p class="disc-card-desc text-parchment-dim fst-italic leading-snug mt-1 mb-0 d-none d-sm-block">
                 <strong class="text-gold not-italic">{{ t.disciplinesList.resonance }}:</strong>
                 {{ d.resonancia }}
               </p>
 
-              <div class="mt-auto pt-1 small" style="opacity:.8;" :style="{ color: d.color }">
+              <div class="disc-card-meta mt-auto pt-1 text-end" style="opacity:.8;" :style="{ color: d.color }">
                 {{ d.powers.length }} {{ t.disciplinesList.powers }}
               </div>
             </div>

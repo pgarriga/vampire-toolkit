@@ -112,3 +112,26 @@ export const CLAN_ICONS: Record<ClanIconType, string> = {
     </g>
   </svg>`,
 }
+
+/**
+ * The Thin-Blood mark from the sheet of the descastados: a circle whose right half
+ * is filled. It is **not** a clan — no entry in `clans.ts`, no `/clan/…` page — it
+ * only shows up where a Discipline lists who has it.
+ *
+ * The one glyph in the app built from measurements rather than traced. The source
+ * is a screenshot whose rescaling flattened the circle's right edge, and a trace
+ * reproduces that dent. Since the mark is a circle, a concentric circle and a
+ * vertical diameter, it is rebuilt from what was measured off that same image:
+ * centre (100, 288.5), outer radius 40, ring 4.5px, chord on the vertical
+ * diameter. Re-trace it properly if a clean source ever turns up.
+ */
+export const THIN_BLOOD_ICON = `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+    <path fill="currentColor" fill-rule="evenodd" d="M50 3.00a47 47 0 1 0 0 94.00a47 47 0 1 0 0-94.00ZM50 8.29a41.71 41.71 0 0 0 0 83.42Z"/>
+  </svg>`
+
+/**
+ * What `discipline.clanes` calls the Thin-Bloods, per language. It is the only
+ * entry in any Discipline's clan list that is not a clan, so it is the only one
+ * that needs naming here — add the new spelling when adding a language.
+ */
+export const THIN_BLOOD_NAMES = new Set(['Sangre Débil', 'Thin-Blood', 'Sang Feble'])

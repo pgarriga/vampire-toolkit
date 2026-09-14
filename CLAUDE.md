@@ -188,7 +188,11 @@ the data model has no place for them yet.
   id: "animalismo",           // slug used in routes
   name: "Animalismo",
   description: "...",
-  tipo: "Mental",             // Mental | Físico | Social
+  tipo: "Mental",             // Mental | Físico | Social — **empty** for Blood Sorcery and
+                              // Thin-Blood Alchemy, whose book "types" (Hechicería,
+                              // Especial…) only restated the discipline name. Every reader
+                              // must cope with `''`: the badge, the card aria-label, the
+                              // clan mini-card meta and the power sheet's Tipo row.
   amenaza: "...",
   resonancia: "...",
   color: "#4a7c3f",           // theme colour (gradients and borders)
@@ -276,15 +280,29 @@ ever needs redoing, re-trace it — do not redraw it by hand.
 diamond with the glyph knocked out via `fill-rule="evenodd"`. Notes:
 
 - **Obfuscation's badge is blank on the sheet** — an empty diamond. That is the symbol.
-- **Thin-Blood Alchemy has no symbol in the legend.** The panel carries Oblivion in its
-  place, so the previous hand-drawn flask was set inside the same diamond frame to keep the
-  set consistent.
+- **Thin-Blood Alchemy's symbol is not in the discipline legend** — it is in the legend of
+  the *Hoja de resumen de los descastados*, as an hourglass in the same diamond frame. That
+  one is now traced (`alchemy`, which replaced the placeholder `flask` key and its
+  hand-drawn artwork).
 - The Oblivion glyph is now in use: `oblivion` is a real discipline (`iconType: 'olvido'`).
 - The `iconType` keys are unchanged (`wolf`, `crown`, …) so `data.ts` still addresses icons
   by the same key, even though the keys describe the old artwork rather than the new.
 
 `CLAN_ICONS` is keyed by clan `id` (no indirection) and holds the 14 clan sigils from the
-clan bands of the same sheet. When re-tracing those, the crop window must stop just short
+clan bands of the same sheet. `clan-icons.ts` also exports `THIN_BLOOD_ICON` and
+`THIN_BLOOD_NAMES`: the Thin-Bloods have a mark on the *descastados* sheet but are not a
+clan (no `clans.ts` entry, no `/clan/…` page), and they are the only name in any
+Discipline's `clanes` list that is not a clan. `useClans().clanSigil(name)` resolves both
+cases — it returns the clan alongside the sigil only when there is one, and `DisciplineView`
+renders a chip without a clan as dashed and `disabled`. **Adding a language means adding
+that language's spelling to `THIN_BLOOD_NAMES`.**
+
+`THIN_BLOOD_ICON` is the one glyph built from measurements instead of traced, and the
+comment above it says why: the source is a screenshot whose rescaling flattened the
+circle's right edge, and the mark is simple enough (a circle, a concentric circle and a
+vertical diameter) to rebuild exactly from measurements taken off that same image. Every
+other glyph in the app is a trace, and re-tracing this one from a clean source would be an
+improvement. When re-tracing those, the crop window must stop just short
 of the clan name — the verbs line starts at ~x132 on the left page and the script name at
 ~x1024 on the right — and blobs are then clustered outward from the largest one.
 **Do not split sigil from text by an x-fraction or by blob height:** the first clipped
@@ -322,9 +340,20 @@ Custom gothic styles on top of Bootstrap's grid + utilities. CSS custom properti
 Relevant classes:
 
 - `.app-navbar` / `.app-menu-toggler` / `.app-menu-overlay` / `.app-menu-panel` / `.app-menu-item` / `.app-menu-badge` — custom top bar and overlay menu
-- `.clan-sigil` / `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-disc-chip` / `.clan-trait` / `.clan-trait-name` — Clans tool
+- `.clan-sigil` / `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-trait` / `.clan-trait-name` — Clans tool
 - `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
 - `.discipline-card` / `.power-card` — cards driven by `--card-color` and `--card-glow`
+- `.disc-clans` / `.disc-clan-sigil` — the in-clan clans on a discipline card, drawn as the
+  clans' own traced sigils instead of a wide uppercase pill of names (Dominate lists six).
+  They are painted `--parchment-dim`, not the clan colour: at 16px a hue reads as noise, and
+  the neutral clears 3:1 on both themes. `discipline.clanes` stores display *names*, so
+  `useClans().clanIdByName()` resolves them; anything that is not a clan (Thin-Blood Alchemy
+  lists "Sangre Débil") falls back to a `.badge-clanes` text chip. The row is `aria-hidden` —
+  the names are in the card's `aria-label`
+- `.clan-chip` (+ `--plain`) / `.clan-chip-sigil` — the same clans on the discipline *page*,
+  as links to each clan's sheet: sigil, name, the clan's own colour in the border and glow.
+  The sigil carries `.sigil`, never an inline colour. A name with no clan behind it gets a
+  dashed, `disabled` chip rather than a link that goes nowhere
 - `.power-dot` / `.power-level-dots-card` — **the one and only level indicator.** The grid
   card used to carry a `NIVEL n` badge *and* the dots, the detail art a `discipline · level`
   pill *and* the dots; the dots won because they are V5's own notation for a rating and need
@@ -339,19 +368,24 @@ Relevant classes:
   `Coste: ` alone costs a third of it, so a gold drop (cost), d10 (dice pool) and clock
   (duration) carry the label and the real wording stays in a `.visually-hidden` span.
   `.power-fact-val` clamps at two lines
-- `.power-card-title` / `.power-facts` (+ `--solo`) / `.power-card-desc` — **every power card
-  is the same height.** Bootstrap only equalises the cards within one wrapped row, so each
-  block reserves a fixed number of lines: 2 for the title, 4 for the facts, 3 for the
-  description. The fact ceiling is measured — across es/en/ca from 320 to 1200px, cost +
-  dice pool + duration never total more than 4: one of the three may wrap, never two.
-  Several strings were reworded to hold that (see the cost/duration section below); if you
-  edit one, re-measure. The title's 2 is a deliberate trade: a
-  3-line reserve left a visible hole above the cost line on nearly every card, so the title
-  is ellipsised instead, which bites 3-5 of the 280 names at the narrow breakpoints
-  ("Encubrimiento de la Concurrencia", "Fortificar la Fachada Interior" and their Catalan
-  twins). It is vertically centred in its box, so a one-line name splits the leftover
-  half-line evenly above and below. If a power name, cost, pool or duration gets longer, re-check
-  those ceilings before shipping it
+- `.power-card-title` / `.power-facts` / `.power-card-desc` — **every power card is the same
+  height.** Bootstrap only equalises the cards within one wrapped row, so each block instead
+  takes a fixed `height` (not `min-height`) of a set number of lines: 2 for the title, 4 for
+  the facts, 3 for the description. The description does **not** use `mt-auto`, so it starts
+  at the same y on every card rather than at the bottom of whatever slack the row had.
+  The fact ceiling is measured with the real font metrics across es/en/ca from 320 to
+  1200px: cost + dice pool + duration never total more than 4, one of the three may wrap,
+  never two. Several cost and duration strings were reworded to hold it (see the
+  cost/duration section below). The title's 2 is a deliberate trade — a 3-line reserve left
+  a visible hole above the cost line on nearly every card — so a longer name is ellipsised
+  instead: 15 of the 441 names in es/en/ca at 320px, 2 at 1200px, "Coaccionar el
+  Temperamento Bestial" being the one that never fits. The title is vertically centred in
+  its box, so a one-line name splits the leftover half-line evenly.
+  **Sizes are load-bearing**: `--card-title-size`, `--card-meta-size` and
+  `--card-desc-size` in `:root` are the one type scale for both card grids (the discipline
+  cards read them through `.disc-card-title` / `.disc-card-desc` / `.disc-card-meta`).
+  Raising one, or lengthening a name, cost, pool or duration, means measuring both ceilings
+  again before shipping
 - `.star-btn` / `.star-btn--filled` — favourites star button (top-right on the power art).
   The two states differ by **shape as well as colour** — a hollow outlined star when off, a
   solid gold one with a glow when on — because a colour-only shift was hard to tell apart
@@ -395,7 +429,7 @@ These are non-negotiable for any change to the codebase.
 2. **All three languages stay in sync.** When adding a UI string, add it to `es`, `en` **and** `ca` blocks in `useI18n.ts` in the same commit. TypeScript will fail the build if `en` or `ca` drift from `es`'s shape.
 3. **Discipline, power and clan content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`; whenever `clans.ts` changes, do the same in `translations-clans-en.ts` **and** `translations-clans-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature. Clan names that differ by language (`El Ministerio` / `The Ministry` / `El Ministeri`, `Hécata` / `Hecata`) also need `clanes` overrides in the discipline overlays.
 4. **Language `auto` order matters.** `CATALAN` (`/^ca\b/i`) is checked before the general `IBERIAN` regex; keep it that way so `ca-*` browsers don't fall into the `es` bucket.
-5. **To add a language:** create `translations-<lang>.ts` mirroring the EN structure, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, add a `<lang>` dict block plus `lang<Lang>` label to every language block in `useI18n.ts`, wire the overlay in `useData.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
+5. **To add a language:** create `translations-<lang>.ts` mirroring the EN structure, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, add a `<lang>` dict block plus `lang<Lang>` label to every language block in `useI18n.ts`, wire the overlay in `useData.ts`, add that language's spelling of the Thin-Bloods to `THIN_BLOOD_NAMES` in `clan-icons.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
 
 ### Responsive
 

@@ -194,7 +194,7 @@ function copyList() {
                     <span class="power-fact-val">{{ shortDuration(power.duration) }}</span>
                   </p>
                 </div>
-                <p class="power-card-desc small text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
+                <p class="power-card-desc text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
                   {{ power.description }}
                 </p>
               </div>

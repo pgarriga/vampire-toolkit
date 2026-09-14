@@ -1114,7 +1114,7 @@ export const CA: Record<DisciplineId, DisciplineTranslation> = {
   'blood-sorcery': {
     name: 'Bruixeria de Sang',
     description: 'També anomenada Taumatúrgia (pels Tremere) o Quietus/Extinció (pels Banu Haqim). A diferència d\'altres Disciplines, els practicants de Bruixeria de Sang requereixen professors. Confereix Poders i desbloqueja la capacitat de realitzar rituals fins al nivell de l\'usuari en la Disciplina.',
-    tipo: 'Bruixeria',
+    tipo: '',
     amenaza: 'Baixa-alta. L\'aparença individual dels Poders i rituals de Bruixeria de Sang varia tant com els seus efectes.',
     resonancia: 'Sanguínia. Encara que no és inherent a la Sang en si mateixa, la Bruixeria de Sang respon amb entusiasme a la sang d\'ocultistes humans, bruixots i líders de sectes, així com a hemofílics i bibliòfils.',
     powers: {
@@ -1195,7 +1195,7 @@ export const CA: Record<DisciplineId, DisciplineTranslation> = {
   'thin-blood-alchemy': {
     name: 'Alquímia de Sang Feble',
     description: 'La Sang Feble de les últimes Generacions gairebé no té poder propi, però certs Sang Feble han après a usar-la com a catalitzador. Barrejant sang humana fortament ressonant i de vegades altres substàncies amb la seva pròpia Vitae, els alquimistes poden simular una àmplia gamma de Poders d\'altres Disciplines i crear alguns Poders únics propis. L\'Alquímia pot simular alguns Poders de Bruixeria de Sang, però no rituals.',
-    tipo: 'Especial (només per a Sang Feble)',
+    tipo: '',
     amenaza: 'Varia segons els Poders que imita i el mètode utilitzat.',
     resonancia: 'La necessària per a cada fórmula, per la qual cosa varia en conseqüència.',
     clanes: ['Sang Feble'],

@@ -1455,7 +1455,7 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "id": "blood-sorcery",
       "name": "Hechicería de Sangre",
       "description": "También llamada Taumaturgia (por los Tremere) o Quietus/Extinción (por los Banu Haqim). A diferencia de otras Disciplinas, los practicantes de Hechicería de Sangre requieren profesores. Confiere Poderes y desbloquea la capacidad de realizar rituales hasta el nivel del usuario en la Disciplina.",
-      "tipo": "Hechicería",
+      "tipo": "",
       "amenaza": "Baja-alta. La apariencia individual de los Poderes y rituales de Hechicería de Sangre varía tanto como sus efectos.",
       "resonancia": "Sanguínea. Aunque no es inherente a la Sangre en sí misma, Hechicería de Sangre responde con entusiasmo a la sangre de ocultistas humanos, hechiceros y líderes de sectas, así como a hemofílicos y bibliófilos.",
       "powers": [
@@ -1563,7 +1563,7 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "id": "thin-blood-alchemy",
       "name": "Alquimia de Sangre Débil",
       "description": "La Sangre Débil de las últimas Generaciones apenas tiene poder propio, pero ciertos Sangre Débil han aprendido a usarla como catalizador. Al mezclar sangre humana fuertemente resonante y a veces otras sustancias con su propia Vitae, los alquimistas pueden simular una amplia gama de Poderes de otras Disciplinas y crear algunos Poderes únicos propios. La Alquimia puede simular algunos Poderes de Hechicería de Sangre, pero no rituales.",
-      "tipo": "Especial (sólo para Sangre Débil)",
+      "tipo": "",
       "amenaza": "Varía según los Poderes que imita y el método utilizado.",
       "resonancia": "La necesaria para cada fórmula, por lo que varía en consecuencia.",
       "metodos": [
@@ -1654,7 +1654,7 @@ export const DISCIPLINES_DATA: DisciplinesData =
       "clanes": [
         "Sangre Débil"
       ],
-      "iconType": "flask"
+      "iconType": "alchemy"
     }
   ]
 };

@@ -27,7 +27,7 @@ const disciplines = computed(() =>
       iconType: d.iconType,
       color: d.color,
       colorGlow: d.colorGlow,
-      meta: `${d.tipo} · ${d.powers.length} ${t.value.disciplinesList.powers}`,
+      meta: [d.tipo, `${d.powers.length} ${t.value.disciplinesList.powers}`].filter(Boolean).join(' · '),
     })),
 )
 
