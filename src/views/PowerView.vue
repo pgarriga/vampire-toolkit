@@ -49,6 +49,7 @@ async function sharePower() {
       duration: t.value.power.duration,
       type:     t.value.power.type,
       amalgam:  t.value.power.amalgam,
+      level:    t.value.power.level,
     })
     const file = new File([blob], `${power.value.id}.png`, { type: 'image/png' })
     await navigator.share({
@@ -188,19 +189,15 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
              :style="{ background: artGradient(discipline) }"
              aria-hidden="true">
 
-          <div class="power-detail-level-dots">
-            <span v-for="(filled, i) in levelDots(power.level)" :key="i"
-                  class="power-dot" :class="{ filled }"
-                  style="width:13px;height:13px;"></span>
+          <div class="power-detail-discipline-tag">
+            <span>{{ discipline.name }}</span>
           </div>
 
           <div v-html="DISCIPLINE_ICONS[discipline.iconType]"
                :style="{ '--card-color': discipline.color }"
                class="power-detail-icon sigil"></div>
 
-          <div class="power-detail-discipline-tag">
-            <span>{{ discipline.name }}</span>
-          </div>
+          <div class="power-level-badge power-level-badge--detail">{{ t.power.level }} {{ power.level }}</div>
 
           <div class="power-detail-art-overlay"></div>
         </div>

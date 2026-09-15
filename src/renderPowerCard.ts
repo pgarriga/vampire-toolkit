@@ -1,6 +1,5 @@
 import type { Discipline, Power } from './types'
 import { DISCIPLINE_ICONS } from './icons'
-import { levelDots } from './helpers'
 
 export interface RenderStrings {
   cost:     string
@@ -8,6 +7,7 @@ export interface RenderStrings {
   duration: string
   type:     string
   amalgam:  string
+  level:    string
 }
 
 const WIDTH   = 1080
@@ -201,30 +201,31 @@ export async function renderPowerCard(
   ctx.fillStyle = fade
   ctx.fillRect(0, headerH * 0.55, WIDTH, headerH * 0.45)
 
-  const dotY = 60
-  const dotR = 12
-  const dotGap = 18
-  const dotsFilled = levelDots(power.level)
-  const dotsW = dotsFilled.length * (dotR * 2) + (dotsFilled.length - 1) * dotGap
-  let dotX = (WIDTH - dotsW) / 2 + dotR
+  // Level label, mirroring `.power-level-badge`: a white pill with near-black text,
+  // which holds its contrast over art mixed from any discipline accent.
+  const badgeText = `${strings.level} ${power.level}`.toUpperCase()
+  const badgeH = 54
+  const badgeR = badgeH / 2
+  ctx.font = `700 30px ${FONT_BODY}`
+  const badgeW = ctx.measureText(badgeText).width + 48
+  const badgeX = WIDTH - badgeW - 44
+  const badgeY = headerH - badgeH - 40
+
+  ctx.fillStyle = '#ffffff'
+  roundRect(ctx, badgeX, badgeY, badgeW, badgeH, badgeR)
+  ctx.fill()
   ctx.lineWidth = 2
-  for (const filled of dotsFilled) {
-    ctx.beginPath()
-    ctx.arc(dotX, dotY, dotR, 0, Math.PI * 2)
-    // Gold, not the discipline accent — see `.power-dot` in main.css: the dots are
-    // the only level indicator and the accent cannot contrast with its own art.
-    if (filled) {
-      ctx.fillStyle = COLOR_GOLD
-      ctx.fill()
-      ctx.strokeStyle = COLOR_GOLD
-    } else {
-      ctx.fillStyle = 'rgba(0,0,0,0.5)'
-      ctx.fill()
-      ctx.strokeStyle = COLOR_GOLD_DIM
-    }
-    ctx.stroke()
-    dotX += dotR * 2 + dotGap
-  }
+  ctx.strokeStyle = 'rgba(0,0,0,0.25)'
+  ctx.stroke()
+
+  // Centred off the glyphs' own box rather than the font's line box: Cormorant's tall
+  // ascender puts 'middle' visibly high for all-caps text with no descenders.
+  const bm = ctx.measureText(badgeText)
+  const capH = bm.actualBoundingBoxAscent || 21
+  ctx.fillStyle = '#14101f'
+  ctx.textAlign = 'center'
+  ctx.textBaseline = 'alphabetic'
+  ctx.fillText(badgeText, badgeX + badgeW / 2, badgeY + badgeR + capH / 2)
 
   const iconSize = 320
   const iconX = (WIDTH - iconSize) / 2

@@ -517,17 +517,69 @@ a { text-decoration: none; color: inherit; }
 }
 @media (min-width: 576px) { .power-art-icon { width: 5rem; height: 5rem; } }
 
-.power-level-dots-card {
-  position: absolute;
-  bottom: 0.7rem; right: 0.7rem;
-  z-index: 3;
+/* Discipline rating on a character sheet: the number of powers they have in it, as
+   V5's own 0–5 dot notation. Capped at 5 like a real rating — the exact number stays
+   in the .visually-hidden label beside it, so nothing is lost past the fifth dot. */
+.disc-rating {
   display: flex;
+  flex-shrink: 0;
   gap: 0.25rem;
 }
-/* The dots are the *only* level indicator, so they are a meaningful graphical
-   object and owe 3:1. They are painted in gold, not in the discipline accent:
-   6 of the 11 accents sit between 2.26:1 and 2.84:1 on the dark card (Potencia
-   #9a1a1a is the worst), and the art behind them is mixed from that same accent. */
+
+/* Power level: a white "Nivel N" pill, where the card art's dots used to sit.
+   White ground with near-black text rather than theme vars, because the art behind it
+   is artGradient(), whose end stops are the fixed `colorDark` and so stays dark in
+   BOTH themes. Fixed colours also mean one look everywhere, including over the page
+   in the picker rows, where the thin dark edge keeps it from melting into the light
+   theme's near-white background.
+
+   The height is explicit and line-height is 1: without them the pill's height comes
+   from Cormorant Garamond's line box, whose tall ascender leaves the all-caps text
+   visibly off-centre (it centred fine back when the badge was a fixed-size circle
+   holding a single digit). */
+.power-level-badge {
+  position: absolute;
+  bottom: 0.6rem; right: 0.6rem;
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 21px;
+  padding: 0 0.5rem;
+  border: 1px solid rgba(0,0,0,0.25);
+  border-radius: 999px;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  background: #ffffff;
+  color: #14101f;
+  font-family: var(--font-body);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+/* Detail art: same pill, larger, under the sigil at the right edge. */
+.power-level-badge--detail {
+  top: auto; left: auto;
+  bottom: 1rem; right: 1rem;
+  height: 28px;
+  padding: 0 0.85rem;
+  font-size: 0.85rem;
+}
+
+/* Picker row: in the flow, not over art, so it drops the absolute placement. */
+.power-level-badge--row {
+  position: static;
+  flex-shrink: 0;
+  box-shadow: none;
+}
+
+/* V5's dot rating, now used only for a Discipline's rating on a character sheet —
+   a power's level is a numbered badge (see .power-level-badge). It is a meaningful
+   graphical object and owes 3:1, and it is painted in gold rather than a discipline
+   accent: 6 of the 11 accents sit between 2.26:1 and 2.84:1 on the dark surface. */
 .power-dot {
   width: 9px; height: 9px;
   border-radius: 50%;
@@ -600,14 +652,6 @@ a { text-decoration: none; color: inherit; }
   inset: 0;
   background: linear-gradient(180deg, transparent 40%, var(--void-card) 100%);
   z-index: 2;
-}
-.power-detail-level-dots {
-  position: absolute;
-  top: 1rem; left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 0.4rem;
-  z-index: 3;
 }
 .power-detail-icon {
   width: 8rem; height: 8rem;
