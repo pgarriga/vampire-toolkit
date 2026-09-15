@@ -30,6 +30,9 @@
   --card-title-size: clamp(0.84rem, 0.5rem + 1.7vw, 0.88rem);
   --card-meta-size:  0.86rem;
   --card-desc-size:  0.92em;
+  /* Width of the single-column pages (home, and the overlay menu that mirrors it).
+     Shared so the menu keeps matching the page behind it. */
+  --content-width: 44rem;
   /* Tool accents (dark) */
   --bane-accent:       #d9635b;
   --tool-disciplines:  #c94a4a;
@@ -884,14 +887,19 @@ a { text-decoration: none; color: inherit; }
   background: rgba(13,11,20,0.92);
   backdrop-filter: blur(10px);
   z-index: 1020;
-  padding: 1rem;
+  /* Side padding matches the pages' own px-4 (1.5rem), so the menu column and the
+     page column sit at the same edges at every width, not just above the cap. */
+  padding: 1rem 1.5rem;
   overflow-y: auto;
 }
 [data-theme="light"] .app-menu-overlay {
   background: rgba(244,236,222,0.94);
 }
+/* Matches the home page's column: the menu shows the same sections, so on a wide
+   display the two line up instead of the menu sitting in a narrower well. Narrow
+   screens are unaffected — the cap never binds there. */
 .app-menu-panel {
-  max-width: 28rem;
+  max-width: var(--content-width);
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -924,29 +932,68 @@ a { text-decoration: none; color: inherit; }
   border-color: var(--gold-dim);
   background: var(--void-card2);
 }
-/* The star fills in when My Powers is the current route. Only the favourites icon is
-   drawn with a <polygon>, so this cannot touch the other nav icons. */
-.app-menu-item.active .app-menu-icon svg polygon { fill: currentColor; }
+/* Section headings inside the overlay menu, matching the home page's own
+   (.home-section-title). The panel is a flex column with a 0.5rem gap, so the
+   spacing above a heading is added rather than set, to group it with what follows. */
+/* The separation between sections belongs between the groups, not on the heading
+   inside one: as a group's first child, a heading's own margin-top was being zeroed
+   by the :first-child rule that used to guard the old flat layout. */
+.app-menu-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1.5rem;
+}
+
+/* No margin of its own: a heading belongs to the items under it, so the gap that
+   separates sections sits on .app-menu-group instead. */
+.app-menu-heading {
+  color: var(--gold);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  margin: 0;
+  padding: 0 0.25rem;
+  text-transform: uppercase;
+}
+
+.app-menu-divider {
+  border: 0;
+  border-top: 1px solid var(--void-border);
+  margin: 1.5rem 0 0.5rem;
+  opacity: 1;
+}
+
+/* The create-character row reads as an action, not a destination — same dashed
+   treatment the home page's own create row uses. */
+.app-menu-item--new {
+  background: transparent;
+  border-style: dashed;
+  color: var(--gold);
+}
+.app-menu-item--new:hover { background: var(--void-card); }
+
+/* A character's own clan sigil, pushed clear of the clan colour by .sigil. */
+.app-menu-sigil { width: 20px; height: 20px; }
+.app-menu-sigil svg { width: 100%; height: 100%; display: block; }
 
 .app-menu-icon { display: flex; flex-shrink: 0; }
 .app-menu-icon svg { width: 20px; height: 20px; display: block; }
 
-.app-menu-badge {
-  margin-left: auto;
-  background: #8b0000;
-  color: #fff;
-  font-size: 0.7rem;
-  font-weight: 700;
-  min-width: 20px; height: 20px;
-  border-radius: 10px;
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0 6px;
-  letter-spacing: 0;
+/* Desktop: the panel is 44rem wide up here, so the phone-sized type reads small in
+   it. A media query rather than clamp() — the panel stops growing at the cap, so a
+   vw-driven size would keep scaling after the box it sits in has stopped. */
+@media (min-width: 768px) {
+  .app-menu-item    { font-size: 1.2rem; min-height: 58px; padding: 0.95rem 1.15rem; }
+  .app-menu-heading { font-size: 0.8rem; }
+  .app-menu-icon svg,
+  .app-menu-sigil   { width: 23px; height: 23px; }
 }
+
 
 /* ─── Home tool cards ─── */
 .tools-wrap {
-  max-width: 44rem;
+  max-width: var(--content-width);
 }
 .tools-grid {
   display: grid;
@@ -1019,8 +1066,10 @@ a { text-decoration: none; color: inherit; }
 }
 
 /* ─── Settings view ─── */
+/* A single-column page like the home page, so it shares that column's width rather
+   than sitting in a narrower well of its own on a wide display. */
 .settings-wrap {
-  max-width: 36rem;
+  max-width: var(--content-width);
 }
 .settings-section {
   display: flex;
