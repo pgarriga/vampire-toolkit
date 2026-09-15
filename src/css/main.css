@@ -1376,7 +1376,7 @@ button.disc-mini-card:focus-visible {
   display: flex;
   flex-direction: column;
   gap: 0.1rem;
-  min-width: 0;   /* lets a long name ellipsise instead of pushing the chevron out */
+  min-width: 0;   /* lets a long name ellipsise instead of widening the row */
 }
 
 .char-row-name {
@@ -1399,13 +1399,6 @@ button.disc-mini-card:focus-visible {
   white-space: nowrap;
 }
 
-.char-row-chevron {
-  color: var(--parchment-faint);
-  flex-shrink: 0;
-  height: 18px;
-  margin-left: auto;
-  width: 18px;
-}
 
 /* The "create new character" row: the empty-state placeholder, and the way to add
    another one once there are some. Dashed so it reads as an action, not a character. */
@@ -1761,6 +1754,17 @@ button.disc-mini-card:focus-visible {
 /* ─── Adding powers to a character ─── */
 
 /* Count of powers the character already has in a Discipline, on the picker's list. */
+/* Kept for the power picker's Discipline rows, which do drill down into a second
+   level. The home page's character rows dropped theirs: every card in that section
+   already reads as tappable, and the Compendium cards right above navigate the same
+   way without one. */
+.disc-pick-chevron {
+  color: var(--parchment-faint);
+  flex-shrink: 0;
+  height: 18px;
+  width: 18px;
+}
+
 .disc-owned-badge {
   background: var(--void-card2);
   border: 1px solid var(--gold-dim);

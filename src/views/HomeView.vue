@@ -144,10 +144,6 @@ const rows = computed(() =>
               <span class="char-row-name font-title">{{ row.name }}</span>
               <span class="char-row-meta">{{ row.meta }}</span>
             </span>
-            <svg class="char-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                 stroke-width="2" aria-hidden="true">
-              <path d="m9 18 6-6-6-6"/>
-            </svg>
           </button>
 
           <!-- Placeholder when there are none, and the way to add more once there are -->

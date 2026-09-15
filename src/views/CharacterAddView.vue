@@ -89,7 +89,7 @@ function goBack(): void {
               </span>
             </span>
             <span v-if="ownedCount(d.id)" class="disc-owned-badge">{{ ownedCount(d.id) }}</span>
-            <svg class="char-row-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            <svg class="disc-pick-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                  stroke-width="2" aria-hidden="true">
               <path d="m9 18 6-6-6-6"/>
             </svg>
