@@ -100,11 +100,14 @@ function goTo(id: string) {
 
             <!-- Body -->
             <div class="d-flex flex-column gap-1 p-2 p-sm-3 flex-fill">
-              <div class="disc-card-head">
+              <div class="d-flex align-items-start gap-2">
                 <h2 class="disc-card-title font-title fw-bold tracking-wide text-white leading-tight mb-0 min-w-0">
                   {{ d.name }}
                 </h2>
-                <span class="badge-tipo badge-tipo--card" v-if="d.tipo">{{ d.tipo }}</span>
+                <!-- Hidden on phones: beside it the name only had 67px at 320px, less
+                     than its own longest word. Same breakpoint the clan chips below use. -->
+                <span class="badge-tipo badge-tipo--card ms-auto d-none d-sm-inline-block"
+                      v-if="d.tipo">{{ d.tipo }}</span>
               </div>
 
               <div class="d-flex flex-wrap gap-1 mt-1" v-if="clanPlain(d).length">
