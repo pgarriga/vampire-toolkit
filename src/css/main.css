@@ -1319,8 +1319,8 @@ button.disc-mini-card:focus-visible {
   cursor: pointer;
   display: flex;
   font-family: var(--font-body);
-  gap: 0.75rem;
-  min-height: 72px;
+  gap: 0.7rem;
+  min-height: 64px;
   padding: 0.75rem 1rem;
   min-width: 0;
   text-align: left;
@@ -1337,9 +1337,10 @@ button.disc-mini-card:focus-visible {
   outline-offset: 2px;
 }
 
-/* 44px on a phone, 52px once there is room. The sigil is decorative — the whole row
-   is the button — so it owes no touch floor, and the 8px it gives back is what lets
-   the longest label ("Desde un fichero JSON guardado") fit on one line at 393px. */
+/* Scales in three steps. On a phone every pixel here is one the label does not get,
+   and the sigil is decorative — the whole row is the button, so it owes no touch
+   floor. On a wide display the row is 44rem and a phone-sized sigil looks lost in it,
+   so it grows and the row grows with it. */
 .char-row-medallion {
   align-items: center;
   border: 1px solid var(--card-color, var(--void-border));
@@ -1347,21 +1348,28 @@ button.disc-mini-card:focus-visible {
   box-shadow: 0 0 14px var(--card-glow, transparent);
   display: flex;
   flex-shrink: 0;
-  height: 44px;
+  height: 38px;
   justify-content: center;
-  width: 44px;
+  width: 38px;
 }
 
 .char-row-sigil {
   display: flex;
-  height: 26px;
-  width: 26px;
+  height: 22px;
+  width: 22px;
 }
 
 @media (min-width: 576px) {
-  .char-row { gap: 0.9rem; }
-  .char-row-medallion { height: 52px; width: 52px; }
-  .char-row-sigil { height: 30px; width: 30px; }
+  .char-row { gap: 0.9rem; min-height: 76px; }
+  .char-row-medallion { height: 54px; width: 54px; }
+  .char-row-sigil { height: 31px; width: 31px; }
+}
+
+@media (min-width: 768px) {
+  .char-row { gap: 1.1rem; min-height: 88px; }
+  .char-row-medallion { height: 64px; width: 64px; }
+  .char-row-sigil { height: 37px; width: 37px; }
+  .char-row-name { font-size: 1.15rem; }
 }
 
 .char-row-text {
@@ -1414,8 +1422,9 @@ button.disc-mini-card:focus-visible {
   box-shadow: none;
   color: var(--gold);
 }
-.char-row-medallion--new svg { width: 21px; height: 21px; }
-@media (min-width: 576px) { .char-row-medallion--new svg { width: 24px; height: 24px; } }
+.char-row-medallion--new svg { width: 18px; height: 18px; }
+@media (min-width: 576px) { .char-row-medallion--new svg { width: 25px; height: 25px; } }
+@media (min-width: 768px) { .char-row-medallion--new svg { width: 29px; height: 29px; } }
 
 /* ─── Create-character form ─── */
 .char-form-wrap { max-width: 36rem; }
