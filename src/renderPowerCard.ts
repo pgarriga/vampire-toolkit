@@ -346,7 +346,7 @@ export async function renderPowerCard(
   ctx.font = `600 26px ${FONT_TITLE}`
   ctx.fillStyle = COLOR_PARCHMENT_DIM
   ctx.textAlign = 'center'
-  ctx.fillText('VAMPIRE TOOLKIT', WIDTH / 2, totalH - footerH + 28)
+  ctx.fillText('VAMPIRE V5 TOOLKIT', WIDTH / 2, totalH - footerH + 28)
   ctx.font = `400 22px ${FONT_BODY}`
   ctx.fillStyle = COLOR_PARCHMENT_FAINT
   ctx.fillText('Vampire: The Masquerade — 5th Edition', WIDTH / 2, totalH - footerH + 62)

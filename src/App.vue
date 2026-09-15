@@ -59,7 +59,7 @@ watch(menuOpen, (open) => {
       href="#/"
       @click.prevent="go('/')"
     >
-      Vampire Toolkit
+      Vampire V5 Toolkit
     </a>
 
     <button
