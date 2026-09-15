@@ -66,6 +66,28 @@ export default defineConfig({
     }),
   ],
   base,
+  build: {
+    rollupOptions: {
+      output: {
+        /**
+         * Split the static game content away from the app code. The disciplines,
+         * clans, traced sigils and translation overlays are ~80% of the bundle and
+         * almost never change, while the app code changes every release. Keeping them
+         * in separate chunks means a release only invalidates the small one, so the
+         * service worker re-downloads a few KB instead of the whole bundle.
+         */
+        manualChunks(id: string) {
+          // Rolldown (Vite 8) only accepts the function form, not the object map.
+          if (/[\\/]src[\\/](data|clans|translations-[\w-]+)\.ts$/.test(id)) return 'game-content'
+          if (/[\\/]src[\\/](icons|clan-icons)\.ts$/.test(id)) return 'game-icons'
+          return undefined
+        },
+      },
+    },
+    // The content chunks are deliberately large and cached separately; the warning
+    // would fire on them every build without telling us anything new.
+    chunkSizeWarningLimit: 700,
+  },
   server: {
     port: 5173,
   },

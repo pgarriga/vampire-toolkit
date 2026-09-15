@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
+// Only Bootstrap's CSS: the grid and utility classes. Its JS bundle is not imported —
+// the navbar and every overlay in this app are hand-written, so nothing used it.
 import 'bootstrap/dist/css/bootstrap.min.css'
-import 'bootstrap/dist/js/bootstrap.bundle.min.js'
 import './css/main.css'
 import router from './router'
 import App from './App.vue'

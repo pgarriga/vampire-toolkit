@@ -88,7 +88,6 @@ a { text-decoration: none; color: inherit; }
 .text-parchment-dim   { color: var(--parchment-dim)   !important; }
 .text-parchment-faint { color: var(--parchment-faint) !important; }
 .text-gold            { color: var(--gold)             !important; }
-.text-gold-dim        { color: var(--gold-dim)         !important; }
 .bg-void              { background-color: var(--void)  !important; }
 
 /* Bootstrap text-white override en tema claro */
@@ -98,7 +97,6 @@ a { text-decoration: none; color: inherit; }
 .font-title    { font-family: var(--font-title) !important; }
 .font-body     { font-family: var(--font-body)  !important; }
 .tracking-wide    { letter-spacing: 0.08em; }
-.tracking-wider   { letter-spacing: 0.12em; }
 .tracking-widest  { letter-spacing: 0.25em; }
 .leading-tight    { line-height: 1.25; }
 .leading-snug     { line-height: 1.375; }
@@ -155,25 +153,6 @@ a { text-decoration: none; color: inherit; }
 }
 .page-enter-from { opacity: 0; transform: translateY(12px); }
 .page-leave-to   { opacity: 0; transform: translateY(-8px); }
-
-/* ─── Blood drip animation ─── */
-.blood-drips { display: flex; justify-content: center; gap: 2.5rem; margin-top: 1rem; }
-.blood-drip {
-  width: 3px;
-  background: linear-gradient(180deg, #8b0000 0%, transparent 100%);
-  border-radius: 0 0 50% 50%;
-  animation: drip 3s ease-in-out infinite;
-}
-.blood-drip:nth-child(1) { height: 28px; animation-delay: 0s; }
-.blood-drip:nth-child(2) { height: 40px; animation-delay: 0.6s; }
-.blood-drip:nth-child(3) { height: 22px; animation-delay: 1.2s; }
-.blood-drip:nth-child(4) { height: 35px; animation-delay: 0.3s; }
-.blood-drip:nth-child(5) { height: 18px; animation-delay: 0.9s; }
-
-@keyframes drip {
-  0%, 100% { transform: scaleY(1); opacity: 0.7; }
-  50%       { transform: scaleY(1.15); opacity: 1; }
-}
 
 /* ─── Search input ─── */
 .search-input {
@@ -1045,19 +1024,6 @@ a { text-decoration: none; color: inherit; }
   flex-shrink: 0;
 }
 .tool-card-icon svg { width: 22px; height: 22px; display: block; }
-.tool-card-badge {
-  background: var(--blood);
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 700;
-  min-width: 26px; height: 26px;
-  border-radius: 13px;
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: 0 8px;
-  letter-spacing: 0;
-  font-family: var(--font-body);
-  line-height: 1;
-}
 .tool-card-desc {
   font-size: 0.95rem;
   color: var(--parchment-dim);
