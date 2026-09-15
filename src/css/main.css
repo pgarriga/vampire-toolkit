@@ -543,6 +543,12 @@ a { text-decoration: none; color: inherit; }
   line-height: 1;
   text-transform: uppercase;
   white-space: nowrap;
+  /* Cormorant Garamond ships old-style figures: its "3" spans -275..409 against a
+     cap height of 625, so beside an all-caps word the digit reads small and hangs
+     below the line. The font carries `lnum`, which lifts every digit to roughly
+     0..636 — level with the caps. Only needed where digits sit alone or next to
+     capitals; in running lowercase text old-style figures are the right shape. */
+  font-variant-numeric: lining-nums;
 }
 
 /* Detail art: same pill, larger, under the sigil at the right edge. */
@@ -1494,6 +1500,7 @@ button.disc-mini-card:focus-visible {
   justify-content: center;
   letter-spacing: 0;
   width: 24px;
+  font-variant-numeric: lining-nums;   /* see .power-level-badge */
 }
 
 /* ─── Clan picker ─── */
@@ -1779,6 +1786,7 @@ button.disc-mini-card:focus-visible {
   min-width: 26px;
   padding: 0.1rem 0.5rem;
   text-align: center;
+  font-variant-numeric: lining-nums;   /* see .power-level-badge */
 }
 
 /* One power as a tick-box row. Full 44px rows: these are the primary control of the
