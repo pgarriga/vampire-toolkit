@@ -1,22 +1,35 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useFavorites } from './composables/useFavorites'
 import { NAV_ICONS } from './nav-icons'
+import { CLAN_ICONS } from './clan-icons'
 import { useI18n } from './composables/useI18n'
+import { useClans } from './composables/useClans'
+import { useCharacters } from './composables/useCharacters'
 
 const route  = useRoute()
 const router = useRouter()
-const { favoriteCount } = useFavorites()
 const { t } = useI18n()
+const { clanById } = useClans()
+const { characters } = useCharacters()
 
 const menuOpen = ref(false)
 
 const isHome        = computed(() => route.path === '/')
 const isDisciplines = computed(() => route.path === '/disciplines' || route.path.startsWith('/discipline'))
 const isClans       = computed(() => route.path === '/clans' || route.path.startsWith('/clan/'))
-const isMyPowers    = computed(() => route.path === '/my-powers')
 const isSettings    = computed(() => route.path === '/settings')
+
+/** One entry per character, mirroring the home page's own list. */
+const characterEntries = computed(() =>
+  characters.value.map(c => ({
+    id: c.id,
+    name: c.name,
+    svg: CLAN_ICONS[c.clanId],
+    color: clanById(c.clanId)?.color ?? 'var(--gold)',
+    path: `/character/${c.id}`,
+  })),
+)
 
 function go(path: string) {
   menuOpen.value = false

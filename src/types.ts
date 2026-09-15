@@ -69,3 +69,22 @@ export interface Clan {
 export interface ClansData {
   clans: Clan[]
 }
+
+/**
+ * A player character. Powers are stored as the same `disciplineId:powerId` keys the
+ * app has always used for saved powers — the list just belongs to a character now
+ * instead of being global.
+ */
+export interface Character {
+  id: string
+  name: string
+  clanId: ClanIconType
+  /**
+   * 1–16. V5 runs from the 1st (Caine) down to the 16th, the thinnest Thin-Blood;
+   * 14th–16th are Thin-Bloods. Optional because characters created before the field
+   * existed have none — nothing backfills a generation the player never chose.
+   */
+  generation?: number
+  powers: string[]
+  createdAt: number
+}

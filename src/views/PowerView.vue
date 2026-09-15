@@ -2,19 +2,19 @@
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
-import { powerById, levelDots, artGradient, parseAmalgama, shortDuration } from '../helpers'
+import { powerById, artGradient, parseAmalgama, shortDuration } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
-import { useFavorites } from '../composables/useFavorites'
-import { useMyPowers } from '../composables/useMyPowers'
+import { useCharacters } from '../composables/useCharacters'
+import { useCharacterPowers } from '../composables/useCharacterPowers'
 import { renderPowerCard } from '../renderPowerCard'
 
 const route  = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { disciplineById, disciplines } = useData()
-const { isFavorite, toggle } = useFavorites()
-const { flatPowers } = useMyPowers()
+const { activeCharacter } = useCharacters()
+const { flatPowers } = useCharacterPowers(activeCharacter)
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
 const power      = computed(() => powerById(discipline.value, route.params['powerId'] as string))
@@ -72,25 +72,28 @@ const amalgamaSegments = computed(() => {
 })
 
 function goBack(): void {
-  if (fromMyPowers.value) router.push('/my-powers')
+  if (fromCharacter.value && activeCharacter.value) router.push(`/character/${activeCharacter.value.id}`)
   else router.push(`/discipline/${route.params['id']}`)
 }
 
 // ── Swipe / arrow navigation between sibling powers ──────────────────────────
 
-const fromMyPowers = computed(() => route.query['from'] === 'my-powers')
+/** Set on links out of a character sheet, so back and swipe follow that list. The
+ *  character is the active one — opening a sheet is the only way to reach this link,
+ *  and the active id is persisted, so a reload of the URL still resolves it. */
+const fromCharacter = computed(() => route.query['from'] === 'character' && !!activeCharacter.value)
 
 /**
  * The powers this view can step through, in the order of the list the reader came
- * from: the discipline's own order, or the flattened My Powers list.
+ * from: the discipline's own order, or the character's flattened power list.
  */
 const siblings = computed<Array<{ disciplineId: string; powerId: string }>>(() => {
   const disc = discipline.value
   const own = disc ? disc.powers.map(p => ({ disciplineId: disc.id, powerId: p.id })) : []
-  if (!fromMyPowers.value) return own
+  if (!fromCharacter.value) return own
   const saved = flatPowers.value.map(e => ({ disciplineId: e.disciplineId, powerId: e.power.id }))
-  // Un-starring the power you are reading drops it out of the saved list; fall back
-  // to the discipline so the gesture keeps working instead of going dead.
+  // Un-starring the power you are reading drops it out of the character's list; fall
+  // back to the discipline so the gesture keeps working instead of going dead.
   const stillSaved = saved.some(
     s => s.disciplineId === route.params['id'] && s.powerId === route.params['powerId'],
   )
@@ -109,7 +112,7 @@ function goSibling(step: number): void {
   if (i === -1) return
   const target = siblings.value[i + step]
   if (!target) return
-  const query = fromMyPowers.value ? '?from=my-powers' : ''
+  const query = fromCharacter.value ? '?from=character' : ''
   router.push(`/discipline/${target.disciplineId}/power/${target.powerId}${query}`)
 }
 
@@ -169,7 +172,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
           <path d="m15 18-6-6 6-6"/>
         </svg>
-        {{ route.query['from'] === 'my-powers' ? t.myPowers.title : discipline.name }}
+        {{ fromCharacter && activeCharacter ? activeCharacter.name : discipline.name }}
       </button>
       <span class="text-parchment-faint">›</span>
       <span class="text-parchment text-truncate">{{ power.name }}</span>
@@ -219,14 +222,6 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
           <span v-else class="share-btn-spinner" aria-hidden="true"></span>
         </button>
 
-        <button class="star-btn star-btn--detail"
-                :class="{ 'star-btn--filled': isFavorite(discipline.id, power.id) }"
-                :aria-pressed="isFavorite(discipline.id, power.id)"
-                @click="toggle(discipline.id, power.id)"
-                :title="isFavorite(discipline.id, power.id) ? t.discipline.removeFromFav : t.discipline.addToFav"
-                :aria-label="isFavorite(discipline.id, power.id) ? t.discipline.removeFromFav : t.discipline.addToFav">
-          <svg viewBox="0 0 24 24" aria-hidden="true" stroke="currentColor" stroke-width="2" stroke-linejoin="round" :fill="isFavorite(discipline.id, power.id) ? 'currentColor' : 'none'"><polygon points="12,2 15.09,8.26 22,9.27 17,14.14 18.18,21.02 12,17.77 5.82,21.02 7,14.14 2,9.27 8.91,8.26"/></svg>
-        </button>
 
         <!-- Content -->
         <div class="px-3 px-sm-4 px-md-5 py-4 py-sm-5">

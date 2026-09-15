@@ -195,6 +195,45 @@ a { text-decoration: none; color: inherit; }
 }
 .search-input::placeholder { color: var(--parchment-faint); }
 
+/* Plain form fields. .search-input carries a baked-in magnifier, which only belongs
+   on an actual search box — these share its look without it. */
+.field-input,
+.field-select {
+  width: 100%;
+  background: var(--void-card2);
+  border: 1px solid var(--void-border);
+  border-radius: 6px;
+  padding: 0.65rem 1rem;
+  color: var(--parchment);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  outline: none;
+  transition: border-color var(--transition), box-shadow var(--transition);
+}
+.field-input:focus,
+.field-select:focus {
+  border-color: #8b0000;
+  box-shadow: 0 0 0 2px rgba(139,0,0,0.2);
+}
+.field-input::placeholder { color: var(--parchment-faint); }
+
+/* The native arrow is drawn in the OS colour, which disappears on the dark theme, so
+   it is replaced with a --parchment-dim chevron that works on both. */
+.field-select {
+  appearance: none;
+  -webkit-appearance: none;
+  padding-right: 2.5rem;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%238a7f70' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.85rem center;
+  background-size: 1.1rem;
+  cursor: pointer;
+  min-height: 48px;
+}
+/* The dropdown list itself is painted by the OS, so the options need explicit
+   colours or they inherit a white-on-white default on some engines. */
+.field-select option { background: var(--void-card2); color: var(--parchment); }
+
 /* ─── Discipline card ─── */
 .discipline-card {
   background: var(--void-card);
@@ -442,7 +481,11 @@ a { text-decoration: none; color: inherit; }
 }
 /* Centred inside that box, so a one-line name splits its slack evenly instead of
    sitting against the art or against the cost line. */
-.power-card-title h3 {
+/* Matches the heading whatever level it is: the power card appears at different
+   depths (h3 under a Discipline page, h4 under a character's Discipline group), and
+   the heading level has to follow the document outline, not the type scale. The box
+   holds exactly one child, so `> *` is the whole title. */
+.power-card-title > * {
   font-size: inherit;
   line-height: inherit;
   margin: 0;
@@ -668,6 +711,8 @@ a { text-decoration: none; color: inherit; }
 
 /* SVGs injected via v-html must fill their container on all browsers */
 .art-icon svg,
+.char-row-sigil svg,
+.clan-pick-sigil svg,
 .disc-clan-sigil svg,
 .clan-chip-sigil svg,
 .power-art-icon svg,
@@ -678,65 +723,6 @@ a { text-decoration: none; color: inherit; }
   height: 100%;
   display: block;
 }
-
-/* ─── Star button (favoritos) ─── */
-.star-btn {
-  position: absolute;
-  top: 0.45rem;
-  right: 0.45rem;
-  z-index: 4;
-  background: rgba(0,0,0,0.65);
-  border: 1px solid var(--void-border);
-  border-radius: 50%;
-  width: 28px; height: 28px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  color: var(--parchment-dim);
-  line-height: 1;
-  padding: 0;
-  transition: color var(--transition), border-color var(--transition),
-              background var(--transition), box-shadow var(--transition);
-}
-
-/* The two states differ by SHAPE as well as colour — hollow outline when off, solid gold
-   when on — because a colour-only shift was hard to read at a glance (and invisible to
-   anyone who cannot separate the two hues). */
-.star-btn svg { width: 15px; height: 15px; display: block; }
-
-/* 44px hit area without growing the visible chip (a11y rule 7). */
-.star-btn::before {
-  content: '';
-  position: absolute;
-  inset: -8px;
-  border-radius: 50%;
-}
-
-.star-btn:hover { color: var(--gold); border-color: var(--gold-dim); }
-
-.star-btn:focus-visible {
-  outline: 2px solid var(--gold);
-  outline-offset: 2px;
-}
-
-.star-btn--filled {
-  color: var(--gold);
-  border-color: var(--gold);
-  background: rgba(0,0,0,0.8);
-  box-shadow: 0 0 10px rgba(201,168,76,0.55);
-}
-
-[data-theme="light"] .star-btn { background: rgba(255,255,255,0.75); }
-[data-theme="light"] .star-btn--filled {
-  background: rgba(255,255,255,0.95);
-  box-shadow: 0 0 10px rgba(122,78,8,0.45);
-}
-
-/* Larger star in PowerView detail art */
-.star-btn--detail {
-  width: 44px; height: 44px;
-  top: 0.75rem; right: 0.75rem;
-}
-.star-btn--detail svg { width: 22px; height: 22px; }
 
 /* ─── Share button (PowerView) ─── */
 .share-btn {
@@ -1046,29 +1032,6 @@ a { text-decoration: none; color: inherit; }
 }
 .amalgama-link:hover { color: #e0bf72; }
 
-/* ─── Copy button (MyPowersView) ─── */
-.copy-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  font-family: var(--font-body);
-  font-size: 0.85rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--parchment-dim);
-  padding: 0.4rem 0.9rem;
-  border: 1px solid var(--void-border);
-  border-radius: 6px;
-  background: var(--void-card);
-  cursor: pointer;
-  transition: all var(--transition);
-  min-height: 36px;
-}
-.copy-btn:hover { color: var(--parchment); border-color: #5a3070; background: var(--void-card2); }
-.copy-btn.copied { color: var(--gold); border-color: var(--gold-dim); }
-.copy-btn--danger { color: #c0392b; border-color: #7a1a1a; }
-.copy-btn--danger:hover { color: #fff; border-color: #c0392b; background: #7a1a1a; }
-
 /* ─── Clanes ─── */
 
 /* Shared by clan sigils and discipline badges. Both sit on a backdrop mixed from the
@@ -1243,3 +1206,509 @@ button.disc-mini-card:focus-visible {
   color: var(--parchment-dim);
   line-height: 1.6;
 }
+
+/* ══════════════════════════════════════════════
+   CHARACTERS
+   ══════════════════════════════════════════════ */
+
+/* ─── Home sections (Compendium / My Characters) ─── */
+.home-section + .home-section { margin-top: 2.5rem; }
+
+.home-section-title {
+  color: var(--gold);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin-bottom: 0.85rem;
+}
+
+/* ─── Character row on the index ───
+   Same slab as .tool-card, laid out horizontally: the clan's sigil on the left, the
+   name on the right. The clan colour only reaches the left edge, the medallion and
+   the glow — the saturated clan palette never clears 4.5:1 as text (see Clans above),
+   so the name stays --parchment. */
+.char-row {
+  align-items: center;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-left: 4px solid var(--card-color, var(--void-border));
+  border-radius: 12px;
+  color: var(--parchment);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-body);
+  gap: 0.9rem;
+  min-height: 72px;
+  padding: 0.75rem 1rem;
+  text-align: left;
+  transition: transform 0.12s ease, border-color 0.12s ease, background var(--transition);
+  width: 100%;
+}
+.char-row:hover {
+  background: var(--void-card2);
+  border-color: var(--card-color, var(--gold-dim));
+  transform: translateY(-2px);
+}
+.char-row:focus-visible {
+  outline: 2px solid var(--card-color, var(--gold));
+  outline-offset: 2px;
+}
+
+.char-row-medallion {
+  align-items: center;
+  border: 1px solid var(--card-color, var(--void-border));
+  border-radius: 50%;
+  box-shadow: 0 0 14px var(--card-glow, transparent);
+  display: flex;
+  flex-shrink: 0;
+  height: 52px;
+  justify-content: center;
+  width: 52px;
+}
+
+.char-row-sigil {
+  display: flex;
+  height: 30px;
+  width: 30px;
+}
+
+.char-row-text {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+  min-width: 0;   /* lets a long name ellipsise instead of pushing the chevron out */
+}
+
+.char-row-name {
+  color: var(--parchment);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1.25;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.char-row-meta {
+  color: var(--parchment-dim);
+  font-size: 0.85rem;
+  line-height: 1.3;
+}
+
+.char-row-chevron {
+  color: var(--parchment-faint);
+  flex-shrink: 0;
+  height: 18px;
+  margin-left: auto;
+  width: 18px;
+}
+
+/* The "create new character" row: the empty-state placeholder, and the way to add
+   another one once there are some. Dashed so it reads as an action, not a character. */
+.char-row--new {
+  background: transparent;
+  border: 1px dashed var(--void-border);
+  border-left: 4px solid var(--gold-dim);
+}
+.char-row--new:hover { background: var(--void-card); border-color: var(--gold-dim); }
+.char-row--new .char-row-name { color: var(--gold); }
+
+.char-row-medallion--new {
+  border: 1px dashed var(--gold-dim);
+  box-shadow: none;
+  color: var(--gold);
+}
+.char-row-medallion--new svg { width: 24px; height: 24px; }
+
+/* ─── Create-character form ─── */
+.char-form-wrap { max-width: 36rem; }
+
+.char-form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.char-form-label {
+  color: var(--parchment);
+  font-size: 1.05rem;
+  letter-spacing: 0.04em;
+}
+
+.char-form-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  justify-content: flex-end;
+  margin-top: 0.5rem;
+}
+
+.char-form-primary {
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+.char-form-primary:disabled {
+  color: var(--parchment-faint);
+  border-color: var(--void-border);
+  cursor: not-allowed;
+  opacity: 1;
+}
+.char-form-primary:disabled:hover {
+  background: var(--void-card);
+  border-color: var(--void-border);
+  color: var(--parchment-faint);
+}
+
+/* Step 1 → 2 progress. --parchment-dim on the pending step keeps it legible without
+   competing with the active one. */
+.char-steps {
+  display: flex;
+  gap: 1.25rem;
+  list-style: none;
+  margin: 0 0 1.5rem;
+  padding: 0;
+}
+
+.char-step {
+  align-items: center;
+  color: var(--parchment-dim);
+  display: flex;
+  font-size: 0.8rem;
+  gap: 0.5rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+.char-step.active { color: var(--gold); }
+.char-step.done   { color: var(--parchment); }
+
+.char-step-num {
+  align-items: center;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  display: inline-flex;
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  height: 24px;
+  justify-content: center;
+  letter-spacing: 0;
+  width: 24px;
+}
+
+/* ─── Clan picker ─── */
+.clan-picker {
+  display: grid;
+  gap: 0.6rem;
+  grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr));
+}
+
+.clan-pick {
+  align-items: center;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 10px;
+  color: var(--parchment);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  font-family: var(--font-body);
+  gap: 0.5rem;
+  min-height: 108px;
+  padding: 0.75rem 0.5rem;
+  transition: background var(--transition), border-color var(--transition), transform 0.12s ease;
+}
+.clan-pick:hover {
+  background: var(--void-card2);
+  border-color: var(--card-color, var(--gold-dim));
+  transform: translateY(-2px);
+}
+.clan-pick:focus-visible {
+  outline: 2px solid var(--card-color, var(--gold));
+  outline-offset: 2px;
+}
+/* Selection is carried by a check mark and a gold ring, not by colour alone. */
+.clan-pick.selected {
+  position: relative;
+  border-color: var(--gold);
+  box-shadow: 0 0 0 1px var(--gold), 0 0 16px var(--card-glow, transparent);
+  background: var(--void-card2);
+}
+.clan-pick.selected .clan-pick-name { color: var(--gold); }
+
+.clan-pick-art {
+  align-items: center;
+  border: 1px solid var(--card-color, var(--void-border));
+  border-radius: 50%;
+  display: flex;
+  flex-shrink: 0;
+  height: 48px;
+  justify-content: center;
+  width: 48px;
+}
+
+.clan-pick-sigil {
+  display: flex;
+  height: 28px;
+  width: 28px;
+}
+
+.clan-pick-check {
+  color: var(--gold);
+  height: 16px;
+  position: absolute;
+  right: 0.4rem;
+  top: 0.4rem;
+  width: 16px;
+}
+
+.clan-pick-name {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  line-height: 1.2;
+  text-align: center;
+}
+
+/* ─── Character sheet ─── */
+
+/* The clan under the character's name. --gold, not the clan colour: same reason the
+   clan nickname is (the clan palette bottoms out at 2.0:1 on the page background). */
+.clan-link {
+  background: none;
+  border: none;
+  color: var(--gold);
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.95rem;
+  letter-spacing: 0.1em;
+  padding: 0.25rem 0;
+  text-decoration: underline;
+  text-decoration-color: var(--gold-dim);
+  text-underline-offset: 3px;
+}
+.clan-link:hover { color: #e0bf72; }
+.clan-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
+.clan-link-nickname { color: var(--parchment-dim); text-decoration: none; }
+
+/* Clan and Generation share one line on the sheet, matching the index row's
+   "Toreador · Gen. 13". They wrap to two lines rather than shrink on a narrow phone,
+   and centre with the rest of the header until the sm breakpoint left-aligns it. */
+.clan-line {
+  align-items: baseline;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem 0.5rem;
+  justify-content: center;
+}
+@media (min-width: 576px) { .clan-line { justify-content: flex-start; } }
+
+/* --parchment-dim clears 4.5:1 on both themes. */
+.char-generation {
+  color: var(--parchment-dim);
+  font-size: 0.9rem;
+  letter-spacing: 0.08em;
+}
+
+/* The separator belongs to the pair, so it only appears when a clan precedes it. */
+.clan-link + .char-generation::before {
+  color: var(--parchment-faint);
+  content: '·';
+  margin-right: 0.5rem;
+}
+
+
+/* ─── Character sheet action bar ───
+   Sits under the name, right-aligned, as a compact row of chips: these are secondary
+   to the sheet itself, so they read small next to the character's name. */
+.char-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+  margin-top: 0.85rem;
+}
+
+.char-action {
+  align-items: center;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 7px;
+  color: var(--parchment-dim);
+  cursor: pointer;
+  display: inline-flex;
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  gap: 0.3rem;
+  letter-spacing: 0.05em;
+  min-height: 34px;
+  padding: 0.25rem 0.65rem;
+  position: relative;
+  transition: all var(--transition);
+}
+/* The chip is 34px so it stays visually small, but the hit area is padded out to 44px
+   to hold the touch floor — vertically only, because expanding sideways would overlap
+   the neighbouring chip and steal its taps (the row's gap is just 0.4rem). */
+.char-action::before { content: ''; position: absolute; inset: -5px 0; }
+
+.char-action:hover {
+  background: var(--void-card2);
+  border-color: var(--gold-dim);
+  color: var(--gold);
+}
+.char-action:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.char-action svg { flex-shrink: 0; height: 14px; width: 14px; }
+
+/* #c0392b on the card surface clears 4.5:1 on both themes. */
+.char-action--danger { color: #c0392b; border-color: #7a1a1a; }
+.char-action--danger:hover { background: #7a1a1a; border-color: #c0392b; color: #fff; }
+
+/* ─── "More options" dropdown ───
+   Anchored to its chip and right-aligned, so it opens inward from the row's right
+   edge and never pushes past the viewport. */
+.char-menu { position: relative; }
+
+.char-menu-panel {
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 9px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.45);
+  display: flex;
+  flex-direction: column;
+  min-width: 11rem;
+  overflow: hidden;
+  padding: 0.3rem;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 0.35rem);
+  z-index: 30;
+}
+
+/* Menu rows are full-size targets even though the chip that opens them is small —
+   there is no neighbour to overlap here, so they hold 44px outright. */
+.char-menu-item {
+  align-items: center;
+  background: none;
+  border: none;
+  border-radius: 6px;
+  color: var(--parchment-dim);
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-body);
+  font-size: 0.88rem;
+  gap: 0.6rem;
+  letter-spacing: 0.05em;
+  min-height: 44px;
+  padding: 0.5rem 0.75rem;
+  text-align: left;
+  transition: background var(--transition), color var(--transition);
+  width: 100%;
+}
+.char-menu-item:hover { background: var(--void-card2); color: var(--gold); }
+.char-menu-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.char-menu-item svg { flex-shrink: 0; height: 16px; width: 16px; }
+
+.char-menu-item--danger { color: #c0392b; }
+.char-menu-item--danger:hover { background: #7a1a1a; color: #fff; }
+
+.char-actions-confirm {
+  align-self: center;
+  color: var(--parchment);
+  font-size: 0.82rem;
+}
+
+.char-edit-panel {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* ─── Loading a character file (home index) ─── */
+.char-load-error {
+  background: var(--void-card);
+  border: 1px solid #7a1a1a;
+  border-radius: 8px;
+  color: var(--bane-accent);
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+}
+
+.char-load-confirm {
+  background: var(--void-card);
+  border: 1px solid var(--gold-dim);
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  padding: 0.9rem 1rem;
+}
+
+.char-load-name {
+  color: var(--gold);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+}
+
+/* ─── Adding powers to a character ─── */
+
+/* Count of powers the character already has in a Discipline, on the picker's list. */
+.disc-owned-badge {
+  background: var(--void-card2);
+  border: 1px solid var(--gold-dim);
+  border-radius: 999px;
+  color: var(--gold);
+  flex-shrink: 0;
+  font-size: 0.8rem;
+  font-weight: 700;
+  min-width: 26px;
+  padding: 0.1rem 0.5rem;
+  text-align: center;
+}
+
+/* One power as a tick-box row. Full 44px rows: these are the primary control of the
+   page and have no neighbour to crowd, unlike the sheet's action chips. */
+.power-pick {
+  align-items: center;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-left: 3px solid var(--card-color, var(--void-border));
+  border-radius: 0.55rem;
+  cursor: pointer;
+  display: flex;
+  font-family: var(--font-body);
+  gap: 0.75rem;
+  min-height: 56px;
+  padding: 0.6rem 0.8rem;
+  text-align: left;
+  transition: background var(--transition), border-color var(--transition);
+  width: 100%;
+}
+.power-pick:hover { background: var(--void-card2); }
+.power-pick:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.power-pick.owned { background: var(--void-card2); border-color: var(--gold-dim); }
+
+.power-pick-box {
+  align-items: center;
+  border: 2px solid var(--parchment-faint);
+  border-radius: 5px;
+  color: var(--void);
+  display: flex;
+  flex-shrink: 0;
+  height: 24px;
+  justify-content: center;
+  transition: all var(--transition);
+  width: 24px;
+}
+.power-pick.owned .power-pick-box {
+  background: var(--gold);
+  border-color: var(--gold);
+}
+.power-pick-box svg { height: 15px; width: 15px; }
+
+.power-pick-name { font-size: 0.95rem; line-height: 1.25; }
+

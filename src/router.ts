@@ -5,7 +5,9 @@ import DisciplineView   from './views/DisciplineView.vue'
 import PowerView        from './views/PowerView.vue'
 import ClansView        from './views/ClansView.vue'
 import ClanView         from './views/ClanView.vue'
-import MyPowersView     from './views/MyPowersView.vue'
+import CharacterCreateView from './views/CharacterCreateView.vue'
+import CharacterView    from './views/CharacterView.vue'
+import CharacterAddView from './views/CharacterAddView.vue'
 import SettingsView     from './views/SettingsView.vue'
 
 const router = createRouter({
@@ -17,7 +19,9 @@ const router = createRouter({
     { path: '/discipline/:id/power/:powerId',     component: PowerView       },
     { path: '/clans',                             component: ClansView       },
     { path: '/clan/:id',                          component: ClanView        },
-    { path: '/my-powers',                         component: MyPowersView    },
+    { path: '/character/new',                     component: CharacterCreateView },
+    { path: '/character/:id',                     component: CharacterView   },
+    { path: '/character/:id/add',                 component: CharacterAddView },
     { path: '/settings',                          component: SettingsView    },
     { path: '/:pathMatch(.*)*',                   redirect: '/'              },
   ],

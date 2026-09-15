@@ -2,8 +2,7 @@
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons'
-import { levelDots, shortCost, shortDicePool, shortDuration, artGradient } from '../helpers'
-import { useFavorites } from '../composables/useFavorites'
+import { shortCost, shortDicePool, shortDuration, artGradient } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
 import { useClans } from '../composables/useClans'
@@ -14,7 +13,6 @@ const { t } = useI18n()
 const { disciplineById } = useData()
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
-const { isFavorite, toggle } = useFavorites()
 const { clanSigil } = useClans()
 
 /** `clanes` holds display names; resolve each to its mark so the chip can carry the
@@ -53,6 +51,7 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
       </button>
       <span class="text-parchment-faint">›</span>
       <span class="text-parchment">{{ discipline.name }}</span>
+
     </nav>
 
     <!-- ── Discipline header ── -->
