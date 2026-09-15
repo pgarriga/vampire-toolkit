@@ -660,24 +660,43 @@ a { text-decoration: none; color: inherit; }
 }
 @media (min-width: 576px) { .power-detail-icon { width: 10rem; height: 10rem; } }
 
+/* Names the Discipline at the art's top-left, opposite the Share button, and sized to
+   match .power-level-badge--detail below the sigil so the two read as a pair.
+   The colour pair is --parchment on a scrim that flips with the theme (see the
+   [data-theme="light"] rule below: the scrim is black on dark and WHITE on light).
+   Both halves must flip together — pinning the text to one palette makes it vanish
+   on the other theme.
+   Explicit height + line-height 1 for the same reason the level badge has them:
+   Cormorant Garamond's tall ascender leaves all-caps text off-centre in a line box. */
 .power-detail-discipline-tag {
   position: absolute;
-  bottom: 1rem; left: 50%;
-  transform: translateX(-50%);
+  top: 1rem; left: 1rem;
   z-index: 3;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+  height: 28px;
+  padding: 0 0.85rem;
   background: rgba(0,0,0,0.8);
   border: 1px solid var(--card-color, var(--void-border));
-  border-radius: 20px;
-  padding: 0.3rem 0.9rem;
-  font-size: 0.875rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
   letter-spacing: 0.08em;
+  line-height: 1;
   text-transform: uppercase;
   color: var(--parchment);
+  /* Keeps clear of the Share button at the opposite corner. Left-aligned, it only
+     costs that button's own footprint, not double it as a centred pill did — so only
+     the longest name (Alquimia de la Sangre Débil) ellipsises at 320px. */
+  max-width: calc(100% - 5.5rem);
   white-space: nowrap;
 }
+.power-detail-discipline-tag span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* The scrim flips with the theme, which is why the text above uses --parchment. */
 [data-theme="light"] .power-detail-discipline-tag {
   background: rgba(255,255,255,0.8);
 }
@@ -788,7 +807,7 @@ a { text-decoration: none; color: inherit; }
 
 .share-btn--detail {
   width: 40px; height: 40px;
-  top: 0.75rem; left: 0.75rem;
+  top: 0.75rem; right: 0.75rem;
 }
 .share-btn--detail svg { width: 18px; height: 18px; }
 

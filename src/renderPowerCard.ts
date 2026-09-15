@@ -241,8 +241,8 @@ export async function renderPowerCard(
   const tagPad = 30
   const tagW = ctx.measureText(tagText).width + tagPad * 2
   const tagH = 56
-  const tagX = (WIDTH - tagW) / 2
-  const tagY = headerH - tagH - 40
+  const tagX = 44
+  const tagY = 34
   ctx.fillStyle = 'rgba(0,0,0,0.75)'
   roundRect(ctx, tagX, tagY, tagW, tagH, 28)
   ctx.fill()
@@ -251,7 +251,7 @@ export async function renderPowerCard(
   ctx.stroke()
   ctx.fillStyle = COLOR_PARCHMENT
   ctx.textAlign = 'center'
-  ctx.fillText(tagText, WIDTH / 2, tagY + 14)
+  ctx.fillText(tagText, tagX + tagW / 2, tagY + 14)
 
   ctx.fillStyle = COLOR_CARD
   ctx.fillRect(0, headerH, WIDTH, bodyH + footerH)
