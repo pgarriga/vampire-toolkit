@@ -305,7 +305,25 @@ a { text-decoration: none; color: inherit; }
    neutral-coloured rather than clan-coloured: at this size a hue reads as noise,
    and --parchment-dim clears 3:1 on both themes. Names live in the aria-label. */
 /* Same three roles as a power card, same three sizes. */
-.disc-card-title { font-size: var(--card-title-size); }
+/* The type badge sits under the name, never beside it — the same way the clan cards
+   put the nickname under the clan name.
+   Beside it the name never had room: this grid adds columns as the viewport grows, so
+   a card stays ~140-180px at every breakpoint and the name got 67px at 320px, 76px at
+   576px and at best 87px at 992px. The longest name word across es/en/ca is
+   "Obfuscation" at ~81px, so it overflowed its box and ran under the badge at nearly
+   every width, not just on small phones. */
+.disc-card-head {
+  align-items: flex-start;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Last resort if a name is ever longer than the column it is given. */
+.disc-card-title {
+  font-size: var(--card-title-size);
+  overflow-wrap: break-word;
+}
 .disc-card-desc  { font-size: var(--card-desc-size); }
 .disc-card-meta  { font-size: var(--card-meta-size); }
 
