@@ -181,9 +181,6 @@ const rows = computed(() =>
             </span>
           </button>
 
-          <input ref="fileInput" class="visually-hidden" type="file"
-                 accept="application/json,.json" @change="onFilePicked" />
-
           <p v-if="loadError" class="char-load-error" role="alert">{{ t.characters.loadError }}</p>
 
           <div v-if="pending" class="char-load-confirm" role="alert">
@@ -197,6 +194,12 @@ const rows = computed(() =>
             </div>
           </div>
         </div>
+
+        <!-- Outside .tools-grid on purpose: Bootstrap's .visually-hidden has no
+             position:absolute, so as a grid item iOS Safari sized the track to this
+             control's intrinsic width and pushed every row past the viewport. -->
+        <input ref="fileInput" class="visually-hidden" type="file"
+               accept="application/json,.json" @change="onFilePicked" />
       </section>
 
     </main>
