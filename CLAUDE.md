@@ -1,6 +1,6 @@
 # Vampire V5 Toolkit — Vampire: The Masquerade 5th Edition
 
-A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 12 disciplines and ~152 powers, look up the 14 clans, and keep a sheet per character with the powers they know. No account required, works offline once loaded.
+A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 12 disciplines and 152 powers, look up the 14 clans, and keep a sheet per character with the powers they know. No account required, works offline once loaded.
 
 ## Stack
 
@@ -25,11 +25,11 @@ Vampire Toolkit/
 ├── scripts/
 │   └── generate-icons.mjs       # Regenerates PWA PNGs from public/favicon.svg (sharp)
 └── src/
-    ├── main.ts                  # Imports Bootstrap CSS+JS, main.css, mounts app
-    ├── App.vue                  # Sticky navbar + sectioned overlay menu + <router-view> with transition
+    ├── main.ts                  # Imports Bootstrap CSS (no JS bundle), main.css, mounts app
+    ├── App.vue                  # Sticky navbar + overlay menu + <router-view> + <AppFooter>
     ├── router.ts                # Hash routes (see Routes below)
     ├── types.ts                 # Interfaces: Discipline, Power, DisciplinesData, Clan, Character
-    ├── data.ts                  # DISCIPLINES_DATA: 12 disciplines and ~152 powers (Spanish source)
+    ├── data.ts                  # DISCIPLINES_DATA: 12 disciplines and 152 powers (Spanish source)
     ├── clans.ts                 # CLANS_DATA: the 14 clans (Spanish source)
     ├── translations-en.ts       # English overlay for disciplines and powers
     ├── translations-ca.ts       # Catalan overlay for disciplines and powers
@@ -42,6 +42,7 @@ Vampire Toolkit/
     │                            #   shortDicePool, shortDuration, artGradient, colorGradient, parseAmalgama
     ├── renderPowerCard.ts       # Canvas 2D renderer — draws a power card and returns a PNG Blob
     ├── components/
+    │   ├── AppFooter.vue        # Site footer — notice + version pill
     │   └── ClanPicker.vue       # The 14 clan sigils as a single-choice grid with search
     ├── composables/
     │   ├── useCharacters.ts     # Characters: storage, CRUD, powers, import/export
@@ -223,8 +224,10 @@ Changes save immediately.
 - **Emblem contrast is handled by two rules — don't paint the sigil inline.**
   The trap: a glyph in the raw clan colour on a backdrop mixed from that *same* colour
   can't contrast, whatever the clan colour is (Lasombra measured 1.71:1, Salubri 1.63:1).
-  - `.clan-sigil` pushes the glyph to near-white on dark / near-black on light with
-    `color-mix()`, keeping a hint of the clan hue.
+  - `.sigil` — the shared rule, see Icons below — pushes the glyph to near-white on dark
+    / near-black on light with `color-mix()`, keeping a hint of the clan hue. Every place
+    that draws a clan glyph (`.disc-clan-sigil`, `.char-row-sigil`, `.clan-pick-sigil`,
+    `.app-menu-sigil`) carries it; there is no `.clan-sigil` of its own.
   - `.clan-medallion` (the clan sheet's disc) tints `--void-card` with ~12–26% clan
     colour instead of using the plain clan gradient, which sits at mid luminance and
     muddies the emblem.
@@ -302,6 +305,34 @@ UI strings (nav labels, section headings, field labels) are translated in `useI1
 
 Power and discipline content (names, descriptions, costs, dice pools, durations) is translated in `translations-en.ts` and `translations-ca.ts`. The `useData.ts` composable applies the appropriate overlay over the Spanish base data when `resolvedLang === 'en'` or `resolvedLang === 'ca'`. All views consume `useData()` instead of importing `DISCIPLINES_DATA` directly.
 
+## Site footer (`components/AppFooter.vue`)
+
+Rendered once in `App.vue` under the `<router-view>`, so it is the same on every page.
+As the last flex child of `#app` — whose views carry `min-vh-100` and flex to fill — it
+lands at the bottom of a short page rather than halfway up the screen.
+
+It holds the **notice** (`t.footer.disclaimer`) that this is a fan-made tool which does not
+replace the official books, only supports play at the table where not every player has one,
+and the **version**, read from `package.json` and shown as a pill beside the brand.
+`SettingsView` no longer prints the version itself; the GitHub link stays in its Repository
+section rather than being repeated here.
+
+- Nothing in it is interactive, so there is no focus order and no 44px target to hold — the
+  a11y work is contrast and what gets spoken. Contrast on the footer's own `--void-card`
+  ground, both themes: notice and version `--parchment-dim` 4.8:1 (dark) / 5.0:1 (light),
+  brand `--gold` 8.2:1 / 5.4:1. The ornament is `--parchment-faint` at 2.1:1 and is
+  `aria-hidden` for that reason.
+- The **version is written twice**: `Versión 3.0.2` in a `.visually-hidden` span and
+  `v3.0.2` `aria-hidden` beside it. Reading the drawn string aloud gave "v three point zero
+  point two".
+- The `<footer>` is a direct child of `#app` and the only one in the app, so it is the
+  single `contentinfo` landmark — a view must not add one of its own.
+- Responsive: the brand size is a `clamp()` so the name and the pill still share a line at
+  320px (Cinzel is a wide display face), and the row is `flex-wrap` for when they cannot.
+  The notice caps at `34rem` for measure inside the `--content-width` column and carries
+  `overflow-wrap: break-word`, since it is translated copy and must break rather than push
+  the page sideways.
+
 ## Data (`src/data.ts`)
 
 Sources: the official Spanish PDFs *Vampiro La Mascarada 5 edición - Disciplinas.pdf*
@@ -375,7 +406,7 @@ than by vocabulary: it cuts at the opposed pool (` contra ` / ` vs. ` / ` vs `),
 parenthetical, then an alternative pool (`, ` / ` o ` / ` or `). **Attribute and skill both
 stay** — "Carisma + Animalismo" is the roll, and half of it is not; only what the player
 does not need mid-roll comes off; skill names are left exactly as written. `N/A` returns
-`null` and the row disappears (37 of the 95 powers need no roll).
+`null` and the row disappears (62 of the 152 powers need no roll).
 
 Four pools were reworded so they read the same way as the rest: `split-second` and
 `lightning-strike` say `Reserva de … normal` (Spanish said "Pool" in one and not the other),
@@ -474,12 +505,12 @@ Relevant classes:
   sits on `.app-menu-group`, never on the heading: a heading belongs to the items under it,
   and as a group's first child its own `margin-top` was being zeroed by a `:first-child`
   rule left over from the old flat layout
-- `.clan-sigil` / `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-trait` / `.clan-trait-name` — Clans tool
+- `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-trait` / `.clan-trait-name` — Clans tool
 - `.home-section` / `.home-section-title` — the home page's two sections (Compendium, My
   Characters), whose headings the overlay menu mirrors
-- `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-badge` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
+- `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
 - `.char-row` (+ `--new`) / `.char-row-medallion` (+ `--new`) / `.char-row-sigil` /
-  `.char-row-text` / `.char-row-name` / `.char-row-meta` / `.char-row-chevron` — a character
+  `.char-row-text` / `.char-row-name` / `.char-row-meta` — a character
   on the index: clan sigil left, name and `clan · Gen. N` right. The clan colour only reaches
   the left edge, the medallion and the glow — the saturated clan palette never clears 4.5:1
   as text, so the name stays `--parchment`. The create and load rows are dashed, so they read
@@ -487,6 +518,11 @@ Relevant classes:
 - `.char-load-error` / `.char-load-confirm` / `.char-load-name` — feedback when loading a
   character file, including the confirm before replacing an existing character
 - `.discipline-card` / `.power-card` — cards driven by `--card-color` and `--card-glow`
+- **The discipline card sheds its middle on phones.** Below `sm` the type badge, the clan
+  name chips, the clan sigils and the resonance line are all `d-none`: at 320px the card has
+  ~122px of text to share, and the badge beside the title left the name 67px — less than its
+  own longest word. Name, level/power count and art stay. The badge is not stacked under the
+  name either; that was tried and cost a line the card's fixed heights do not have
 - `.disc-clans` / `.disc-clan-sigil` — the in-clan clans on a discipline card, drawn as the
   clans' own traced sigils instead of a wide uppercase pill of names (Dominate lists six).
   They are painted `--parchment-dim`, not the clan colour: at 16px a hue reads as noise, and
@@ -530,8 +566,10 @@ Relevant classes:
   never two. Several cost and duration strings were reworded to hold it (see the
   cost/duration section below). The title's 2 is a deliberate trade — a 3-line reserve left
   a visible hole above the cost line on nearly every card — so a longer name is ellipsised
-  instead: 15 of the 441 names in es/en/ca at 320px, 2 at 1200px, "Coaccionar el
-  Temperamento Bestial" being the one that never fits. The title is vertically centred in
+  instead: 15 of the then 441 names in es/en/ca at 320px, 2 at 1200px, "Coaccionar el
+  Temperamento Bestial" being the one that never fits. That tally was taken before the
+  Players Guide powers landed (456 names now) and has not been retaken — the 2-line
+  reserve has not moved, so it is a floor rather than a current count. The title is vertically centred in
   its box, so a one-line name splits the leftover half-line evenly.
   **Sizes are load-bearing**: `--card-title-size`, `--card-meta-size` and
   `--card-desc-size` in `:root` are the one type scale for both card grids (the discipline
@@ -571,6 +609,11 @@ Relevant classes:
   theme** (black on dark, white on light) — both halves must flip together, and pinning the
   text to one palette makes it vanish on the other
 - `.settings-section` / `.settings-option` / `.ornament-divider` — settings page
+- `.app-footer` / `.app-footer-inner` / `.app-footer-ornament` / `.app-footer-brand` /
+  `.app-footer-version` / `.app-footer-text` — the site footer. The
+  notice is `--parchment-dim`, the dimmest step that still clears 4.5:1 on the footer's
+  `--void-card` ground in both themes (4.8:1 / 5.0:1); `--parchment-faint` would measure
+  2.1:1
 
 `--card-color` and `--card-glow` are injected inline from Vue; `--tool-accent` is set inline per tool card while the underlying accent value is read from the theme vars `--tool-disciplines` / `--tool-clans` / `--tool-my-powers`.
 
