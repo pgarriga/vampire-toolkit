@@ -6,6 +6,7 @@ import { CLAN_ICONS } from './clan-icons'
 import { useI18n } from './composables/useI18n'
 import { useClans } from './composables/useClans'
 import { useCharacters } from './composables/useCharacters'
+import AppFooter from './components/AppFooter.vue'
 
 const route  = useRoute()
 const router = useRouter()
@@ -177,4 +178,6 @@ watch(menuOpen, (open) => {
       <component :is="Component" />
     </transition>
   </router-view>
+
+  <AppFooter />
 </template>

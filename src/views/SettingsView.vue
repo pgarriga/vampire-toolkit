@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { version } from '../../package.json'
 import { useSettings, type Theme, type Lang } from '../composables/useSettings'
 import { useI18n } from '../composables/useI18n'
 
@@ -161,9 +160,5 @@ const langOptions = computed(() => [
       </section>
 
     </div>
-
-    <footer class="text-center pb-5 opacity-50" style="font-size: 1.05rem; font-weight: 600;">
-      v{{ version }}
-    </footer>
   </div>
 </template>

@@ -144,6 +144,10 @@ const es = {
     repoDesc:    'Toolkit de código abierto. Cualquier aportación es bienvenida — abre un issue o una pull request.',
     repoButton:  'Ver en GitHub',
   },
+  footer: {
+    version:    'Versión',
+    disclaimer: 'Herramienta no oficial hecha por aficionados. En ningún caso sustituye a los manuales y suplementos oficiales de Vampiro: La Mascarada, que siguen siendo la única referencia de reglas; solo busca agilizar la partida presencial cuando no todos los jugadores tienen el libro a mano.',
+  },
 }
 
 const en: typeof es = {
@@ -289,6 +293,10 @@ const en: typeof es = {
     repoDesc:   'Open-source toolkit. Contributions are welcome — open an issue or pull request.',
     repoButton: 'View on GitHub',
   },
+  footer: {
+    version:    'Version',
+    disclaimer: 'Unofficial, fan-made tool. It in no way replaces the official Vampire: The Masquerade books and supplements, which remain the only rules reference; it just speeds up play at the table when not every player has a copy to hand.',
+  },
 }
 
 const ca: typeof es = {
@@ -433,6 +441,10 @@ const ca: typeof es = {
     repo:       'Repositori',
     repoDesc:   'Toolkit de codi obert. Qualsevol aportació és benvinguda — obre una issue o una pull request.',
     repoButton: 'Veure a GitHub',
+  },
+  footer: {
+    version:    'Versió',
+    disclaimer: 'Eina no oficial feta per aficionats. En cap cas substitueix els manuals i suplements oficials de Vampir: La Mascarada, que continuen sent l\'única referència de regles; només busca agilitzar la partida presencial quan no tots els jugadors tenen el llibre a mà.',
   },
 }
 
