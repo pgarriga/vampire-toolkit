@@ -1313,6 +1313,80 @@ button.disc-mini-card:focus-visible {
   margin-bottom: 0.85rem;
 }
 
+/* ─── Site footer (AppFooter.vue) ───
+   The last flex child of #app, so on a short page it lands at the bottom instead of
+   halfway up. --void-card is only 1.04:1 off the page ground on the dark theme, so the
+   band is not what separates the footer — the ornament and the hairline are, the same
+   way the settings page divides its sections. The band is there for the light theme,
+   where the same pair of colours does show.
+   Measured on that ground, both themes: notice and version --parchment-dim 4.8:1 dark
+   and 5.0:1 light, brand --gold 8.2:1 and 5.4:1. --parchment-dim is the dimmest step
+   that clears 4.5:1 — --parchment-faint measures 2.1:1 and is only used for the
+   ornament, which is aria-hidden and decorative. Nothing here is interactive, so there
+   is no 44px target to hold. */
+.app-footer {
+  background: var(--void-card);
+  border-top: 1px solid var(--void-border);
+  padding: 2rem 1.5rem calc(2rem + env(safe-area-inset-bottom, 0px));
+}
+.app-footer-inner {
+  max-width: var(--content-width);
+  margin-inline: auto;
+  text-align: center;
+}
+.app-footer-ornament {
+  font-size: 0.95rem;
+  margin-bottom: 1.1rem;
+}
+.app-footer-brand {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  margin-bottom: 0.9rem;
+  color: var(--gold);
+  /* clamp so the brand and the pill still share one line at 320px: Cinzel is a wide
+     display face and 18 tracked-out caps plus the pill overrun a 272px column at a
+     fixed 0.9rem. They may still wrap — the row is flex-wrap — but only on the
+     narrowest phones. */
+  font-size: clamp(0.82rem, 0.66rem + 0.8vw, 0.95rem);
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+/* The version rides beside the brand as a pill rather than as a lone line at the
+   very bottom, where it read as debug output. Body face on purpose: Cinzel's
+   figures are display-width and the number is the part that must stay scannable. */
+.app-footer-version {
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: none;
+  color: var(--parchment-dim);
+  /* --void-border measured 1.25:1 against the footer's own ground: a ring nobody
+     could see. --parchment-faint is the app's quiet line colour and reads without
+     competing with the gold beside it. */
+  border: 1px solid var(--parchment-faint);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+}
+.app-footer-text {
+  max-width: 34rem;
+  margin: 0 auto;
+  color: var(--parchment-dim);
+  /* 0.9rem to match .settings-section-desc, the app's other block of small copy:
+     Cormorant Garamond has a short x-height and a step below that reads as fine
+     print rather than as something meant to be read. */
+  font-size: 0.9rem;
+  line-height: 1.6;
+  text-wrap: pretty;
+  /* Nothing here is long enough to overflow a 272px column, but the paragraph is
+     translated copy — break rather than push the page sideways. */
+  overflow-wrap: break-word;
+}
+
 /* ─── Character row on the index ───
    Same slab as .tool-card, laid out horizontally: the clan's sigil on the left, the
    name on the right. The clan colour only reaches the left edge, the medallion and
