@@ -78,6 +78,14 @@ const tools = computed(() => [
     accent: 'var(--tool-disciplines)',
     onClick: () => router.push('/disciplines'),
   },
+  {
+    key: 'traits',
+    icon: NAV_ICONS.traits,
+    title: t.value.home.traitsTitle,
+    description: t.value.home.traitsDesc,
+    accent: 'var(--tool-traits)',
+    onClick: () => router.push('/traits'),
+  },
 ])
 
 /** One row per saved character, each carrying its clan's sigil and colour. */

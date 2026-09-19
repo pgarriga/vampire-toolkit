@@ -88,3 +88,49 @@ export interface Character {
   powers: string[]
   createdAt: number
 }
+
+// ── Core Traits (Rasgos centrales) ───────────────────────────────────────────
+
+/** Attributes and Skills are the same shape; only what they carry differs. */
+export type TraitKind = 'attribute' | 'skill'
+
+/** The three columns of a V5 sheet. Attributes and Skills share them. */
+export type TraitCategory = 'fisico' | 'social' | 'mental'
+
+/**
+ * One "Attribute + Skill" roll. The attribute is stored as a trait **id**, not a
+ * name, so the overlays only have to translate the example — the attribute's own
+ * name comes from its own entry and can never drift from it.
+ */
+export interface TraitCombo {
+  attributeId: string
+  example: string
+}
+
+export interface Trait {
+  id: string
+  name: string
+  kind: TraitKind
+  category: TraitCategory
+  description: string
+  /** The corebook's five readings of the score, dots 1–5. Always five entries. */
+  dots: string[]
+  /**
+   * What the score feeds outside its own rolls — Health, Willpower. Only three
+   * Attributes have one; every other trait leaves it out.
+   */
+  note?: string
+  /** Skills only: the corebook's example Specialties. */
+  specialties?: string[]
+  /** Skills only: the three Attribute + Skill rolls the Skill shows up in. */
+  combos?: TraitCombo[]
+  /**
+   * Other names the same trait is printed under, so a search for the wording a
+   * player remembers still finds it. Never rendered.
+   */
+  aka?: string[]
+}
+
+export interface TraitsData {
+  traits: Trait[]
+}

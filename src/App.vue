@@ -19,6 +19,7 @@ const menuOpen = ref(false)
 const isHome        = computed(() => route.path === '/')
 const isDisciplines = computed(() => route.path === '/disciplines' || route.path.startsWith('/discipline'))
 const isClans       = computed(() => route.path === '/clans' || route.path.startsWith('/clan/'))
+const isTraits      = computed(() => route.path === '/traits' || route.path.startsWith('/trait/'))
 const isSettings    = computed(() => route.path === '/settings')
 
 /** One entry per character, mirroring the home page's own list. */
@@ -123,6 +124,16 @@ watch(menuOpen, (open) => {
         >
           <span class="app-menu-icon" v-html="NAV_ICONS.disciplines"></span>
           {{ t.nav.disciplines }}
+        </button>
+
+        <button
+          class="app-menu-item"
+          :class="{ active: isTraits }"
+          role="menuitem"
+          @click="go('/traits')"
+        >
+          <span class="app-menu-icon" v-html="NAV_ICONS.traits"></span>
+          {{ t.nav.traits }}
         </button>
       </div>
 

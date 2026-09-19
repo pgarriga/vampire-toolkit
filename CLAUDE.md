@@ -1,6 +1,6 @@
 # Vampire V5 Toolkit — Vampire: The Masquerade 5th Edition
 
-A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 12 disciplines and 152 powers, look up the 14 clans, and keep a sheet per character with the powers they know. No account required, works offline once loaded.
+A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions. Pure static PWA with no backend: browse the 12 disciplines and 152 powers, look up the 14 clans, read up on the 9 Attributes and 27 Skills, and keep a sheet per character with the powers they know. No account required, works offline once loaded.
 
 ## Stack
 
@@ -74,6 +74,8 @@ Vampire Toolkit/
 | `#/disciplines` | `DisciplinesView` | Grid of all 12 disciplines with search |
 | `#/discipline/:id` | `DisciplineView` | Power grid for the discipline |
 | `#/discipline/:id/power/:powerId` | `PowerView` | Detail card for a specific power |
+| `#/traits` | `TraitsView` | Core Traits — the 9 Attributes, then the 27 Skills |
+| `#/trait/:id` | `TraitView` | One Attribute or Skill in full |
 | `#/clans` | `ClansView` | Grid of all 14 clans with search |
 | `#/clan/:id` | `ClanView` | Clan detail — description, in-clan Disciplines, Bane, Compulsion |
 | `#/character/new` | `CharacterCreateView` | Create a character: name + generation, then clan |
@@ -90,7 +92,7 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
 - Left: "Vampire V5 Toolkit" brand — clicking it goes home
 - Right: hamburger button (always visible, on every viewport)
 - Clicking it opens a full-screen overlay menu **laid out like the home page**: a plain
-  Home item, then a **Compendium** section (Clans, Disciplines) and a **My Characters**
+  Home item, then a **Compendium** section (Clans, Disciplines, Core Traits) and a **My Characters**
   section listing every character by name with their own clan sigil, then the create-
   character row, then a divider and **Settings** last
 - Section headings reuse the home page's look (`.app-menu-heading` ≈ `.home-section-title`).
@@ -195,6 +197,104 @@ Changes save immediately.
   discipline's rating as V5 dots (`.disc-rating`) — the count of powers the character has in
   it, capped at 5 like a real rating, with the exact number in a `.visually-hidden` label so
   nothing is lost past the fifth dot.
+
+## Core Traits (`src/traits.ts` + `src/trait-icons.ts` + `composables/useTraits.ts`)
+
+The third leg of the compendium, alongside Disciplines and Clans, and read-only like
+them. Source: the official Spanish PDF *Vampiro La Mascarada 5ª edición - Rasgos
+Centrales.pdf*. `TRAITS_DATA.traits` is one flat array of 36 entries — 9 Attributes and
+27 Skills — because the two are the same shape and only differ in what they carry:
+
+```ts
+{
+  id: 'latrocinio',
+  name: 'Latrocinio',
+  kind: 'skill',              // attribute | skill
+  category: 'fisico',         // fisico | social | mental — the sheet's three columns
+  description: '...',
+  dots: [ ... ],              // the book's five readings of the score. ALWAYS five.
+  note?: '...',               // what the score feeds outside its own rolls
+  specialties?: [ ... ],      // Skills only
+  combos?: [ { attributeId, example } ],  // Skills only, always three
+  aka?: [ 'Crimen', 'Seguridad' ],        // searched, never rendered
+}
+```
+
+- **Follow the book closely, but reword it.** The content tracks *Rasgos Centrales*
+  faithfully — same reading of each score, same examples (the kg figures on Strength,
+  the Winchester line, the Gangrel packs), same level of detail — while the phrasing is
+  ours. It is a paraphrase, not a transcription, and that is the line to hold in all
+  three languages: **a new trait says what the book says, in words that are not the
+  book's.** The same applies to `data.ts`'s powers, and for the same reason the footer
+  gives: this supports play at the table, it does not replace the manual.
+- **Names are the ones the corebook prints**, so `Latrocinio` not "Crimen", `Pelea con
+  Armas` not "Armas cuerpo a cuerpo", `Consciencia` not "Alerta", `Ciencias` not
+  "Ciencia". The wordings a player may remember instead live in `aka`, which
+  `TraitsView`'s search matches and no view draws. **Adding a Skill means deciding its
+  printed name first and pushing every alternative into `aka`** — not renaming the id,
+  which is the route and the overlay key.
+- **`combos` stores the attribute's id, not its name.** The overlays therefore only
+  translate the `example`; the attribute's own entry owns its name, so a roll can never
+  read "Dexterity + Latrocinio". It also means an overlay cannot invent a pairing or
+  reorder them — `useTraits` maps over the *base* combos and looks the example up.
+- **An Attribute's rolls are the Skills' `combos` read backwards** (`skillsUsing()`), not
+  a second list. One source, so `#/trait/destreza` and `#/trait/sigilo` cannot disagree
+  about whether Dexterity + Stealth is a roll. Composure pairs with no Skill in the
+  table the data was built from, so its page simply has no rolls section — that is the
+  `v-if`, not a bug.
+- `specialties` carries the book's example lists, which are already explicitly
+  non-exhaustive there; they are proper nouns of the system, not prose.
+- `dots` is always exactly five entries and the views index it by position, so the dot
+  count is `i + 1`. A trait with four would silently draw a four-dot rating.
+
+### Icons — three, not thirty-six
+
+`TRAIT_ICONS` is keyed by **category**, not by trait. There is no symbol for a Skill on
+the official sheet the way there is for a Discipline or a Clan, and drawing 36 glyphs
+freehand would break the rule that every mark in this app is traced. What the reader
+needs to tell apart at a glance is which column a trait sits in, and that is three
+marks: a claw for the body, a masquerade mask for the Social column, an open grimoire
+for the Mental one.
+
+**They are in the sigil register, not the nav one.** They sit where a clan sigil or a
+discipline badge sits, so they are built the way those are — `viewBox="0 0 100 100"`,
+one `currentColor` path, `fill-rule="evenodd"`, the same filled diamond frame
+`DISCIPLINE_ICONS` carries, with the glyph knocked out of it. They carry `.sigil` over
+the tinted `.trait-card-art` surface like every other glyph — **never an inline colour**.
+
+An earlier set was drawn as thin 24x24 strokes like `NAV_ICONS` and was rejected on
+sight: perfectly legible, but line art is the language of this app's *chrome*, so next
+to the engraved sigils it read as generic app furniture rather than as content. **A
+redraw keeps the diamond and keeps the glyph filled.**
+
+The frame is authored rather than traced, since there is nothing to trace for it. Its
+one trap is that a diamond pinches at top and bottom, so a tall narrow glyph bursts out
+of it — the alchemical Salt and Mercury marks were tried and both spilled past the
+frame, and the first claw and grimoire had to be pulled in at the corners. Keep a glyph
+wide and centred on the waist of the diamond, and check it at 80px where the overflow
+shows.
+
+### Colour
+
+`--trait-fisico` / `--trait-social` / `--trait-mental`, defined per theme. Same rule as
+the clan palette: saturated mid-tones, used for sigils, the medallion tint and card
+edges only. The Attributes a Skill rolls with (`.trait-card-meta`) are `--gold`, and the
+dot-level text is `--parchment-dim` — a column accent would not clear 4.5:1 on both
+grounds.
+
+### The two views
+
+- `TraitsView` (`#/traits`) — search, then **Attributes**, then **Skills**, each split
+  into the sheet's three columns. A card carries the icon, the name and the blurb clamped
+  to two lines, and nothing else: **the Attributes a Skill rolls with are deliberately
+  not on the card**, only on the trait's own page. The search still matches name, `aka`,
+  blurb, Specialties and the names of the Attributes a Skill rolls with, so typing
+  "Destreza" lists every Skill that pairs with it — that last one is now a match with no
+  visible cue on the card, which is the trade for the quieter grid.
+- `TraitView` (`#/trait/:id`) — header (medallion, name, `Habilidad Física`, blurb,
+  optional note), the five dot levels as V5 dots with the number in a `.visually-hidden`
+  label, the rolls as linked rows, and the Specialties as chips. Every roll row
+  navigates to the trait on the other side of the `+`.
 
 ## Clans (`src/clans.ts` + `src/clan-icons.ts` + `composables/useClans.ts`)
 
@@ -491,7 +591,7 @@ maths in `sigilColor()`.
 `colorDark`, so it stays dark on the light theme while `.sigil` flips the glyph to
 near-black — dark on dark. The big discipline cards are fine because they are tall enough
 that the glyph sits over the light middle of the gradient; anything small (`.clan-medallion`,
-`.disc-mini-art`) uses the theme-following tinted card surface instead.
+`.disc-mini-art`, `.trait-card-art`) uses the theme-following tinted card surface instead.
 
 ## CSS (`src/css/main.css`)
 
@@ -506,6 +606,23 @@ Relevant classes:
   and as a group's first child its own `margin-top` was being zeroed by a `:first-child`
   rule left over from the old flat layout
 - `.clan-medallion` / `.clan-nickname` / `.clan-verbs` / `.clan-verb` / `.clan-section` / `.clan-section-title` / `.clan-trait` / `.clan-trait-name` — Clans tool
+- `.traits-subtitle` / `.trait-section` / `.trait-section-title` / `.trait-group` — the Core
+  Traits index. `.trait-section-title` ("Atributos", "Habilidades") sits a rank above the
+  column headings under it, which reuse `.clan-section-title`
+- `.trait-card` / `.trait-card-art` / `.trait-card-icon` (28px in a 42px badge, the ratio
+  `.disc-mini-icon` uses) / `.trait-card-body` /
+  `.trait-card-name` / `.trait-card-desc` — one trait on the index.
+  Same anatomy as `.disc-mini-card` but with a description, so it is its own rule rather
+  than that one stretched over both. Items align to the **top**, not centre: the card is
+  two or three lines tall and a centred badge would float in the middle. The blurb clamps
+  at 2 lines
+- `.trait-note` — the Health / Willpower / free-Specialty line in a trait's header
+- `.trait-levels` / `.trait-level` / `.trait-level-dots` / `.trait-level-text` — the five
+  dot readings. `.trait-level-dots` is a fixed 65px (five 9px `.power-dot`s plus their
+  gaps) so every row's text starts at the same x, whatever the rating
+- `.trait-roll` / `.trait-roll-pool` / `.trait-roll-example` — an "Attribute + Skill" row.
+  It holds 44px outright via `min-height: 52px`; unlike `.char-action` there is no
+  neighbour to crowd, so the target needs no `::before`
 - `.home-section` / `.home-section-title` — the home page's two sections (Compendium, My
   Characters), whose headings the overlay menu mirrors
 - `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
@@ -627,8 +744,8 @@ apart; the overlay's side padding matches the pages' `px-4` for the same reason.
 
 | Chunk | Holds | Size (gzip) |
 |-------|-------|-------------|
-| `index` | app code — views, composables, router | ~60 kB |
-| `game-content` | `data.ts`, `clans.ts`, the four translation overlays | ~78 kB |
+| `index` | app code — views, composables, router | ~64 kB |
+| `game-content` | `data.ts`, `clans.ts`, `traits.ts`, the six translation overlays | ~118 kB |
 | `game-icons` | `icons.ts`, `clan-icons.ts` (traced sigils) | ~105 kB |
 
 The content is ~80% of the bundle and almost never changes, while the app code changes every
@@ -670,7 +787,7 @@ These are non-negotiable for any change to the codebase.
 
 1. **No hardcoded UI strings in views.** Every user-visible label, placeholder, aria-label and empty-state message comes from `useI18n().t.value.<section>.<key>`.
 2. **All three languages stay in sync.** When adding a UI string, add it to `es`, `en` **and** `ca` blocks in `useI18n.ts` in the same commit. TypeScript will fail the build if `en` or `ca` drift from `es`'s shape.
-3. **Discipline, power and clan content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`; whenever `clans.ts` changes, do the same in `translations-clans-en.ts` **and** `translations-clans-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature. Clan names that differ by language (`El Ministerio` / `The Ministry` / `El Ministeri`, `Hécata` / `Hecata`) also need `clanes` overrides in the discipline overlays.
+3. **Discipline, power and clan content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`; whenever `clans.ts` changes, do the same in `translations-clans-en.ts` **and** `translations-clans-ca.ts`; whenever `traits.ts` changes, do the same in `translations-traits-en.ts` **and** `translations-traits-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature. Clan names that differ by language (`El Ministerio` / `The Ministry` / `El Ministeri`, `Hécata` / `Hecata`) also need `clanes` overrides in the discipline overlays.
 4. **Language `auto` order matters.** `CATALAN` (`/^ca\b/i`) is checked before the general `IBERIAN` regex; keep it that way so `ca-*` browsers don't fall into the `es` bucket.
 5. **To add a language:** create `translations-<lang>.ts` mirroring the EN structure, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, add a `<lang>` dict block plus `lang<Lang>` label to every language block in `useI18n.ts`, wire the overlay in `useData.ts`, add that language's spelling of the Thin-Bloods to `THIN_BLOOD_NAMES` in `clan-icons.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
 
