@@ -3,6 +3,8 @@ import HomeView         from './views/HomeView.vue'
 import DisciplinesView  from './views/DisciplinesView.vue'
 import DisciplineView   from './views/DisciplineView.vue'
 import PowerView        from './views/PowerView.vue'
+import TraitsView       from './views/TraitsView.vue'
+import TraitView        from './views/TraitView.vue'
 import ClansView        from './views/ClansView.vue'
 import ClanView         from './views/ClanView.vue'
 import CharacterCreateView from './views/CharacterCreateView.vue'
@@ -17,6 +19,8 @@ const router = createRouter({
     { path: '/disciplines',                       component: DisciplinesView },
     { path: '/discipline/:id',                    component: DisciplineView  },
     { path: '/discipline/:id/power/:powerId',     component: PowerView       },
+    { path: '/traits',                            component: TraitsView      },
+    { path: '/trait/:id',                         component: TraitView       },
     { path: '/clans',                             component: ClansView       },
     { path: '/clan/:id',                          component: ClanView        },
     { path: '/character/new',                     component: CharacterCreateView },

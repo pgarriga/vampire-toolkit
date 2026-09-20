@@ -7,7 +7,7 @@
  * by the caller through CSS.
  */
 export type NavIconType =
-  | 'home' | 'clans' | 'disciplines' | 'characters' | 'settings'
+  | 'home' | 'clans' | 'disciplines' | 'traits' | 'characters' | 'settings'
 
 const OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
 
@@ -25,6 +25,14 @@ export const NAV_ICONS: Record<NavIconType, string> = {
   disciplines: `${OPEN}
     <circle cx="12" cy="12" r="3"/>
     <path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/>
+  </svg>`,
+
+  // Core Traits: a dot rating, the notation the whole chapter is written in.
+  traits: `${OPEN}
+    <circle cx="5" cy="8" r="2.2" fill="currentColor" stroke="none"/>
+    <circle cx="12" cy="8" r="2.2" fill="currentColor" stroke="none"/>
+    <circle cx="19" cy="8" r="2.2"/>
+    <path d="M4 15h16M4 19h10"/>
   </svg>`,
 
   characters: `${OPEN}

@@ -5,6 +5,7 @@ const es = {
   nav: {
     home:        'Inicio',
     disciplines: 'Disciplinas',
+    traits:      'Rasgos centrales',
     clans:       'Clanes',
     settings:    'Ajustes',
     openMenu:    'Abrir menú',
@@ -17,6 +18,8 @@ const es = {
     disciplinesDesc:   'Explora las 12 disciplinas de V5 y sus más de 150 poderes: coste, reserva de dados, duración y descripción.',
     clansTitle:        'Clanes',
     clansDesc:         'Consulta los 14 clanes de V5: sus disciplinas de clan, su Prohibición y su Compulsión.',
+    traitsTitle:       'Rasgos centrales',
+    traitsDesc:        'Los 9 Atributos y las 27 Habilidades de V5: qué mide cada uno, qué significa cada nivel y con qué Atributo se tira cada Habilidad.',
   },
   disciplinesList: {
     title:             'Disciplinas',
@@ -67,6 +70,37 @@ const es = {
     bane:        'Prohibición',
     compulsion:  'Compulsión',
     notFound:    'Clan no encontrado.',
+    backHome:    'Volver al inicio',
+  },
+  traitsList: {
+    title:             'Rasgos centrales',
+    subtitle:          'Los 9 Atributos y las 27 Habilidades con las que se construye cualquier reserva de dados.',
+    searchPlaceholder: 'Buscar atributo o habilidad…',
+    searchAriaLabel:   'Buscar atributo o habilidad',
+    attributes:        'Atributos',
+    skills:            'Habilidades',
+    combos:            'combinaciones',
+    noResults:         'No se encontraron rasgos para',
+    // Headings for the six groups. Spanish and Catalan inflect the adjective for the
+    // noun's gender, so the pairs are written out rather than composed from a word.
+    groups: {
+      attribute: { fisico: 'Atributos Físicos', social: 'Atributos Sociales', mental: 'Atributos Mentales' },
+      skill:     { fisico: 'Habilidades Físicas', social: 'Habilidades Sociales', mental: 'Habilidades Mentales' },
+    },
+    // The same six, singular — what a trait's own sheet calls it.
+    kinds: {
+      attribute: { fisico: 'Atributo Físico', social: 'Atributo Social', mental: 'Atributo Mental' },
+      skill:     { fisico: 'Habilidad Física', social: 'Habilidad Social', mental: 'Habilidad Mental' },
+    },
+  },
+  trait: {
+    back:        'Rasgos centrales',
+    levels:      'Niveles',
+    combos:      'Combinaciones',
+    combosAttr:  'Habilidades que usan este Atributo',
+    specialties: 'Especialidades',
+    level:       'Nivel',
+    notFound:    'Rasgo no encontrado.',
     backHome:    'Volver al inicio',
   },
   myPowers: {
@@ -154,6 +188,7 @@ const en: typeof es = {
   nav: {
     home:        'Home',
     disciplines: 'Disciplines',
+    traits:      'Core Traits',
     clans:       'Clans',
     settings:    'Settings',
     openMenu:    'Open menu',
@@ -166,6 +201,8 @@ const en: typeof es = {
     disciplinesDesc:   'Browse all 12 V5 disciplines and 150+ powers: cost, dice pool, duration and description.',
     clansTitle:        'Clans',
     clansDesc:         'Look up the 14 V5 clans: their in-clan Disciplines, their Bane and their Compulsion.',
+    traitsTitle:       'Core Traits',
+    traitsDesc:        'The 9 Attributes and 27 Skills of V5: what each one measures, what every dot means, and which Attribute each Skill rolls with.',
   },
   disciplinesList: {
     title:             'Disciplines',
@@ -216,6 +253,37 @@ const en: typeof es = {
     bane:        'Bane',
     compulsion:  'Compulsion',
     notFound:    'Clan not found.',
+    backHome:    'Back to home',
+  },
+  traitsList: {
+    title:             'Core Traits',
+    subtitle:          'The 9 Attributes and 27 Skills every dice pool is built from.',
+    searchPlaceholder: 'Search attribute or skill…',
+    searchAriaLabel:   'Search attribute or skill',
+    attributes:        'Attributes',
+    skills:            'Skills',
+    combos:            'combinations',
+    noResults:         'No traits found for',
+    // Headings for the six groups. Spanish and Catalan inflect the adjective for the
+    // noun's gender, so the pairs are written out rather than composed from a word.
+    groups: {
+      attribute: { fisico: 'Physical Attributes', social: 'Social Attributes', mental: 'Mental Attributes' },
+      skill:     { fisico: 'Physical Skills', social: 'Social Skills', mental: 'Mental Skills' },
+    },
+    // The same six, singular — what a trait's own sheet calls it.
+    kinds: {
+      attribute: { fisico: 'Physical Attribute', social: 'Social Attribute', mental: 'Mental Attribute' },
+      skill:     { fisico: 'Physical Skill', social: 'Social Skill', mental: 'Mental Skill' },
+    },
+  },
+  trait: {
+    back:        'Core Traits',
+    levels:      'Dot levels',
+    combos:      'Combinations',
+    combosAttr:  'Skills that use this Attribute',
+    specialties: 'Specialties',
+    level:       'Dot',
+    notFound:    'Trait not found.',
     backHome:    'Back to home',
   },
   myPowers: {
@@ -303,6 +371,7 @@ const ca: typeof es = {
   nav: {
     home:        'Inici',
     disciplines: 'Disciplines',
+    traits:      'Trets centrals',
     clans:       'Clans',
     settings:    'Ajustaments',
     openMenu:    'Obrir menú',
@@ -315,6 +384,8 @@ const ca: typeof es = {
     disciplinesDesc:   'Explora les 12 disciplines de V5 i els seus més de 150 poders: cost, reserva de daus, durada i descripció.',
     clansTitle:        'Clans',
     clansDesc:         'Consulta els 14 clans de V5: les seves disciplines de clan, la seva Prohibició i la seva Compulsió.',
+    traitsTitle:       'Trets centrals',
+    traitsDesc:        'Els 9 Atributs i les 27 Habilitats de V5: què mesura cadascun, què significa cada nivell i amb quin Atribut es tira cada Habilitat.',
   },
   disciplinesList: {
     title:             'Disciplines',
@@ -365,6 +436,37 @@ const ca: typeof es = {
     bane:        'Prohibició',
     compulsion:  'Compulsió',
     notFound:    'Clan no trobat.',
+    backHome:    'Tornar a l\'inici',
+  },
+  traitsList: {
+    title:             'Trets centrals',
+    subtitle:          'Els 9 Atributs i les 27 Habilitats amb què es construeix qualsevol reserva de daus.',
+    searchPlaceholder: 'Cercar atribut o habilitat…',
+    searchAriaLabel:   'Cercar atribut o habilitat',
+    attributes:        'Atributs',
+    skills:            'Habilitats',
+    combos:            'combinacions',
+    noResults:         'No s\'han trobat trets per a',
+    // Headings for the six groups. Spanish and Catalan inflect the adjective for the
+    // noun's gender, so the pairs are written out rather than composed from a word.
+    groups: {
+      attribute: { fisico: 'Atributs Físics', social: 'Atributs Socials', mental: 'Atributs Mentals' },
+      skill:     { fisico: 'Habilitats Físiques', social: 'Habilitats Socials', mental: 'Habilitats Mentals' },
+    },
+    // The same six, singular — what a trait's own sheet calls it.
+    kinds: {
+      attribute: { fisico: 'Atribut Físic', social: 'Atribut Social', mental: 'Atribut Mental' },
+      skill:     { fisico: 'Habilitat Física', social: 'Habilitat Social', mental: 'Habilitat Mental' },
+    },
+  },
+  trait: {
+    back:        'Trets centrals',
+    levels:      'Nivells',
+    combos:      'Combinacions',
+    combosAttr:  'Habilitats que fan servir aquest Atribut',
+    specialties: 'Especialitats',
+    level:       'Nivell',
+    notFound:    'Tret no trobat.',
     backHome:    'Tornar a l\'inici',
   },
   myPowers: {
