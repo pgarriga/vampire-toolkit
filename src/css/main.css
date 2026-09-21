@@ -91,6 +91,22 @@ body {
 
 a { text-decoration: none; color: inherit; }
 
+/* A control is for tapping, not for reading off. Without this a tap that lands a
+   hair off, a double click or a drag that starts on a card leaves the card's text
+   highlighted — and on the power grid a highlighted card reads as a *selected*
+   power, a state the app does not have (powers are picked in CharacterAddView,
+   never here). Covers every <button>, the articles that act as buttons
+   (.discipline-card, .power-card) and the navbar brand. Prose is untouched: the
+   detail sheets' descriptions stay selectable and copyable, which is the point of
+   scoping this to controls rather than to body. The -webkit- prefix is still
+   required by Safari/iOS. */
+button,
+[role="button"],
+.app-navbar-brand {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
 ::-webkit-scrollbar       { width: 6px; }
 ::-webkit-scrollbar-track { background: var(--void); }
 ::-webkit-scrollbar-thumb { background: #5a3070; border-radius: 3px; }
