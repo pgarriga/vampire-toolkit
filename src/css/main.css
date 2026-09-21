@@ -253,10 +253,18 @@ button,
   cursor: pointer;
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
 }
-.discipline-card:hover {
-  transform: translateY(-5px);
-  border-color: var(--card-color, #5a3070);
-  box-shadow: 0 8px 32px var(--card-glow, rgba(90,48,112,0.3));
+/* Every :hover in this file is gated on (hover: hover). A touch screen has no
+   pointer to leave, so a tap applies :hover and the browser keeps it there until
+   something else is tapped — and on the way back from the page the card opened,
+   the card that was tapped comes back still lifted, bordered and glowing, which
+   reads as a *selected* discipline, power, clan or trait. None of these grids has
+   a selected state. Desktop is unaffected: a real pointer still gets the lift. */
+@media (hover: hover) {
+  .discipline-card:hover {
+    transform: translateY(-5px);
+    border-color: var(--card-color, #5a3070);
+    box-shadow: 0 8px 32px var(--card-glow, rgba(90,48,112,0.3));
+  }
 }
 .discipline-card:active { transform: translateY(-2px); }
 .discipline-card:focus-visible {
@@ -356,7 +364,9 @@ button,
   color: var(--parchment-dim);
   opacity: 0.9;
 }
-.discipline-card:hover .disc-clan-sigil { color: var(--parchment); }
+@media (hover: hover) {
+  .discipline-card:hover .disc-clan-sigil { color: var(--parchment); }
+}
 
 /* ─── Clan chips on a discipline page ───
    Its in-clan clans, each a link to that clan's sheet. The sigil is painted with
@@ -383,9 +393,11 @@ button,
 @supports not (background: color-mix(in srgb, red 10%, blue)) {
   .clan-chip { background: var(--void-card); }
 }
-.clan-chip:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 18px var(--card-glow, rgba(90,48,112,0.3));
+@media (hover: hover) {
+  .clan-chip:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 18px var(--card-glow, rgba(90,48,112,0.3));
+  }
 }
 .clan-chip:focus-visible {
   outline: 2px solid var(--card-color, var(--gold));
@@ -399,7 +411,9 @@ button,
   color: var(--parchment-dim);
   cursor: default;
 }
-.clan-chip--plain:hover { transform: none; box-shadow: none; }
+@media (hover: hover) {
+  .clan-chip--plain:hover { transform: none; box-shadow: none; }
+}
 /* Colour comes from `.sigil` on the element itself — never set it here. */
 .clan-chip-sigil {
   flex: 0 0 auto;
@@ -417,10 +431,12 @@ button,
   transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
   min-height: 44px;
 }
-.power-card:hover {
-  transform: translateY(-6px) scale(1.01);
-  border-color: var(--card-color, #5a3070);
-  box-shadow: 0 12px 40px var(--card-glow, rgba(90,48,112,0.35));
+@media (hover: hover) {
+  .power-card:hover {
+    transform: translateY(-6px) scale(1.01);
+    border-color: var(--card-color, #5a3070);
+    box-shadow: 0 12px 40px var(--card-glow, rgba(90,48,112,0.35));
+  }
 }
 .power-card:focus-visible {
   outline: 2px solid var(--card-color, #8b0000);
@@ -644,7 +660,9 @@ button,
   background: transparent;
   min-height: 44px;
 }
-.back-btn:hover { color: var(--parchment); border-color: #5a3070; background: var(--void-card2); }
+@media (hover: hover) {
+  .back-btn:hover { color: var(--parchment); border-color: #5a3070; background: var(--void-card2); }
+}
 .back-btn svg { width: 14px; height: 14px; }
 
 /* ─── Power detail ─── */
@@ -820,7 +838,9 @@ button,
   padding: 0;
   transition: color var(--transition), border-color var(--transition), background var(--transition), transform var(--transition);
 }
-.share-btn:hover:not(:disabled) { color: var(--gold); border-color: var(--gold-dim); }
+@media (hover: hover) {
+  .share-btn:hover:not(:disabled) { color: var(--gold); border-color: var(--gold-dim); }
+}
 .share-btn:active:not(:disabled) { transform: scale(0.94); }
 .share-btn:disabled { opacity: 0.7; cursor: progress; }
 [data-theme="light"] .share-btn { background: rgba(255,255,255,0.75); }
@@ -895,7 +915,9 @@ button,
   justify-content: center;
   transition: color var(--transition), background var(--transition), border-color var(--transition);
 }
-.app-menu-toggler:hover { color: var(--parchment); background: var(--void-card2); border-color: var(--gold-dim); }
+@media (hover: hover) {
+  .app-menu-toggler:hover { color: var(--parchment); background: var(--void-card2); border-color: var(--gold-dim); }
+}
 .app-menu-toggler:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 .app-menu-overlay {
@@ -939,10 +961,12 @@ button,
   text-align: left;
   transition: color var(--transition), background var(--transition), border-color var(--transition);
 }
-.app-menu-item:hover {
-  color: var(--parchment);
-  background: var(--void-card2);
-  border-color: var(--gold-dim);
+@media (hover: hover) {
+  .app-menu-item:hover {
+    color: var(--parchment);
+    background: var(--void-card2);
+    border-color: var(--gold-dim);
+  }
 }
 .app-menu-item.active {
   color: var(--gold);
@@ -988,7 +1012,9 @@ button,
   border-style: dashed;
   color: var(--gold);
 }
-.app-menu-item--new:hover { background: var(--void-card); }
+@media (hover: hover) {
+  .app-menu-item--new:hover { background: var(--void-card); }
+}
 
 /* A character's own clan sigil, pushed clear of the clan colour by .sigil. */
 .app-menu-sigil { width: 20px; height: 20px; }
@@ -1038,10 +1064,12 @@ button,
   gap: 0.5rem;
   transition: transform 0.12s ease, border-color 0.12s ease, background var(--transition);
 }
-.tool-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--tool-accent);
-  background: var(--void-card2);
+@media (hover: hover) {
+  .tool-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--tool-accent);
+    background: var(--void-card2);
+  }
 }
 .tool-card:focus-visible {
   outline: 2px solid var(--tool-accent);
@@ -1119,19 +1147,23 @@ button,
   min-height: 44px;
   text-decoration: none;
 }
-.settings-option:hover {
-  color: var(--parchment);
-  border-color: #5a3070;
-  background: var(--void-card2);
+@media (hover: hover) {
+  .settings-option:hover {
+    color: var(--parchment);
+    border-color: #5a3070;
+    background: var(--void-card2);
+  }
 }
 .settings-option:disabled {
   cursor: progress;
   opacity: 0.6;
 }
-.settings-option:disabled:hover {
-  color: var(--parchment-dim);
-  border-color: var(--void-border);
-  background: var(--void-card);
+@media (hover: hover) {
+  .settings-option:disabled:hover {
+    color: var(--parchment-dim);
+    border-color: var(--void-border);
+    background: var(--void-card);
+  }
 }
 .settings-option.active {
   color: var(--gold);
@@ -1149,7 +1181,9 @@ button,
   cursor: pointer;
   transition: color var(--transition);
 }
-.amalgama-link:hover { color: #e0bf72; }
+@media (hover: hover) {
+  .amalgama-link:hover { color: #e0bf72; }
+}
 
 /* ─── Clanes ─── */
 
@@ -1253,10 +1287,12 @@ button,
 
 button.disc-mini-card { cursor: pointer; }
 
-button.disc-mini-card:hover {
-  background: var(--void-card2);
-  box-shadow: 0 0 16px var(--card-glow, transparent);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  button.disc-mini-card:hover {
+    background: var(--void-card2);
+    box-shadow: 0 0 16px var(--card-glow, transparent);
+    transform: translateY(-2px);
+  }
 }
 
 button.disc-mini-card:focus-visible {
@@ -1441,10 +1477,12 @@ button.disc-mini-card:focus-visible {
   transition: transform 0.12s ease, border-color 0.12s ease, background var(--transition);
   width: 100%;
 }
-.char-row:hover {
-  background: var(--void-card2);
-  border-color: var(--card-color, var(--gold-dim));
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .char-row:hover {
+    background: var(--void-card2);
+    border-color: var(--card-color, var(--gold-dim));
+    transform: translateY(-2px);
+  }
 }
 .char-row:focus-visible {
   outline: 2px solid var(--card-color, var(--gold));
@@ -1521,7 +1559,9 @@ button.disc-mini-card:focus-visible {
   border: 1px dashed var(--void-border);
   border-left: 4px solid var(--gold-dim);
 }
-.char-row--new:hover { background: var(--void-card); border-color: var(--gold-dim); }
+@media (hover: hover) {
+  .char-row--new:hover { background: var(--void-card); border-color: var(--gold-dim); }
+}
 .char-row--new .char-row-name { color: var(--gold); }
 
 .char-row-medallion--new {
@@ -1566,10 +1606,12 @@ button.disc-mini-card:focus-visible {
   cursor: not-allowed;
   opacity: 1;
 }
-.char-form-primary:disabled:hover {
-  background: var(--void-card);
-  border-color: var(--void-border);
-  color: var(--parchment-faint);
+@media (hover: hover) {
+  .char-form-primary:disabled:hover {
+    background: var(--void-card);
+    border-color: var(--void-border);
+    color: var(--parchment-faint);
+  }
 }
 
 /* Step 1 → 2 progress. --parchment-dim on the pending step keeps it legible without
@@ -1630,10 +1672,12 @@ button.disc-mini-card:focus-visible {
   padding: 0.75rem 0.5rem;
   transition: background var(--transition), border-color var(--transition), transform 0.12s ease;
 }
-.clan-pick:hover {
-  background: var(--void-card2);
-  border-color: var(--card-color, var(--gold-dim));
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .clan-pick:hover {
+    background: var(--void-card2);
+    border-color: var(--card-color, var(--gold-dim));
+    transform: translateY(-2px);
+  }
 }
 .clan-pick:focus-visible {
   outline: 2px solid var(--card-color, var(--gold));
@@ -1699,7 +1743,9 @@ button.disc-mini-card:focus-visible {
   text-decoration-color: var(--gold-dim);
   text-underline-offset: 3px;
 }
-.clan-link:hover { color: #e0bf72; }
+@media (hover: hover) {
+  .clan-link:hover { color: #e0bf72; }
+}
 .clan-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 .clan-link-nickname { color: var(--parchment-dim); text-decoration: none; }
@@ -1765,17 +1811,21 @@ button.disc-mini-card:focus-visible {
    the neighbouring chip and steal its taps (the row's gap is just 0.4rem). */
 .char-action::before { content: ''; position: absolute; inset: -5px 0; }
 
-.char-action:hover {
-  background: var(--void-card2);
-  border-color: var(--gold-dim);
-  color: var(--gold);
+@media (hover: hover) {
+  .char-action:hover {
+    background: var(--void-card2);
+    border-color: var(--gold-dim);
+    color: var(--gold);
+  }
 }
 .char-action:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .char-action svg { flex-shrink: 0; height: 14px; width: 14px; }
 
 /* #c0392b on the card surface clears 4.5:1 on both themes. */
 .char-action--danger { color: #c0392b; border-color: #7a1a1a; }
-.char-action--danger:hover { background: #7a1a1a; border-color: #c0392b; color: #fff; }
+@media (hover: hover) {
+  .char-action--danger:hover { background: #7a1a1a; border-color: #c0392b; color: #fff; }
+}
 
 /* ─── "More options" dropdown ───
    Anchored to its chip and right-aligned, so it opens inward from the row's right
@@ -1818,12 +1868,16 @@ button.disc-mini-card:focus-visible {
   transition: background var(--transition), color var(--transition);
   width: 100%;
 }
-.char-menu-item:hover { background: var(--void-card2); color: var(--gold); }
+@media (hover: hover) {
+  .char-menu-item:hover { background: var(--void-card2); color: var(--gold); }
+}
 .char-menu-item:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 .char-menu-item svg { flex-shrink: 0; height: 16px; width: 16px; }
 
 .char-menu-item--danger { color: #c0392b; }
-.char-menu-item--danger:hover { background: #7a1a1a; color: #fff; }
+@media (hover: hover) {
+  .char-menu-item--danger:hover { background: #7a1a1a; color: #fff; }
+}
 
 .char-actions-confirm {
   align-self: center;
@@ -1912,7 +1966,9 @@ button.disc-mini-card:focus-visible {
   transition: background var(--transition), border-color var(--transition);
   width: 100%;
 }
-.power-pick:hover { background: var(--void-card2); }
+@media (hover: hover) {
+  .power-pick:hover { background: var(--void-card2); }
+}
 .power-pick:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 .power-pick.owned { background: var(--void-card2); border-color: var(--gold-dim); }
 
@@ -1983,10 +2039,12 @@ button.disc-mini-card:focus-visible {
   width: 100%;
 }
 
-.trait-card:hover {
-  background: var(--void-card2);
-  box-shadow: 0 0 16px var(--card-color, transparent);
-  transform: translateY(-2px);
+@media (hover: hover) {
+  .trait-card:hover {
+    background: var(--void-card2);
+    box-shadow: 0 0 16px var(--card-color, transparent);
+    transform: translateY(-2px);
+  }
 }
 
 .trait-card:focus-visible {
@@ -2111,7 +2169,9 @@ button.disc-mini-card:focus-visible {
   width: 100%;
 }
 
-.trait-roll:hover { background: var(--void-card2); transform: translateY(-2px); }
+@media (hover: hover) {
+  .trait-roll:hover { background: var(--void-card2); transform: translateY(-2px); }
+}
 .trait-roll:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 .trait-roll-pool {
