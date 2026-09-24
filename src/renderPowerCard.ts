@@ -129,8 +129,8 @@ export async function renderPowerCard(
   const rowPadY        = 32
   const rowMinH        = 68
   const rowKeyPadX     = 32
-  const rowKeyColW     = 240
-  const rowValColX     = rowKeyPadX + rowKeyColW
+  const rowKeyMinW     = 240
+  const rowKeyGap      = 28
   const ornamentH      = 80
 
   const measureCanvas = document.createElement('canvas')
@@ -146,7 +146,12 @@ export async function renderPowerCard(
   if (hasFact(power.duration)) rows.push({ key: strings.duration, val: power.duration })
   if (discipline.tipo) rows.push({ key: strings.type, val: discipline.tipo })
 
-  const valColW = contentW - rowValColX - rowKeyPadX
+  // The key column fits the widest label: "RESERVA DE DADOS" is wider than the
+  // 240px that suits the English labels, and ran straight into its value.
+  mctx.font = `700 26px ${FONT_BODY}`
+  const widestKey  = Math.max(0, ...rows.map(r => mctx.measureText(r.key.toUpperCase()).width))
+  const rowValColX = rowKeyPadX + Math.max(rowKeyMinW, Math.ceil(widestKey) + rowKeyGap)
+  const valColW    = contentW - rowValColX - rowKeyPadX
   mctx.font = `400 32px ${FONT_BODY}`
   const rowsMeta = rows.map(r => {
     const valLines = wrapText(mctx, r.val, valColW)
@@ -219,12 +224,17 @@ export async function renderPowerCard(
 
   // Centred off the glyphs' own box rather than the font's line box: Cormorant's tall
   // ascender puts 'middle' visibly high for all-caps text with no descenders.
+  // The baseline is switched *before* measuring: the ascent is reported from the
+  // current baseline, and measured from 'top' it came back near zero.
+  ctx.textBaseline = 'alphabetic'
   const bm = ctx.measureText(badgeText)
   const capH = bm.actualBoundingBoxAscent || 21
   ctx.fillStyle = '#14101f'
   ctx.textAlign = 'center'
-  ctx.textBaseline = 'alphabetic'
   ctx.fillText(badgeText, badgeX + badgeW / 2, badgeY + badgeR + capH / 2)
+  // Everything below is laid out from the top of each line; leaving 'alphabetic' set
+  // drew it all a line's ascent too high.
+  ctx.textBaseline = 'top'
 
   const iconSize = 320
   const iconX = (WIDTH - iconSize) / 2
