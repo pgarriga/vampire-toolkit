@@ -24,7 +24,7 @@
  * Subject matter: a claw for the body, a mask for the Masquerade, a grimoire for what
  * the Mental Skills are all made of.
  */
-import type { TraitCategory } from './types'
+import type { TraitCategory } from '../types'
 
 /** Outer diamond, then the inner one as a hole. Prefixed to every glyph. */
 const RING = 'M50 3.5 L96.5 50 L50 96.5 L3.5 50 Z M50 15 L85 50 L50 85 L15 50 Z '

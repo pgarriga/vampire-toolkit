@@ -21,36 +21,53 @@ Vampire Toolkit/
 ├── index.html                   # Vite entry point
 ├── vite.config.ts               # base: './' locally, '/vampire-toolkit/' on GH Actions; PWA plugin
 ├── tsconfig.json
-├── package.json                 # Scripts: dev / build / preview
+├── package.json                 # Scripts: dev / build / preview / typecheck
 ├── scripts/
 │   └── generate-icons.mjs       # Regenerates PWA PNGs from public/favicon.svg (sharp)
 └── src/
     ├── main.ts                  # Imports Bootstrap CSS (no JS bundle), main.css, mounts app
+    ├── env.d.ts                 # Vite client types (CSS side-effect imports, import.meta.env)
     ├── App.vue                  # Sticky navbar + overlay menu + <router-view> + <AppFooter>
     ├── router.ts                # Hash routes (see Routes below)
-    ├── types.ts                 # Interfaces: Discipline, Power, DisciplinesData, Clan, Character
-    ├── data.ts                  # DISCIPLINES_DATA: 12 disciplines and 152 powers (Spanish source)
-    ├── clans.ts                 # CLANS_DATA: the 14 clans (Spanish source)
-    ├── translations-en.ts       # English overlay for disciplines and powers
-    ├── translations-ca.ts       # Catalan overlay for disciplines and powers
-    ├── translations-clans-en.ts # English overlay for clans
-    ├── translations-clans-ca.ts # Catalan overlay for clans
-    ├── icons.ts                 # DISCIPLINE_ICONS: traced diamond badge per discipline
-    ├── clan-icons.ts            # CLAN_ICONS + THIN_BLOOD_ICON / THIN_BLOOD_NAMES
-    ├── nav-icons.ts             # NAV_ICONS: stroked line icons for the menu and home cards
-    ├── helpers.ts               # levelDots, disciplineById, powerById, factHead, shortCost,
-    │                            #   shortDicePool, shortDuration, artGradient, colorGradient, parseAmalgama
+    ├── types.ts                 # Interfaces: Discipline, Power, Clan, Trait, Character
+    ├── helpers.ts               # Pure functions: levelDots, foldForSearch, hasFact, factHead,
+    │                            #   shortCost, shortDicePool, shortDuration, artGradient,
+    │                            #   colorGradient, parseAmalgama
+    ├── storage.ts               # Guarded localStorage access (get/set/remove/keys, JSON)
     ├── renderPowerCard.ts       # Canvas 2D renderer — draws a power card and returns a PNG Blob
+    ├── content/                 # Game content — the `game-content` chunk
+    │   ├── disciplines.ts       # DISCIPLINES_DATA: 12 disciplines and 152 powers (Spanish source)
+    │   ├── disciplines.en.ts    # English overlay for disciplines and powers
+    │   ├── disciplines.ca.ts    # Catalan overlay for disciplines and powers
+    │   ├── clans.ts             # CLANS_DATA: the 14 clans (Spanish source)
+    │   ├── clans.en.ts / .ca.ts # English / Catalan overlays for clans
+    │   ├── traits.ts            # TRAITS_DATA: 9 Attributes and 27 Skills (Spanish source)
+    │   └── traits.en.ts / .ca.ts# English / Catalan overlays for traits
+    ├── icons/
+    │   ├── disciplines.ts       # DISCIPLINE_ICONS: traced diamond badge per discipline
+    │   ├── clans.ts             # CLAN_ICONS + THIN_BLOOD_ICON / THIN_BLOOD_NAMES
+    │   ├── traits.ts            # TRAIT_ICONS: one diamond sigil per trait category
+    │   └── nav.ts               # NAV_ICONS: stroked line icons for the menu and home cards
+    ├── i18n/
+    │   ├── es.ts                # Spanish UI strings — the shape source (`Messages`)
+    │   ├── en.ts                # English UI strings, typed as `Messages`
+    │   └── ca.ts                # Catalan UI strings, typed as `Messages`
     ├── components/
     │   ├── AppFooter.vue        # Site footer — notice + version pill
-    │   └── ClanPicker.vue       # The 14 clan sigils as a single-choice grid with search
+    │   ├── ClanPicker.vue       # The 14 clan sigils as a single-choice grid with search
+    │   ├── PageNav.vue          # Breadcrumb bar on detail pages: back button › current page
+    │   ├── PageHeader.vue       # Title band of the index pages and Settings
+    │   ├── SearchInput.vue      # The search box under an index page's title
+    │   └── PowerCard.vue        # One power on a grid (Discipline page + character sheet)
     ├── composables/
     │   ├── useCharacters.ts     # Characters: storage, CRUD, powers, import/export
     │   ├── useCharacterPowers.ts# One character's powers grouped by discipline + the flat swipe order
+    │   ├── useRouteCharacter.ts # The route's `:id` character, made active on open
     │   ├── useSettings.ts       # Theme (auto/dark/light) and language (auto/es/en/ca) preferences
-    │   ├── useI18n.ts           # UI string translations based on resolved language
+    │   ├── useI18n.ts           # Picks the UI strings for the resolved language
     │   ├── useData.ts           # Localized discipline/power data — applies EN or CA overlay
-    │   └── useClans.ts          # Localized clan data + clanSigil / clanIdByName
+    │   ├── useClans.ts          # Localized clan data + clanSigil / clanIdByName
+    │   └── useTraits.ts         # Localized traits + skillsUsing
     ├── css/
     │   └── main.css             # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
@@ -60,11 +77,17 @@ Vampire Toolkit/
         ├── PowerView.vue        # Power detail card + mobile Share button
         ├── ClansView.vue        # Clan grid with search
         ├── ClanView.vue         # Clan detail — description, in-clan Disciplines, Bane, Compulsion
+        ├── TraitsView.vue       # Core Traits index — Attributes, then Skills
+        ├── TraitView.vue        # One Attribute or Skill in full
         ├── CharacterCreateView.vue # Two-step wizard: name + generation, then clan
         ├── CharacterView.vue    # Character sheet — identity, actions, powers by discipline
         ├── CharacterAddView.vue # Power picker: choose a Discipline, then tick its powers
         └── SettingsView.vue     # Theme, language, cache and repository info
 ```
+
+**Shared data is module-level.** `useData`, `useClans`, `useTraits`, `useI18n` and
+`useSettings` each hold one `computed` at module scope that every caller shares, so a
+language change re-applies each overlay once rather than once per component.
 
 ## Routes
 
@@ -98,7 +121,7 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
 - Section headings reuse the home page's look (`.app-menu-heading` ≈ `.home-section-title`).
   A `role="menu"` accepts only `menuitem` children, so each section is a `role="group"`
   carrying the name and the visible heading is `aria-hidden`
-- Menu and home-card icons both come from `src/nav-icons.ts`, so a tool's card always
+- Menu and home-card icons both come from `src/icons/nav.ts`, so a tool's card always
   shows the same icon as its menu entry
 - Menu closes on route change, on Escape, and on click outside the panel
 - Body scroll is locked while the menu is open
@@ -156,7 +179,7 @@ only ever added from inside a sheet, so the owner is always known at the call si
 
 `useCharacterPowers(character)` takes the character as a ref rather than reading a global,
 so a view can never render one character's sheet while listing another's powers. It returns
-`groupedPowers` (by discipline in `data.ts` order, sorted by level inside each group) and
+`groupedPowers` (by discipline in `content/disciplines.ts` order, sorted by level inside each group) and
 `flatPowers` (what `PowerView` swipes through) — both must agree or swiping would skip powers.
 
 ### Adding and removing powers (`CharacterAddView`)
@@ -198,7 +221,7 @@ Changes save immediately.
   it, capped at 5 like a real rating, with the exact number in a `.visually-hidden` label so
   nothing is lost past the fifth dot.
 
-## Core Traits (`src/traits.ts` + `src/trait-icons.ts` + `composables/useTraits.ts`)
+## Core Traits (`src/content/traits.ts` + `src/icons/traits.ts` + `composables/useTraits.ts`)
 
 The third leg of the compendium, alongside Disciplines and Clans, and read-only like
 them. Source: the official Spanish PDF *Vampiro La Mascarada 5ª edición - Rasgos
@@ -225,7 +248,7 @@ Centrales.pdf*. `TRAITS_DATA.traits` is one flat array of 36 entries — 9 Attri
   the Winchester line, the Gangrel packs), same level of detail — while the phrasing is
   ours. It is a paraphrase, not a transcription, and that is the line to hold in all
   three languages: **a new trait says what the book says, in words that are not the
-  book's.** The same applies to `data.ts`'s powers, and for the same reason the footer
+  book's.** The same applies to `content/disciplines.ts`'s powers, and for the same reason the footer
   gives: this supports play at the table, it does not replace the manual.
 - **Names are the ones the corebook prints**, so `Latrocinio` not "Crimen", `Pelea con
   Armas` not "Armas cuerpo a cuerpo", `Consciencia` not "Alerta", `Ciencias` not
@@ -296,7 +319,7 @@ grounds.
   label, the rolls as linked rows, and the Specialties as chips. Every roll row
   navigates to the trait on the other side of the `+`.
 
-## Clans (`src/clans.ts` + `src/clan-icons.ts` + `composables/useClans.ts`)
+## Clans (`src/content/clans.ts` + `src/icons/clans.ts` + `composables/useClans.ts`)
 
 `CLANS_DATA.clans` holds the 14 V5 clans, each with `nickname`, `verbs`, `description`,
 `disciplines` (discipline **ids**), `bane`, `compulsion` and its own colour triplet.
@@ -307,9 +330,9 @@ grounds.
   the wrapping `<g transform="translate(tx,ty) scale(s)">`. If a sigil ever needs
   redoing, re-trace from the sheet — do not redraw it freehand.
   `CLAN_ICONS` is keyed by clan `id` (the `id` doubles as the icon key — unlike
-  `iconType` for disciplines there is no indirection). Same conventions as `icons.ts`:
+  `iconType` for disciplines there is no indirection). Same conventions as `icons/disciplines.ts`:
   `viewBox="0 0 100 100"`, `currentColor`, `fill-rule="evenodd"` for the interior holes.
-  The traced paths are detailed, which is why `clan-icons.ts` is ~150 KB.
+  The traced paths are detailed, which is why `icons/clans.ts` is ~150 KB.
 - `disciplines` stores ids so `ClanView` can render each one as a `.disc-mini-card`
   (badge, name, type, power count) that navigates to its discipline page.
   Every id resolves, `oblivion` included, so all of them are ordinary links. (Until the
@@ -343,7 +366,7 @@ grounds.
 
 On the power sheet a horizontal drag steps to a sibling power, carousel-style: **dragging
 left pulls the next power in, dragging right goes back**. The list it steps through is the
-one the reader came from — `discipline.powers` in `data.ts` order, or the active character's
+one the reader came from — `discipline.powers` in `content/disciplines.ts` order, or the active character's
 flattened power list when the route carries `?from=character`. It stops at both ends rather
 than wrapping.
 
@@ -399,11 +422,11 @@ app on network files.
 
 Requires a **secure context (HTTPS or `localhost`)** — the Web Share API is gated by browsers.
 
-## Internationalisation (`composables/useI18n.ts` + `src/translations-en.ts` + `src/translations-ca.ts`)
+## Internationalisation (`src/i18n/` + `composables/useI18n.ts` + the `content/*.en.ts` / `*.ca.ts` overlays)
 
-UI strings (nav labels, section headings, field labels) are translated in `useI18n.ts` and selected via `resolvedLang`. The Spanish block is the shape source (`typeof es`) — every other language must match its keys exactly, which the TypeScript compiler enforces.
+UI strings (nav labels, section headings, field labels) live in `src/i18n/es.ts`, `en.ts` and `ca.ts`, and `useI18n.ts` picks one via `resolvedLang`. The Spanish file is the shape source (`Messages = typeof es`) — every other language must match its keys exactly, which the TypeScript compiler enforces.
 
-Power and discipline content (names, descriptions, costs, dice pools, durations) is translated in `translations-en.ts` and `translations-ca.ts`. The `useData.ts` composable applies the appropriate overlay over the Spanish base data when `resolvedLang === 'en'` or `resolvedLang === 'ca'`. All views consume `useData()` instead of importing `DISCIPLINES_DATA` directly.
+Power and discipline content (names, descriptions, costs, dice pools, durations) is translated in `content/disciplines.en.ts` and `content/disciplines.ca.ts`. The `useData.ts` composable applies the appropriate overlay over the Spanish base data when `resolvedLang === 'en'` or `resolvedLang === 'ca'`. All views consume `useData()` instead of importing `DISCIPLINES_DATA` directly.
 
 ## Site footer (`components/AppFooter.vue`)
 
@@ -433,7 +456,7 @@ section rather than being repeated here.
   `overflow-wrap: break-word`, since it is translated copy and must break rather than push
   the page sideways.
 
-## Data (`src/data.ts`)
+## Data (`src/content/disciplines.ts`)
 
 Sources: the official Spanish PDFs *Vampiro La Mascarada 5 edición - Disciplinas.pdf*
 (corebook Disciplines) and *…Disciplinas 2.pdf* (the Players Guide chapter, which adds 39
@@ -528,7 +551,7 @@ Rules for new or edited powers:
 3. `N/A` means "this power has no duration"; it is the only value the views hide.
 4. The EN and CA overlays carry the same shape — same head, same parenthetical.
 
-## Icons (`src/icons.ts` + `src/clan-icons.ts`)
+## Icons (`src/icons/disciplines.ts` + `src/icons/clans.ts`)
 
 Both icon sets are **traced from the official sheet, not drawn freehand**. Pipeline for
 each glyph: crop it out of the sheet → upscale the *source* crop with lanczos (thresholding
@@ -545,13 +568,13 @@ diamond with the glyph knocked out via `fill-rule="evenodd"`. Notes:
   one is now traced (`alchemy`, which replaced the placeholder `flask` key and its
   hand-drawn artwork).
 - The Oblivion glyph is now in use: `oblivion` is a real discipline (`iconType: 'olvido'`).
-- The `iconType` keys are unchanged (`wolf`, `crown`, …) so `data.ts` still addresses icons
+- The `iconType` keys are unchanged (`wolf`, `crown`, …) so `content/disciplines.ts` still addresses icons
   by the same key, even though the keys describe the old artwork rather than the new.
 
 `CLAN_ICONS` is keyed by clan `id` (no indirection) and holds the 14 clan sigils from the
-clan bands of the same sheet. `clan-icons.ts` also exports `THIN_BLOOD_ICON` and
+clan bands of the same sheet. `icons/clans.ts` also exports `THIN_BLOOD_ICON` and
 `THIN_BLOOD_NAMES`: the Thin-Bloods have a mark on the *descastados* sheet but are not a
-clan (no `clans.ts` entry, no `/clan/…` page), and they are the only name in any
+clan (no `content/clans.ts` entry, no `/clan/…` page), and they are the only name in any
 Discipline's `clanes` list that is not a clan. `useClans().clanSigil(name)` resolves both
 cases — it returns the clan alongside the sigil only when there is one, and `DisciplineView`
 renders a chip without a clan as dashed and `disabled`. **Adding a language means adding
@@ -745,13 +768,16 @@ apart; the overlay's side padding matches the pages' `px-4` for the same reason.
 | Chunk | Holds | Size (gzip) |
 |-------|-------|-------------|
 | `index` | app code — views, composables, router | ~64 kB |
-| `game-content` | `data.ts`, `clans.ts`, `traits.ts`, the six translation overlays | ~118 kB |
-| `game-icons` | `icons.ts`, `clan-icons.ts` (traced sigils) | ~105 kB |
+| `game-content` | everything under `src/content/` — the three data files and their six overlays | ~118 kB |
+| `game-icons` | `icons/disciplines.ts`, `icons/clans.ts` (traced sigils) | ~105 kB |
 
 The content is ~80% of the bundle and almost never changes, while the app code changes every
 release. Split, a release only invalidates the small chunk, so the service worker
 re-downloads ~60 kB instead of ~271 kB. First load is unchanged — all three are
 modulepreloaded from `index.html` and precached.
+
+The rules match on folders (`src/content/`, `src/icons/`), so a new data file or
+overlay lands in the right chunk without touching the config.
 
 **Rolldown (Vite 8) only accepts the function form of `manualChunks`**, not the object map;
 the object form fails the build with `manualChunks is not a function`.
@@ -786,10 +812,10 @@ These are non-negotiable for any change to the codebase.
 ### Translations
 
 1. **No hardcoded UI strings in views.** Every user-visible label, placeholder, aria-label and empty-state message comes from `useI18n().t.value.<section>.<key>`.
-2. **All three languages stay in sync.** When adding a UI string, add it to `es`, `en` **and** `ca` blocks in `useI18n.ts` in the same commit. TypeScript will fail the build if `en` or `ca` drift from `es`'s shape.
-3. **Discipline, power and clan content lives in the overlays.** Whenever `data.ts` gets a new discipline or power, add matching entries with the same `id` key to `translations-en.ts` **and** `translations-ca.ts`; whenever `clans.ts` changes, do the same in `translations-clans-en.ts` **and** `translations-clans-ca.ts`; whenever `traits.ts` changes, do the same in `translations-traits-en.ts` **and** `translations-traits-ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature. Clan names that differ by language (`El Ministerio` / `The Ministry` / `El Ministeri`, `Hécata` / `Hecata`) also need `clanes` overrides in the discipline overlays.
+2. **All three languages stay in sync.** When adding a UI string, add it to `src/i18n/es.ts`, `en.ts` **and** `ca.ts` in the same commit. TypeScript will fail the build if `en` or `ca` drift from `es`'s shape.
+3. **Discipline, power and clan content lives in the overlays.** Whenever `content/disciplines.ts` gets a new discipline or power, add matching entries with the same `id` key to `content/disciplines.en.ts` **and** `content/disciplines.ca.ts`; whenever `content/clans.ts` changes, do the same in `clans.en.ts` **and** `clans.ca.ts`; whenever `content/traits.ts` changes, do the same in `traits.en.ts` **and** `traits.ca.ts`. Missing keys silently fall back to the Spanish source — treat that as a bug, not a feature. Clan names that differ by language (`El Ministerio` / `The Ministry` / `El Ministeri`, `Hécata` / `Hecata`) also need `clanes` overrides in the discipline overlays.
 4. **Language `auto` order matters.** `CATALAN` (`/^ca\b/i`) is checked before the general `IBERIAN` regex; keep it that way so `ca-*` browsers don't fall into the `es` bucket.
-5. **To add a language:** create `translations-<lang>.ts` mirroring the EN structure, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, add a `<lang>` dict block plus `lang<Lang>` label to every language block in `useI18n.ts`, wire the overlay in `useData.ts`, add that language's spelling of the Thin-Bloods to `THIN_BLOOD_NAMES` in `clan-icons.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
+5. **To add a language:** create `content/disciplines.<lang>.ts`, `clans.<lang>.ts` and `traits.<lang>.ts` mirroring the EN ones, add `src/i18n/<lang>.ts` typed as `Messages`, add the code to `Lang`/`VALID_LANGS`/`resolvedLang` in `useSettings.ts`, register it in `useI18n.ts`'s `dict` and add a `lang<Lang>` label to every `src/i18n/` file, wire the overlays into the `OVERLAYS` maps of `useData.ts`, `useClans.ts` and `useTraits.ts`, add that language's spelling of the Thin-Bloods to `THIN_BLOOD_NAMES` in `icons/clans.ts`, and add the option (alphabetically after `auto`) to `SettingsView.vue`.
 
 ### Responsive
 
@@ -818,6 +844,9 @@ npm run build
 
 # Preview build
 npm run preview
+
+# Type-check the whole app, .vue files included (CI runs this before the build)
+npm run typecheck
 
 # Regenerate PWA icons from public/favicon.svg (only when the favicon changes)
 node scripts/generate-icons.mjs

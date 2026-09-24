@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { CLAN_ICONS } from '../clan-icons'
-import { colorGradient } from '../helpers'
+import { CLAN_ICONS } from '../icons/clans'
+import { colorGradient, foldForSearch } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import { useData } from '../composables/useData'
 import type { Clan } from '../types'
+import PageHeader from '../components/PageHeader.vue'
+import SearchInput from '../components/SearchInput.vue'
 
 const search = ref('')
 const router = useRouter()
@@ -14,24 +16,19 @@ const { t } = useI18n()
 const { clans: allClans } = useClans()
 const { disciplineById } = useData()
 
-// Strips diacritics so "hecata" matches "Hécata" and "prohibicion" matches "Prohibición"
-function norm(s: string): string {
-  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-}
-
 /** Localized Discipline names for a clan, for the search index. */
 function disciplineNames(clan: Clan): string[] {
   return clan.disciplines.flatMap(id => disciplineById(id)?.name ?? [])
 }
 
 const clans = computed<Clan[]>(() => {
-  const q = norm(search.value).trim()
+  const q = foldForSearch(search.value).trim()
   if (!q) return allClans.value
   return allClans.value.filter(c =>
-    norm(c.name).includes(q) ||
-    norm(c.nickname).includes(q) ||
-    norm(c.bane.name).includes(q) ||
-    disciplineNames(c).some(n => norm(n).includes(q))
+    foldForSearch(c.name).includes(q) ||
+    foldForSearch(c.nickname).includes(q) ||
+    foldForSearch(c.bane.name).includes(q) ||
+    disciplineNames(c).some(n => foldForSearch(n).includes(q))
   )
 })
 
@@ -47,28 +44,9 @@ function clanGradient(c: Clan): string {
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment">
 
-    <!-- ── Header ── -->
-    <header class="page-header text-center px-4 pt-5 pb-4 position-relative overflow-hidden">
-      <div class="position-absolute top-0 start-0 w-100 h-100 pe-none"
-           style="background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(139,0,0,0.15) 0%, transparent 70%);"></div>
+    <PageHeader :title="t.clansList.title" />
 
-      <h1 class="font-title fw-black tracking-widest text-uppercase lh-sm position-relative page-title-main"
-          style="font-size: clamp(1.8rem,5vw,3.2rem);">
-        {{ t.clansList.title }}
-      </h1>
-    </header>
-
-    <!-- ── Search ── -->
-    <div class="mx-auto px-4 pt-4 pb-1" style="max-width: 28rem;">
-      <input
-        v-model="search"
-        class="search-input"
-        type="text"
-        :placeholder="t.clansList.searchPlaceholder"
-        autocomplete="off"
-        :aria-label="t.clansList.searchAriaLabel"
-      />
-    </div>
+    <SearchInput v-model="search" :placeholder="t.clansList.searchPlaceholder" :label="t.clansList.searchAriaLabel" />
 
     <!-- ── Clans grid ── -->
     <main v-if="clans.length"

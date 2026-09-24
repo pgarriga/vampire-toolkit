@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, onMounted, onBeforeUnmount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { DISCIPLINE_ICONS } from '../icons'
-import { powerById, artGradient, parseAmalgama, shortDuration } from '../helpers'
+import { DISCIPLINE_ICONS } from '../icons/disciplines'
+import { artGradient, hasFact, parseAmalgama } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
 import { useCharacters } from '../composables/useCharacters'
 import { useCharacterPowers } from '../composables/useCharacterPowers'
 import { renderPowerCard } from '../renderPowerCard'
+import PageNav from '../components/PageNav.vue'
 
 const route  = useRoute()
 const router = useRouter()
@@ -17,7 +18,7 @@ const { activeCharacter } = useCharacters()
 const { flatPowers } = useCharacterPowers(activeCharacter)
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
-const power      = computed(() => powerById(discipline.value, route.params['powerId'] as string))
+const power      = computed(() => discipline.value?.powers.find(p => p.id === route.params['powerId']))
 
 const canShare   = ref(false)
 const isSharing  = ref(false)
@@ -93,7 +94,7 @@ const siblings = computed<Array<{ disciplineId: string; powerId: string }>>(() =
   const own = disc ? disc.powers.map(p => ({ disciplineId: disc.id, powerId: p.id })) : []
   if (!fromCharacter.value) return own
   const saved = flatPowers.value.map(e => ({ disciplineId: e.disciplineId, powerId: e.power.id }))
-  // Un-starring the power you are reading drops it out of the character's list; fall
+  // Un-ticking the power you are reading drops it out of the character's list; fall
   // back to the discipline so the gesture keeps working instead of going dead.
   const stillSaved = saved.some(
     s => s.disciplineId === route.params['id'] && s.powerId === route.params['powerId'],
@@ -166,18 +167,8 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
   <div class="min-vh-100 bg-void font-body text-parchment" v-if="discipline && power"
        @touchstart.passive="onTouchStart" @touchend.passive="onTouchEnd">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="goBack">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ fromCharacter && activeCharacter ? activeCharacter.name : discipline.name }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment text-truncate">{{ power.name }}</span>
-    </nav>
+    <PageNav :back-label="fromCharacter && activeCharacter ? activeCharacter.name : discipline.name"
+             :current="power.name" truncate @back="goBack" />
 
     <!-- ── Card ── -->
     <div class="mx-auto px-3 px-sm-4 py-4 pb-5" style="max-width: 42rem;">
@@ -236,11 +227,11 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
               <div class="pst-key">{{ t.power.cost }}</div>
               <div class="pst-val">{{ power.cost }}</div>
             </div>
-            <div v-if="power.dicePool && power.dicePool !== 'N/A'" class="pst-row">
+            <div v-if="hasFact(power.dicePool)" class="pst-row">
               <div class="pst-key">{{ t.power.dicePool }}</div>
               <div class="pst-val">{{ power.dicePool }}</div>
             </div>
-            <div v-if="shortDuration(power.duration)" class="pst-row">
+            <div v-if="hasFact(power.duration)" class="pst-row">
               <div class="pst-key">{{ t.power.duration }}</div>
               <div class="pst-val">{{ power.duration }}</div>
             </div>

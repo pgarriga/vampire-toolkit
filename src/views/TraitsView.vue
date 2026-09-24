@@ -1,23 +1,18 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import { TRAIT_ICONS } from '../trait-icons'
+import { TRAIT_ICONS } from '../icons/traits'
+import { foldForSearch } from '../helpers'
 import { useI18n } from '../composables/useI18n'
-import { useTraits } from '../composables/useTraits'
-import type { Trait, TraitCategory, TraitKind } from '../types'
+import { useTraits, TRAIT_CATEGORIES } from '../composables/useTraits'
+import type { Trait, TraitKind } from '../types'
+import PageHeader from '../components/PageHeader.vue'
+import SearchInput from '../components/SearchInput.vue'
 
 const search = ref('')
 const router = useRouter()
 const { t } = useI18n()
 const { traits: allTraits, traitById } = useTraits()
-
-/** The three columns, in the order a V5 sheet prints them. */
-const CATEGORIES: TraitCategory[] = ['fisico', 'social', 'mental']
-
-// Strips diacritics so "fisico" matches "Físico" and "astucia" matches "Astúcia"
-function norm(s: string): string {
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-}
 
 /**
  * Everything a reader might type: the name, the wordings the same trait is printed
@@ -35,14 +30,14 @@ function haystack(tr: Trait): string {
 }
 
 const matches = computed<Trait[]>(() => {
-  const q = norm(search.value).trim()
+  const q = foldForSearch(search.value).trim()
   if (!q) return allTraits.value
-  return allTraits.value.filter(tr => norm(haystack(tr)).includes(q))
+  return allTraits.value.filter(tr => foldForSearch(haystack(tr)).includes(q))
 })
 
 /** One group per column that still has a match, with the heading for this kind. */
 function groups(kind: TraitKind) {
-  return CATEGORIES
+  return TRAIT_CATEGORIES
     .map(category => ({
       category,
       heading: t.value.traitsList.groups[kind][category],
@@ -54,7 +49,6 @@ function groups(kind: TraitKind) {
 const attributeGroups = computed(() => groups('attribute'))
 const skillGroups     = computed(() => groups('skill'))
 
-
 function goTo(id: string): void {
   router.push(`/trait/${id}`)
 }
@@ -63,31 +57,13 @@ function goTo(id: string): void {
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment">
 
-    <!-- ── Header ── -->
-    <header class="page-header text-center px-4 pt-5 pb-4 position-relative overflow-hidden">
-      <div class="position-absolute top-0 start-0 w-100 h-100 pe-none"
-           style="background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(139,0,0,0.15) 0%, transparent 70%);"></div>
-
-      <h1 class="font-title fw-black tracking-widest text-uppercase lh-sm position-relative page-title-main"
-          style="font-size: clamp(1.8rem,5vw,3.2rem);">
-        {{ t.traitsList.title }}
-      </h1>
+    <PageHeader :title="t.traitsList.title">
       <p class="position-relative text-parchment-dim fst-italic mx-auto mb-0 mt-3 traits-subtitle">
         {{ t.traitsList.subtitle }}
       </p>
-    </header>
+    </PageHeader>
 
-    <!-- ── Search ── -->
-    <div class="mx-auto px-4 pt-4 pb-1" style="max-width: 28rem;">
-      <input
-        v-model="search"
-        class="search-input"
-        type="text"
-        :placeholder="t.traitsList.searchPlaceholder"
-        autocomplete="off"
-        :aria-label="t.traitsList.searchAriaLabel"
-      />
-    </div>
+    <SearchInput v-model="search" :placeholder="t.traitsList.searchPlaceholder" :label="t.traitsList.searchAriaLabel" />
 
     <main v-if="attributeGroups.length || skillGroups.length"
           class="container-fluid px-3 px-sm-4 py-4 pb-5 max-content mx-auto">

@@ -1,21 +1,28 @@
-import type { Discipline, Power } from './types'
-import { DISCIPLINES_DATA } from './data'
+import type { Discipline } from './types'
 
 export function levelDots(level: number, max = 5): boolean[] {
   return Array.from({ length: max }, (_, i) => i < level)
 }
 
-export function disciplineById(id: string): Discipline | undefined {
-  return DISCIPLINES_DATA.disciplines.find(d => d.id === id)
+/**
+ * Lower-cased with the diacritics stripped, so a search for "hecata" finds "Hécata"
+ * and "dominacion" finds "Dominación". Every search box in the app matches on this.
+ */
+export function foldForSearch(s: string): string {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '')
 }
 
-export function powerById(disc: Discipline | undefined, powerId: string): Power | undefined {
-  return disc?.powers.find(p => p.id === powerId)
+/**
+ * Whether a power fact carries anything. `N/A` is how the data says "no roll" or
+ * "no duration", and it is the only value the views hide.
+ */
+export function hasFact(value: string | undefined | null): value is string {
+  return !!value && value !== 'N/A'
 }
 
 /**
  * Head of a normalised cost/duration value: everything before the parenthetical
- * qualifier. `data.ts` and both overlays store these facts in a fixed short
+ * qualifier. `content/disciplines.ts` and both overlays store these facts in a fixed short
  * vocabulary (`1 Enardecimiento`, `Una escena`, …) with any nuance kept in a
  * trailing `(…)`. The detail sheet prints the whole string; the small grid cards
  * print just this head so the line never grows past two rows on a phone.
@@ -31,8 +38,7 @@ export function shortCost(cost: string | undefined | null): string {
 
 /** `null` when the power has no meaningful duration, so the row can be dropped. */
 export function shortDuration(dur: string | undefined | null): string | null {
-  if (!dur || dur === 'N/A') return null
-  return factHead(dur)
+  return hasFact(dur) ? factHead(dur) : null
 }
 
 /** Separators a dice pool uses before naming the *opposing* pool, per language. */
@@ -48,7 +54,7 @@ const POOL_ALT = [' o ', ' or ']
  * Returns `null` for powers that need no roll.
  */
 export function shortDicePool(pool: string | undefined | null): string | null {
-  if (!pool || pool === 'N/A') return null
+  if (!hasFact(pool)) return null
   let v = pool
   for (const sep of POOL_OPPOSED) {
     const i = v.indexOf(sep)

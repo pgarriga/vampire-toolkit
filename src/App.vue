@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { NAV_ICONS } from './nav-icons'
-import { CLAN_ICONS } from './clan-icons'
+import { NAV_ICONS } from './icons/nav'
+import { CLAN_ICONS } from './icons/clans'
 import { useI18n } from './composables/useI18n'
 import { useClans } from './composables/useClans'
 import { useCharacters } from './composables/useCharacters'

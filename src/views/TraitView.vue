@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { TRAIT_ICONS } from '../trait-icons'
+import { TRAIT_ICONS } from '../icons/traits'
 import { levelDots } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useTraits } from '../composables/useTraits'
+import PageNav from '../components/PageNav.vue'
 
 const route  = useRoute()
 const router = useRouter()
@@ -58,18 +59,8 @@ function goTrait(id: string): void { router.push(`/trait/${id}`) }
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment" v-if="trait">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="goBack">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ t.trait.back }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment">{{ trait.name }}</span>
-    </nav>
+    <PageNav :back-label="t.trait.back"
+             :current="trait.name" @back="goBack" />
 
     <!-- ── Header ── -->
     <header class="d-flex flex-column flex-sm-row gap-3 gap-sm-4 align-items-center align-items-sm-start

@@ -1,24 +1,19 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { DISCIPLINE_ICONS } from '../icons'
+import { computed, ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { DISCIPLINE_ICONS } from '../icons/disciplines'
 import { shortCost, shortDuration } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
 import { useCharacters } from '../composables/useCharacters'
+import { useRouteCharacter } from '../composables/useRouteCharacter'
+import PageNav from '../components/PageNav.vue'
 
-const route  = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { disciplines, disciplineById } = useData()
-const { characterById, setActive, togglePower, hasPower } = useCharacters()
-
-const charId    = computed(() => route.params['id'] as string)
-const character = computed(() => characterById(charId.value))
-
-// Opening a character's picker also makes them the active one, so the menu entry and
-// PowerView's swipe list follow the sheet the reader is working on.
-watch(charId, id => { if (characterById(id)) setActive(id) }, { immediate: true })
+const { togglePower, hasPower } = useCharacters()
+const { charId, character } = useRouteCharacter()
 
 /** null = choosing a Discipline; otherwise the Discipline whose powers are listed. */
 const picked = ref<string | null>(null)
@@ -49,20 +44,9 @@ function goBack(): void {
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment" v-if="character">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="goBack">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ picked ? t.characters.addTitle : character.name }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment text-truncate">
-        {{ discipline ? discipline.name : t.characters.addTitle }}
-      </span>
-    </nav>
+    <PageNav :back-label="picked ? t.characters.addTitle : character.name"
+             :current="discipline ? discipline.name : t.characters.addTitle"
+             truncate @back="goBack" />
 
     <main class="char-form-wrap mx-auto px-3 px-sm-4 py-4 pb-5">
 
@@ -114,7 +98,7 @@ function goBack(): void {
             @click="toggle(p.id)"
           >
             <!-- A box that fills with a tick, so the state reads by shape as well as
-                 colour (same reason .star-btn changes shape, not just hue). -->
+                 colour rather than by colour alone. -->
             <span class="power-pick-box" aria-hidden="true">
               <svg v-if="isOwned(p.id)" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                    stroke-width="3" stroke-linecap="round" stroke-linejoin="round">

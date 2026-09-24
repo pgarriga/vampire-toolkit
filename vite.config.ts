@@ -78,8 +78,8 @@ export default defineConfig({
          */
         manualChunks(id: string) {
           // Rolldown (Vite 8) only accepts the function form, not the object map.
-          if (/[\\/]src[\\/](data|clans|traits|translations-[\w-]+)\.ts$/.test(id)) return 'game-content'
-          if (/[\\/]src[\\/](icons|clan-icons)\.ts$/.test(id)) return 'game-icons'
+          if (/[\\/]src[\\/]content[\\/]/.test(id)) return 'game-content'
+          if (/[\\/]src[\\/]icons[\\/](disciplines|clans)\.ts$/.test(id)) return 'game-icons'
           return undefined
         },
       },

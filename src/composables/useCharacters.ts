@@ -1,13 +1,14 @@
 import { ref, computed } from 'vue'
-import { DISCIPLINES_DATA } from '../data'
-import { CLANS_DATA } from '../clans'
+import { DISCIPLINES_DATA } from '../content/disciplines'
+import { CLANS_DATA } from '../content/clans'
+import { readJSON, writeJSON, storageGet, storageSet, storageRemove, storageKeys } from '../storage'
 import type { Character, ClanIconType } from '../types'
 
 /**
  * One localStorage entry per character: `v5-character:<id>` holds that character's
  * whole JSON and nothing else. The list is rebuilt by scanning for the prefix, so
  * there is no separate index key that could fall out of step with the entries — and
- * the file under a key is exactly what the Save button writes to disk.
+ * the file under a key is exactly what Export writes to disk.
  */
 const KEY_PREFIX         = 'v5-character:'
 const STORAGE_KEY_ACTIVE = 'v5-active-character'
@@ -41,19 +42,6 @@ export const DEFAULT_GENERATION = 13
 
 function validGeneration(g: unknown): g is number {
   return typeof g === 'number' && Number.isInteger(g) && g >= 1 && g <= 16
-}
-
-function readJSON(key: string): unknown {
-  try {
-    const raw = localStorage.getItem(key)
-    return raw ? JSON.parse(raw) : null
-  } catch {
-    return null
-  }
-}
-
-function writeJSON(key: string, value: unknown): void {
-  try { localStorage.setItem(key, JSON.stringify(value)) } catch { /* storage unavailable */ }
 }
 
 /**
@@ -111,37 +99,29 @@ function newId(): string {
 
 // ── Storage housekeeping, oldest layout first ────────────────────────────────
 
-try {
-  // Powers belong to a character now, so the old global lists are deleted outright
-  // rather than migrated. This runs on every load, not once, so a stale key cannot
-  // survive in a browser that missed the release that dropped it.
-  for (const key of DEAD_KEYS) localStorage.removeItem(key)
+// Powers belong to a character now, so the old global lists are deleted outright
+// rather than migrated. This runs on every load, not once, so a stale key cannot
+// survive in a browser that missed the release that dropped it.
+for (const key of DEAD_KEYS) storageRemove(key)
 
-  // The single-array layout: split it into one entry per character.
-  const list = readJSON(LEGACY_LIST_KEY)
-  if (Array.isArray(list)) {
-    for (const entry of list) {
-      const c = sanitize(entry)
-      if (c) writeJSON(KEY_PREFIX + c.id, c)
-    }
-    localStorage.removeItem(LEGACY_LIST_KEY)
+// The single-array layout: split it into one entry per character.
+const legacyList = readJSON(LEGACY_LIST_KEY)
+if (Array.isArray(legacyList)) {
+  for (const entry of legacyList) {
+    const c = sanitize(entry)
+    if (c) writeJSON(KEY_PREFIX + c.id, c)
   }
-} catch { /* storage unavailable */ }
+  storageRemove(LEGACY_LIST_KEY)
+}
 
 // ── Singleton state: shared by every component ───────────────────────────────
 
 /** Every `v5-character:*` entry, oldest first so the index order is stable. */
 function loadAll(): Character[] {
-  const out: Character[] = []
-  try {
-    for (let i = 0; i < localStorage.length; i++) {
-      const key = localStorage.key(i)
-      if (!key || !key.startsWith(KEY_PREFIX)) continue
-      const c = sanitize(readJSON(key))
-      if (c) out.push(c)
-    }
-  } catch { /* storage unavailable */ }
-  return out.sort(byCreated)
+  return storageKeys()
+    .filter(key => key.startsWith(KEY_PREFIX))
+    .flatMap(key => sanitize(readJSON(key)) ?? [])
+    .sort(byCreated)
 }
 
 function byCreated(a: Character, b: Character): number {
@@ -151,16 +131,14 @@ function byCreated(a: Character, b: Character): number {
 const characters = ref<Character[]>(loadAll())
 
 /**
- * Which character the star buttons write to. Set whenever a character sheet is
- * opened, so starring a power from a Discipline page lands on the sheet the reader
- * just came from. Persisted so a reload — or a `?from=character` deep link — keeps
- * pointing at the same one.
+ * The last character sheet opened. `PowerView` follows it for `?from=character`
+ * links — back goes to that sheet and swiping walks its powers. Persisted so a
+ * reload of such a link keeps pointing at the same character.
  */
 const activeId = ref<string | null>(loadActiveId())
 
 function loadActiveId(): string | null {
-  let stored: string | null = null
-  try { stored = localStorage.getItem(STORAGE_KEY_ACTIVE) } catch { /* unavailable */ }
+  const stored = storageGet(STORAGE_KEY_ACTIVE)
   if (stored && characters.value.some(c => c.id === stored)) return stored
   return characters.value[0]?.id ?? null
 }
@@ -171,10 +149,8 @@ function persist(c: Character): void {
 }
 
 function persistActive(): void {
-  try {
-    if (activeId.value) localStorage.setItem(STORAGE_KEY_ACTIVE, activeId.value)
-    else localStorage.removeItem(STORAGE_KEY_ACTIVE)
-  } catch { /* storage unavailable */ }
+  if (activeId.value) storageSet(STORAGE_KEY_ACTIVE, activeId.value)
+  else storageRemove(STORAGE_KEY_ACTIVE)
 }
 
 export function useCharacters() {
@@ -210,7 +186,7 @@ export function useCharacters() {
     const i = characters.value.findIndex(c => c.id === id)
     if (i === -1) return
     characters.value.splice(i, 1)
-    try { localStorage.removeItem(KEY_PREFIX + id) } catch { /* storage unavailable */ }
+    storageRemove(KEY_PREFIX + id)
     if (activeId.value === id) setActive(characters.value[0]?.id ?? null)
   }
 

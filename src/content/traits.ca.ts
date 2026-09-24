@@ -1,9 +1,9 @@
 // Catalan translations overlay for the Core Traits data (Attributes and Skills).
-// Mirrors the EN overlay's shape exactly — see `translations-traits-en.ts` for why
+// Mirrors the EN overlay's shape exactly — see `traits.en.ts` for why
 // `combos` is keyed by attribute id rather than by name, and `traits.ts` for the
 // follow-the-book-but-reword contract this content is held to.
 
-import type { TraitTranslation } from './translations-traits-en'
+import type { TraitTranslation } from './traits.en'
 
 type TraitId =
   | 'fuerza' | 'destreza' | 'resistencia'

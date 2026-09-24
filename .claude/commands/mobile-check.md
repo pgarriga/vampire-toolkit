@@ -5,7 +5,7 @@ Audita y corrige los problemas de responsive para móvil en este proyecto. Sigue
 ## 1. Leer los archivos CSS y HTML actuales
 
 Lee todos los archivos relevantes antes de tocar nada:
-- `css/style.css` — estilos principales
+- `src/css/main.css` — estilos principales
 - `index.html` — estructura HTML y meta tags
 
 ## 2. Auditoría — detectar problemas

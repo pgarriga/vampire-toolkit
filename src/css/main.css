@@ -1087,7 +1087,7 @@ button,
 }
 .tool-card-title { flex: 1; }
 
-/* Same line icon the tool's entry uses in the overlay menu (see src/nav-icons.ts). */
+/* Same line icon the tool's entry uses in the overlay menu (see src/icons/nav.ts). */
 .tool-card-icon {
   display: flex;
   flex-shrink: 0;

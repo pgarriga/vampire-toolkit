@@ -1,4 +1,4 @@
-import type { IconType } from './types'
+import type { IconType } from '../types'
 
 // Discipline badges traced from the "LEYENDA DE LAS DISCIPLINAS" panel of the official
 // clan sheet: a filled diamond with the glyph knocked out. Same pipeline as CLAN_ICONS —
@@ -10,7 +10,7 @@ import type { IconType } from './types'
 //    which this app has no discipline for), so its flask is set in the same diamond frame
 //    to keep the set consistent.
 //
-// The iconType keys are unchanged, so data.ts keeps addressing icons the same way.
+// The iconType keys are unchanged, so content/disciplines.ts keeps addressing icons the same way.
 export const DISCIPLINE_ICONS: Record<IconType, string> = {
 
   // ── ANIMALISM — Beast paw ──

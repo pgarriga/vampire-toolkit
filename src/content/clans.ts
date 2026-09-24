@@ -1,11 +1,11 @@
-import type { ClansData } from './types'
+import type { ClansData } from '../types'
 
 // Sources: the official "Hoja de Clanes" reference sheet (nickname, verbs,
 // Disciplines, Bane and Compulsion names) plus the V5 corebook, Camarilla,
 // Anarch and Companion rules for the Bane/Compulsion mechanics.
 //
 // Clans are listed in the sheet's own order (alphabetical in Spanish).
-// Discipline ids match src/data.ts, `oblivion` included.
+// Discipline ids match src/content/disciplines.ts, `oblivion` included.
 export const CLANS_DATA: ClansData = {
   clans: [
     {

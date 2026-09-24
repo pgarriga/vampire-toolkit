@@ -16,7 +16,7 @@
  * stored by attribute **id** so an overlay only translates the example and the
  * attribute's name can never drift from its own entry.
  */
-import type { TraitsData } from './types'
+import type { TraitsData } from '../types'
 
 export const TRAITS_DATA: TraitsData = {
   traits: [

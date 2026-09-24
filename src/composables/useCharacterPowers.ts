@@ -14,7 +14,7 @@ export interface FlatPower {
 
 /**
  * One character's powers in the one canonical order: grouped by discipline in
- * `data.ts` order, sorted by level inside each group. `CharacterView` renders the
+ * `content/disciplines.ts` order, sorted by level inside each group. `CharacterView` renders the
  * groups and `PowerView` swipes through the flattened list, so both must agree —
  * hence this lives here rather than in either view.
  *
