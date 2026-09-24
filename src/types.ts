@@ -57,7 +57,7 @@ export interface Clan {
   nickname: string
   verbs: string[]
   description: string
-  /** Discipline ids, matching `src/data.ts`. */
+  /** Discipline ids, matching `src/content/disciplines.ts`. */
   disciplines: string[]
   bane: ClanTrait
   compulsion: ClanTrait

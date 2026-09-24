@@ -1,8 +1,8 @@
 // Catalan translations overlay for V5 clan data
 // Applied over the Spanish base data in src/clans.ts when language is Catalan
 
-import type { ClanIconType } from './types'
-import type { ClanTranslation } from './translations-clans-en'
+import type { ClanIconType } from '../types'
+import type { ClanTranslation } from './clans.en'
 
 export const CLANS_CA: Record<ClanIconType, ClanTranslation> = {
 

@@ -5,6 +5,7 @@ import ClanPicker from '../components/ClanPicker.vue'
 import { useI18n } from '../composables/useI18n'
 import { useCharacters, GENERATIONS, DEFAULT_GENERATION } from '../composables/useCharacters'
 import type { ClanIconType } from '../types'
+import PageNav from '../components/PageNav.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -47,18 +48,8 @@ watch(nameInput, el => el?.focus(), { immediate: true })
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="step === 1 ? cancel() : goStep1()">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ step === 1 ? t.characters.back : t.characters.previous }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment">{{ t.characters.newTitle }}</span>
-    </nav>
+    <PageNav :back-label="step === 1 ? t.characters.back : t.characters.previous"
+             :current="t.characters.newTitle" @back="step === 1 ? cancel() : goStep1()" />
 
     <main class="char-form-wrap mx-auto px-4 py-4 pb-5">
 

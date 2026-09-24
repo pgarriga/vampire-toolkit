@@ -1,7 +1,7 @@
 // English translations overlay for V5 clan data
 // Applied over the Spanish base data in src/clans.ts when language is English
 
-import type { ClanIconType } from './types'
+import type { ClanIconType } from '../types'
 
 export type ClanTraitTranslation = {
   name: string

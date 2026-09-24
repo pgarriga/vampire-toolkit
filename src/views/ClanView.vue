@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { CLAN_ICONS } from '../clan-icons'
-import { DISCIPLINE_ICONS } from '../icons'
+import { CLAN_ICONS } from '../icons/clans'
+import { DISCIPLINE_ICONS } from '../icons/disciplines'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import { useData } from '../composables/useData'
 import type { Discipline } from '../types'
+import PageNav from '../components/PageNav.vue'
 
 const route  = useRoute()
 const router = useRouter()
@@ -38,18 +39,8 @@ function goDiscipline(id: string): void { router.push(`/discipline/${id}`) }
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment" v-if="clan">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="goBack">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ t.clan.back }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment">{{ clan.name }}</span>
-    </nav>
+    <PageNav :back-label="t.clan.back"
+             :current="clan.name" @back="goBack" />
 
     <!-- ── Clan header ── -->
     <header class="d-flex flex-column flex-sm-row gap-3 gap-sm-4 align-items-center align-items-sm-start

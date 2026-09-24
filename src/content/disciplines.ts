@@ -1,4 +1,4 @@
-import type { DisciplinesData } from './types'
+import type { DisciplinesData } from '../types'
 
 export const DISCIPLINES_DATA: DisciplinesData =
 {

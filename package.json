@@ -6,6 +6,7 @@
     "dev": "node node_modules/vite/bin/vite.js",
     "build": "node node_modules/vite/bin/vite.js build",
     "preview": "node node_modules/vite/bin/vite.js preview",
+    "typecheck": "node node_modules/vue-tsc/bin/vue-tsc.js --noEmit -p tsconfig.json",
     "version": "node -e \"const fs=require('fs');const v=require('./package.json').version;const r=fs.readFileSync('README.md','utf8');fs.writeFileSync('README.md',r.replace(/version-[\\d.]+/,'version-'+v));\" && git add README.md"
   },
   "dependencies": {

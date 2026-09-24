@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { CLAN_ICONS } from '../clan-icons'
+import { CLAN_ICONS } from '../icons/clans'
+import { foldForSearch } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import type { ClanIconType } from '../types'
@@ -16,15 +17,10 @@ const { clans } = useClans()
 
 const search = ref('')
 
-/** Strips diacritics so "hecata" matches "Hécata", as the clans list does. */
-function norm(s: string): string {
-  return s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '')
-}
-
 const shown = computed(() => {
-  const q = norm(search.value).trim()
+  const q = foldForSearch(search.value).trim()
   if (!q) return clans.value
-  return clans.value.filter(c => norm(c.name).includes(q) || norm(c.nickname).includes(q))
+  return clans.value.filter(c => foldForSearch(c.name).includes(q) || foldForSearch(c.nickname).includes(q))
 })
 </script>
 
@@ -57,7 +53,7 @@ const shown = computed(() => {
         </span>
         <span class="clan-pick-name font-title">{{ c.name }}</span>
         <!-- Selection shows as a mark as well as a colour shift, so it does not
-             rest on hue alone (same reason .star-btn changes shape). -->
+             rest on hue alone. -->
         <svg v-if="model === c.id" class="clan-pick-check" viewBox="0 0 24 24" fill="none"
              stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"
              aria-hidden="true">

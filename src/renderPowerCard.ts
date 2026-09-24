@@ -1,5 +1,6 @@
 import type { Discipline, Power } from './types'
-import { DISCIPLINE_ICONS } from './icons'
+import { DISCIPLINE_ICONS } from './icons/disciplines'
+import { hasFact } from './helpers'
 
 export interface RenderStrings {
   cost:     string
@@ -141,10 +142,8 @@ export async function renderPowerCard(
 
   const rows: Row[] = []
   if (power.cost) rows.push({ key: strings.cost, val: power.cost })
-  if (power.dicePool && power.dicePool !== 'N/A') rows.push({ key: strings.dicePool, val: power.dicePool })
-  if (power.duration && power.duration !== 'N/A') {
-    rows.push({ key: strings.duration, val: power.duration })
-  }
+  if (hasFact(power.dicePool)) rows.push({ key: strings.dicePool, val: power.dicePool })
+  if (hasFact(power.duration)) rows.push({ key: strings.duration, val: power.duration })
   if (discipline.tipo) rows.push({ key: strings.type, val: discipline.tipo })
 
   const valColW = contentW - rowValColX - rowKeyPadX

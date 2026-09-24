@@ -1,19 +1,21 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { DISCIPLINE_ICONS } from '../icons'
-import { shortCost, shortDicePool, shortDuration, artGradient } from '../helpers'
+import { DISCIPLINE_ICONS } from '../icons/disciplines'
+import { artGradient } from '../helpers'
 import { useI18n } from '../composables/useI18n'
 import { useData } from '../composables/useData'
 import { useClans } from '../composables/useClans'
+import PageNav from '../components/PageNav.vue'
+import PowerCard from '../components/PowerCard.vue'
 
 const route  = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { disciplineById } = useData()
+const { clanSigil } = useClans()
 
 const discipline = computed(() => disciplineById(route.params['id'] as string))
-const { clanSigil } = useClans()
 
 /** `clanes` holds display names; resolve each to its mark so the chip can carry the
  *  sigil and, when there is a clan behind it, that clan's colour and a link. The
@@ -40,19 +42,7 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment" v-if="discipline">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="goBack">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ t.discipline.back }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment">{{ discipline.name }}</span>
-
-    </nav>
+    <PageNav :back-label="t.discipline.back" :current="discipline.name" @back="goBack" />
 
     <!-- ── Discipline header ── -->
     <header class="d-flex flex-column flex-sm-row gap-3 gap-sm-4 align-items-center align-items-sm-start
@@ -122,56 +112,7 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
       <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-2 g-sm-3">
 
         <div class="col" v-for="power in discipline.powers" :key="power.id">
-          <article
-            class="power-card d-flex flex-column h-100"
-            :style="{ '--card-color': discipline.color, '--card-glow': discipline.colorGlow }"
-            @click="goPower(power.id)"
-            @keydown.enter.prevent="goPower(power.id)"
-            @keydown.space.prevent="goPower(power.id)"
-            tabindex="0"
-            role="button"
-            :aria-label="`${power.name}, ${t.discipline.level} ${power.level}, ${t.discipline.cost}: ${power.cost}`"
-          >
-            <!-- Card art -->
-            <div class="power-card-art"
-                 :style="{ background: artGradient(discipline) }" aria-hidden="true">
-              <div v-html="DISCIPLINE_ICONS[discipline.iconType]"
-                   :style="{ '--card-color': discipline.color }"
-                   class="power-art-icon sigil"></div>
-
-
-              <div class="power-level-badge">{{ t.discipline.level }} {{ power.level }}</div>
-
-              <div class="art-overlay" :style="{ background: 'linear-gradient(180deg, transparent 30%, var(--void-card) 100%)' }"></div>
-            </div>
-
-            <!-- Card body -->
-            <div class="d-flex flex-column gap-1 p-2 p-sm-3 flex-fill">
-              <div class="power-card-title">
-                <h3 class="font-title fw-bold text-white">{{ power.name }}</h3>
-              </div>
-              <div class="power-facts">
-                <p class="power-fact text-parchment-dim">
-                  <svg class="power-fact-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.6c0 0-6.4 7.3-6.4 11.2a6.4 6.4 0 0 0 12.8 0C18.4 9.9 12 2.6 12 2.6z"/></svg>
-                  <span class="visually-hidden">{{ t.discipline.cost }}:</span>
-                  <span class="power-fact-val">{{ shortCost(power.cost) }}</span>
-                </p>
-                <p class="power-fact text-parchment-dim" v-if="shortDicePool(power.dicePool)">
-                  <svg class="power-fact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.2 3 9.4l9 12.4 9-12.4z"/><path d="M3 9.4 12 13l9-3.6M12 13v8.8"/></svg>
-                  <span class="visually-hidden">{{ t.discipline.dicePool }}:</span>
-                  <span class="power-fact-val">{{ shortDicePool(power.dicePool) }}</span>
-                </p>
-                <p class="power-fact text-parchment-dim" v-if="shortDuration(power.duration)">
-                  <svg class="power-fact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 2"/></svg>
-                  <span class="visually-hidden">{{ t.discipline.duration }}:</span>
-                  <span class="power-fact-val">{{ shortDuration(power.duration) }}</span>
-                </p>
-              </div>
-              <p class="power-card-desc text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
-                {{ power.description }}
-              </p>
-            </div>
-          </article>
+          <PowerCard :discipline="discipline" :power="power" @open="goPower(power.id)" />
         </div>
 
       </div>

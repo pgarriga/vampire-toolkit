@@ -1,9 +1,9 @@
 import { computed } from 'vue'
-import { TRAITS_DATA } from '../traits'
-import { TRAITS_EN, type TraitTranslation } from '../translations-traits-en'
-import { TRAITS_CA } from '../translations-traits-ca'
+import { TRAITS_DATA } from '../content/traits'
+import { TRAITS_EN, type TraitTranslation } from '../content/traits.en'
+import { TRAITS_CA } from '../content/traits.ca'
 import { useSettings } from './useSettings'
-import type { Trait, TraitCategory, TraitKind } from '../types'
+import type { Trait, TraitCategory } from '../types'
 
 /**
  * The overlay only carries the wording. `combos` comes back keyed by attribute id,
@@ -34,41 +34,34 @@ function applyOverlay(traits: Trait[], overlay: Record<string, TraitTranslation>
 /** The order the three columns are printed in on a V5 sheet. */
 export const TRAIT_CATEGORIES: TraitCategory[] = ['fisico', 'social', 'mental']
 
-export function useTraits() {
-  const { resolvedLang } = useSettings()
+const OVERLAYS = { en: TRAITS_EN, ca: TRAITS_CA }
 
-  const traits = computed<Trait[]>(() => {
-    if (resolvedLang.value === 'en') return applyOverlay(TRAITS_DATA.traits, TRAITS_EN)
-    if (resolvedLang.value === 'ca') return applyOverlay(TRAITS_DATA.traits, TRAITS_CA)
-    return TRAITS_DATA.traits
+// Module-level and shared, like `useData`: the overlay is applied once per language.
+const { resolvedLang } = useSettings()
+const traits = computed<Trait[]>(() =>
+  resolvedLang.value === 'es'
+    ? TRAITS_DATA.traits
+    : applyOverlay(TRAITS_DATA.traits, OVERLAYS[resolvedLang.value]),
+)
+
+const skills = computed(() => traits.value.filter(t => t.kind === 'skill'))
+
+function traitById(id: string): Trait | undefined {
+  return traits.value.find(t => t.id === id)
+}
+
+/**
+ * The Skills that roll off a given Attribute, with the example for that pairing.
+ * Derived from the Skills' own `combos` rather than stored twice, so the Attribute
+ * page and the Skill page can never disagree about a roll.
+ */
+function skillsUsing(attributeId: string): Array<{ skill: Trait; example: string }> {
+  return skills.value.flatMap(s => {
+    const combo = s.combos?.find(c => c.attributeId === attributeId)
+    return combo ? [{ skill: s, example: combo.example }] : []
   })
+}
 
-  const attributes = computed(() => traits.value.filter(t => t.kind === 'attribute'))
-  const skills     = computed(() => traits.value.filter(t => t.kind === 'skill'))
-
-  function traitById(id: string): Trait | undefined {
-    return traits.value.find(t => t.id === id)
-  }
-
-  /** The traits of one kind, split into the sheet's three columns and in sheet order. */
-  function byCategory(kind: TraitKind): Array<{ category: TraitCategory; traits: Trait[] }> {
-    return TRAIT_CATEGORIES.map(category => ({
-      category,
-      traits: traits.value.filter(t => t.kind === kind && t.category === category),
-    })).filter(g => g.traits.length > 0)
-  }
-
-  /**
-   * The Skills that roll off a given Attribute, with the example for that pairing.
-   * Derived from the Skills' own `combos` rather than stored twice, so the Attribute
-   * page and the Skill page can never disagree about a roll.
-   */
-  function skillsUsing(attributeId: string): Array<{ skill: Trait; example: string }> {
-    return skills.value.flatMap(s => {
-      const combo = s.combos?.find(c => c.attributeId === attributeId)
-      return combo ? [{ skill: s, example: combo.example }] : []
-    })
-  }
-
-  return { traits, attributes, skills, traitById, byCategory, skillsUsing }
+export function useTraits() {
+  return { traits, traitById, skillsUsing }
 }

@@ -1,7 +1,7 @@
 // Catalan translations overlay for VtM V5 discipline/power data
 // Applied over the Spanish base data when language is set to Catalan
 
-import type { DisciplineTranslation } from './translations-en'
+import type { DisciplineTranslation } from './disciplines.en'
 
 type DisciplineId =
   | 'animalism'

@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
-import { NAV_ICONS } from '../nav-icons'
-import { CLAN_ICONS } from '../clan-icons'
+import { NAV_ICONS } from '../icons/nav'
+import { CLAN_ICONS } from '../icons/clans'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import type { Character } from '../types'
@@ -33,7 +33,7 @@ async function onFilePicked(e: Event): Promise<void> {
   input.value = ''
   if (!file) return
 
-  let character = null
+  let character: Character | null = null
   try {
     character = parseCharacter(await file.text())
   } catch { /* unreadable file — handled as invalid below */ }
@@ -42,22 +42,18 @@ async function onFilePicked(e: Event): Promise<void> {
 
   // Replacing a character the user already has is destructive, so it is confirmed.
   if (characterById(character.id)) { pending.value = character; return }
-  open(importAndGet(character))
+  importAndOpen(character)
 }
 
 function confirmReplace(): void {
   const c = pending.value
   pending.value = null
-  if (c) open(importAndGet(c))
+  if (c) importAndOpen(c)
 }
 
-function importAndGet(c: Character): string {
+function importAndOpen(c: Character): void {
   importCharacter(c)
-  return c.id
-}
-
-function open(id: string): void {
-  router.push(`/character/${id}`)
+  router.push(`/character/${c.id}`)
 }
 
 /** The compendium: reference material that ships with the app. */
@@ -171,7 +167,7 @@ const rows = computed(() =>
             </span>
           </button>
 
-          <!-- Load a character back from a file saved with the sheet's Save button -->
+          <!-- Load a character back from a file written by the sheet's Export -->
           <button type="button" class="char-row char-row--new" @click="pickFile">
             <span class="char-row-medallion char-row-medallion--new" aria-hidden="true">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"

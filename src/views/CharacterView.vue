@@ -1,35 +1,26 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { useRouter } from 'vue-router'
 import ClanPicker from '../components/ClanPicker.vue'
-import { CLAN_ICONS } from '../clan-icons'
-import { DISCIPLINE_ICONS } from '../icons'
+import PageNav from '../components/PageNav.vue'
+import PowerCard from '../components/PowerCard.vue'
+import { CLAN_ICONS } from '../icons/clans'
+import { DISCIPLINE_ICONS } from '../icons/disciplines'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import { useCharacters, GENERATIONS, DEFAULT_GENERATION } from '../composables/useCharacters'
 import { useCharacterPowers } from '../composables/useCharacterPowers'
-import { artGradient, levelDots, shortCost, shortDicePool, shortDuration } from '../helpers'
+import { useRouteCharacter } from '../composables/useRouteCharacter'
+import { artGradient, levelDots } from '../helpers'
 import type { ClanIconType } from '../types'
 
-const route  = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { clanById } = useClans()
-const {
-  characterById, characterJSON, setActive, deleteCharacter, updateCharacter,
-} = useCharacters()
+const { characterJSON, deleteCharacter, updateCharacter } = useCharacters()
+const { charId, character } = useRouteCharacter()
 
-const charId = computed(() => route.params['id'] as string)
-
-/**
- * Opening a sheet makes that character the active one, so the star buttons on the
- * Discipline and Power pages write to the list the reader just came from. Done in
- * setup rather than onMounted so the first render already reads the right list.
- */
-watch(charId, id => { if (characterById(id)) setActive(id) }, { immediate: true })
-
-const character = computed(() => characterById(charId.value))
-const clan      = computed(() => (character.value ? clanById(character.value.clanId) : undefined))
+const clan = computed(() => (character.value ? clanById(character.value.clanId) : undefined))
 
 const { groupedPowers } = useCharacterPowers(character)
 
@@ -98,7 +89,7 @@ function goPower(discId: string, powerId: string) {
 }
 
 function powerCountLabel(n: number): string {
-  return `${n} ${n !== 1 ? t.value.myPowers.powers : t.value.myPowers.power}`
+  return `${n} ${n !== 1 ? t.value.characters.powers : t.value.characters.power}`
 }
 
 function removeCharacter() {
@@ -137,18 +128,7 @@ function downloadCharacter(): void {
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment" v-if="character">
 
-    <!-- ── Nav ── -->
-    <nav class="d-flex align-items-center flex-wrap gap-2 px-3 px-sm-4 py-3 border-bottom border-void-border"
-         style="font-size:.9rem;">
-      <button class="back-btn" @click="router.push('/')">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-          <path d="m15 18-6-6 6-6"/>
-        </svg>
-        {{ t.characters.back }}
-      </button>
-      <span class="text-parchment-faint">›</span>
-      <span class="text-parchment text-truncate">{{ character.name }}</span>
-    </nav>
+    <PageNav :back-label="t.characters.back" :current="character.name" truncate @back="router.push('/')" />
 
     <!-- ── Character header: the clan, then the name ── -->
     <header v-if="!editing"
@@ -319,53 +299,8 @@ function downloadCharacter(): void {
           <!-- Power cards grid -->
           <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-2 g-sm-3">
             <div class="col" v-for="power in group.powers" :key="power.id">
-              <article
-                class="power-card d-flex flex-column h-100"
-                :style="{ '--card-color': group.discipline.color, '--card-glow': group.discipline.colorGlow }"
-                @click="goPower(group.discipline.id, power.id)"
-                @keydown.enter.prevent="goPower(group.discipline.id, power.id)"
-                @keydown.space.prevent="goPower(group.discipline.id, power.id)"
-                tabindex="0"
-                role="button"
-                :aria-label="`${power.name}, ${t.discipline.level} ${power.level}, ${t.myPowers.cost}: ${power.cost}`"
-              >
-                <!-- Art -->
-                <div class="power-card-art"
-                     :style="{ background: artGradient(group.discipline) }"
-                     aria-hidden="true">
-                  <div v-html="DISCIPLINE_ICONS[group.discipline.iconType]"
-                       :style="{ '--card-color': group.discipline.color }"
-                       class="power-art-icon sigil"></div>
-                  <div class="power-level-badge">{{ t.discipline.level }} {{ power.level }}</div>
-                  <div class="art-overlay" :style="{ background: 'linear-gradient(180deg, transparent 30%, var(--void-card) 100%)' }"></div>
-                </div>
-                <!-- Body -->
-                <div class="d-flex flex-column gap-1 p-2 p-sm-3 flex-fill">
-                  <div class="power-card-title">
-                    <h4 class="font-title fw-bold text-white">{{ power.name }}</h4>
-                  </div>
-                  <div class="power-facts">
-                    <p class="power-fact text-parchment-dim">
-                      <svg class="power-fact-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.6c0 0-6.4 7.3-6.4 11.2a6.4 6.4 0 0 0 12.8 0C18.4 9.9 12 2.6 12 2.6z"/></svg>
-                      <span class="visually-hidden">{{ t.myPowers.cost }}:</span>
-                      <span class="power-fact-val">{{ shortCost(power.cost) }}</span>
-                    </p>
-                    <p class="power-fact text-parchment-dim" v-if="shortDicePool(power.dicePool)">
-                      <svg class="power-fact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 2.2 3 9.4l9 12.4 9-12.4z"/><path d="M3 9.4 12 13l9-3.6M12 13v8.8"/></svg>
-                      <span class="visually-hidden">{{ t.myPowers.dicePool }}:</span>
-                      <span class="power-fact-val">{{ shortDicePool(power.dicePool) }}</span>
-                    </p>
-                    <p class="power-fact text-parchment-dim" v-if="shortDuration(power.duration)">
-                      <svg class="power-fact-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7.2V12l3 2"/></svg>
-                      <span class="visually-hidden">{{ t.myPowers.duration }}:</span>
-                      <span class="power-fact-val">{{ shortDuration(power.duration) }}</span>
-                    </p>
-                  </div>
-                  <p class="power-card-desc text-parchment-dim fst-italic leading-snug mb-0 d-none d-sm-block line-clamp-3">
-                    {{ power.description }}
-                  </p>
-                </div>
-              </article>
+              <PowerCard :discipline="group.discipline" :power="power" :heading-level="4"
+                         @open="goPower(group.discipline.id, power.id)" />
             </div>
           </div>
 

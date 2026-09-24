@@ -69,28 +69,33 @@ Vampire Toolkit/
     ├── main.ts               # Bootstrap CSS (no JS bundle) + main.css + mounts the app
     ├── App.vue               # Custom sticky navbar + sectioned overlay menu + page transitions + footer
     ├── router.ts             # Hash routes
+    ├── env.d.ts              # Vite client types
     ├── types.ts              # TypeScript interfaces (Discipline, Power, Clan, Trait, Character)
-    ├── data.ts               # The 12 disciplines and 152 powers (Spanish source)
-    ├── clans.ts              # The 14 clans (Spanish source)
-    ├── traits.ts             # The 9 Attributes and 27 Skills (Spanish source)
-    ├── translations-en.ts    # English translations overlay (disciplines + powers)
-    ├── translations-ca.ts    # Catalan translations overlay (disciplines + powers)
-    ├── translations-clans-en.ts # English translations overlay (clans)
-    ├── translations-clans-ca.ts # Catalan translations overlay (clans)
-    ├── translations-traits-en.ts # English translations overlay (Attributes + Skills)
-    ├── translations-traits-ca.ts # Catalan translations overlay (Attributes + Skills)
-    ├── icons.ts              # Discipline badges traced from the official legend
-    ├── clan-icons.ts         # SVG sigil per clan
-    ├── nav-icons.ts          # Line icons shared by the menu and the home cards
-    ├── trait-icons.ts        # One line icon per trait category (Physical/Social/Mental)
-    ├── helpers.ts            # Pure functions (shortCost, artGradient…)
+    ├── helpers.ts            # Pure functions (shortCost, artGradient, foldForSearch…)
+    ├── storage.ts            # Guarded localStorage access
     ├── renderPowerCard.ts    # Canvas renderer — draws a power card to a PNG Blob for sharing
+    ├── content/              # Game content, Spanish source + EN/CA overlays
+    │   ├── disciplines.ts    # The 12 disciplines and 152 powers
+    │   ├── clans.ts          # The 14 clans
+    │   ├── traits.ts         # The 9 Attributes and 27 Skills
+    │   └── *.en.ts / *.ca.ts # English and Catalan overlays for each of the three
+    ├── icons/
+    │   ├── disciplines.ts    # Discipline badges traced from the official legend
+    │   ├── clans.ts          # SVG sigil per clan
+    │   ├── traits.ts         # One sigil per trait category (Physical/Social/Mental)
+    │   └── nav.ts            # Line icons shared by the menu and the home cards
+    ├── i18n/                 # UI strings: es.ts (shape source), en.ts, ca.ts
     ├── components/
     │   ├── AppFooter.vue     # Site footer — unofficial-tool notice + version
-    │   └── ClanPicker.vue    # The 14 clan sigils as a single-choice grid with search
+    │   ├── ClanPicker.vue    # The 14 clan sigils as a single-choice grid with search
+    │   ├── PageNav.vue       # Breadcrumb bar on detail pages
+    │   ├── PageHeader.vue    # Title band of the index pages and Settings
+    │   ├── SearchInput.vue   # Search box on the index pages
+    │   └── PowerCard.vue     # One power on a grid
     ├── composables/
     │   ├── useCharacters.ts  # Characters: storage, CRUD, powers, import/export
     │   ├── useCharacterPowers.ts # One character's powers grouped by discipline
+    │   ├── useRouteCharacter.ts  # The character named by the route
     │   ├── useSettings.ts    # Theme and language preferences
     │   ├── useI18n.ts        # UI string translations
     │   ├── useData.ts        # Localized discipline/power data
@@ -147,6 +152,9 @@ npm run build
 # Preview build
 npm run preview
 
+# Type-check the whole app, .vue files included (CI runs this before the build)
+npm run typecheck
+
 # Regenerate PWA icons from public/favicon.svg (only when the favicon changes)
 node scripts/generate-icons.mjs
 ```
@@ -161,11 +169,11 @@ Core Traits: the official Spanish PDF *Vampiro La Mascarada 5ª Edición — Ras
 
 Clans: the official *Hoja de Clanes* reference sheet (archetype, verbs, Disciplines, Bane and Compulsion names), with the Bane and Compulsion mechanics from the V5 corebook, Camarilla, Anarch and Companion.
 
-- The Spanish content lives in `src/data.ts`.
-- English translations are in `src/translations-en.ts`, Catalan in `src/translations-ca.ts`. Both are overlays keyed by the same power `id` — the `useData` composable picks the right one based on the resolved language.
-- Attributes and Skills live in `src/traits.ts`, with `src/translations-traits-en.ts` and `src/translations-traits-ca.ts` as overlays keyed by the same trait `id`; `useTraits` applies the right one. A Skill's rolls store the *attribute id*, so an overlay only translates the example sentence.
+- The Spanish content lives in `src/content/disciplines.ts`.
+- English translations are in `src/content/disciplines.en.ts`, Catalan in `src/content/disciplines.ca.ts`. Both are overlays keyed by the same power `id` — the `useData` composable picks the right one based on the resolved language.
+- Attributes and Skills live in `src/content/traits.ts`, with `src/content/traits.en.ts` and `src/content/traits.ca.ts` as overlays keyed by the same trait `id`; `useTraits` applies the right one. A Skill's rolls store the *attribute id*, so an overlay only translates the example sentence.
 - To add or edit a power, update all three files in the same commit (types are defined in `src/types.ts`).
-- UI strings (nav, headings, buttons) live in `src/composables/useI18n.ts`; every string must exist in the `es`, `en` and `ca` blocks — TypeScript enforces the shape.
+- UI strings (nav, headings, buttons) live in `src/i18n/es.ts`, `en.ts` and `ca.ts`; every string must exist in all three — TypeScript enforces the shape.
 
 ## Your data
 
@@ -197,7 +205,7 @@ See [`CLAUDE.md`](./CLAUDE.md) for the full, prescriptive version of these rules
 
 ## Icons
 
-SVG icons are in `src/icons.ts`. Each icon uses `currentColor` to inherit the discipline's theme color. ViewBox `0 0 100 100`.
+SVG icons are in `src/icons/disciplines.ts`. Each icon uses `currentColor` to inherit the discipline's theme color. ViewBox `0 0 100 100`.
 
 | Key | Discipline |
 |-----|-----------|

@@ -1,4 +1,4 @@
-import type { ClanIconType } from './types'
+import type { ClanIconType } from '../types'
 
 // Clan sigils traced from the official "Hoja de Clanes" reference sheet, so each one is
 // the clan's real symbol rather than an interpretation. Pipeline: crop the sigil out of

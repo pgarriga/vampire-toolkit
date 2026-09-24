@@ -2,6 +2,7 @@
 import { computed, ref } from 'vue'
 import { useSettings, type Theme, type Lang } from '../composables/useSettings'
 import { useI18n } from '../composables/useI18n'
+import PageHeader from '../components/PageHeader.vue'
 
 const { theme, lang } = useSettings()
 const { t } = useI18n()
@@ -53,15 +54,7 @@ const langOptions = computed(() => [
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment">
 
-    <!-- ── Header ── -->
-    <header class="page-header text-center px-4 pt-5 pb-4 position-relative overflow-hidden">
-      <div class="position-absolute top-0 start-0 w-100 h-100 pe-none"
-           style="background: radial-gradient(ellipse 60% 40% at 50% 0%, rgba(139,0,0,0.15) 0%, transparent 70%);"></div>
-      <h1 class="font-title fw-black tracking-widest text-uppercase lh-sm position-relative page-title-main"
-          style="font-size: clamp(1.4rem,4vw,2.4rem);">
-        {{ t.settings.title }}
-      </h1>
-    </header>
+    <PageHeader :title="t.settings.title" size="clamp(1.4rem,4vw,2.4rem)" />
 
     <!-- ── Settings ── -->
     <div class="settings-wrap mx-auto px-4 py-5">
