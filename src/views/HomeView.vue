@@ -222,7 +222,9 @@ const rows = computed(() =>
         <!-- Outside .tools-grid on purpose: Bootstrap's .visually-hidden has no
              position:absolute, so as a grid item iOS Safari sized the track to this
              control's intrinsic width and pushed every row past the viewport. -->
-        <input ref="fileInput" class="visually-hidden" type="file"
+        <!-- Out of the tab order and the accessibility tree: the Load row is the
+             control, and this input is only what it clicks. -->
+        <input ref="fileInput" class="visually-hidden" type="file" tabindex="-1" aria-hidden="true"
                accept="application/json,.json" @change="onFilePicked" />
       </section>
 

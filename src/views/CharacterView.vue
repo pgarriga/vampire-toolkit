@@ -30,9 +30,27 @@ const confirmDelete = ref(false)
 
 const menuOpen = ref(false)
 const menuRoot = ref<HTMLElement | null>(null)
+const moreBtn  = ref<HTMLButtonElement | null>(null)
+const editBtn  = ref<HTMLButtonElement | null>(null)
+const cancelDeleteBtn = ref<HTMLButtonElement | null>(null)
+
+/** Focus the given button once the DOM has swapped to the row that holds it. Every
+ *  one of these swaps removes the control that had focus, which drops it to <body>. */
+function focusAfterRender(el: { value: HTMLElement | null }): void {
+  nextTick(() => el.value?.focus())
+}
 
 function chooseExport(): void { menuOpen.value = false; downloadCharacter() }
-function chooseDelete(): void { menuOpen.value = false; confirmDelete.value = true }
+function chooseDelete(): void {
+  menuOpen.value = false
+  confirmDelete.value = true
+  // Onto Cancel, not Delete: an Enter pressed out of habit must not destroy anything.
+  focusAfterRender(cancelDeleteBtn)
+}
+function cancelDelete(): void {
+  confirmDelete.value = false
+  focusAfterRender(moreBtn)
+}
 
 // Dismissible the same three ways the overlay menu is: click outside, Escape, and
 // leaving the sheet. The toggle's own click is inside menuRoot, so it never self-closes.
@@ -41,7 +59,9 @@ function onDocPointer(e: MouseEvent): void {
   if (menuRoot.value && !menuRoot.value.contains(e.target as Node)) menuOpen.value = false
 }
 function onDocKey(e: KeyboardEvent): void {
-  if (e.key === 'Escape') menuOpen.value = false
+  if (e.key !== 'Escape' || !menuOpen.value) return
+  menuOpen.value = false
+  moreBtn.value?.focus()
 }
 onMounted(() => {
   document.addEventListener('click', onDocPointer)
@@ -77,7 +97,12 @@ function startEdit(): void {
 function saveEdit(): void {
   if (!canSaveEdit.value || !draftClan.value) return
   updateCharacter(charId.value, { name: draftName.value, clanId: draftClan.value, generation: draftGen.value })
+  stopEdit()
+}
+
+function stopEdit(): void {
   editing.value = false
+  focusAfterRender(editBtn)
 }
 
 // Leaving the sheet — or switching to another character — drops a half-finished edit
@@ -98,8 +123,8 @@ function removeCharacter() {
 }
 
 /**
- * Writes the character's own localStorage entry out as a file, byte for byte — so a
- * saved file and a stored character are the same JSON.
+ * Writes the character's own localStorage entry out as a file — the same JSON,
+ * pretty-printed — so a saved file and a stored character are one format.
  */
 function downloadCharacter(): void {
   const json = characterJSON(charId.value)
@@ -120,7 +145,9 @@ function downloadCharacter(): void {
     console.error('Character download failed', err)
     alert(t.value.characters.downloadError)
   } finally {
-    if (url) URL.revokeObjectURL(url)
+    // Not straight away: Safari and Firefox start the download after `click()`
+    // returns, and a URL revoked before then saves nothing.
+    if (url) setTimeout(() => URL.revokeObjectURL(url), 1000)
   }
 }
 </script>
@@ -161,7 +188,7 @@ function downloadCharacter(): void {
                  because the edit panel carries its own Save/Cancel. ── -->
         <div class="char-actions">
           <template v-if="!confirmDelete">
-            <button class="char-action" :aria-label="t.characters.editAria" @click="startEdit">
+            <button ref="editBtn" class="char-action" :aria-label="t.characters.editAria" @click="startEdit">
               <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"
                    stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
                 <path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>
@@ -170,7 +197,7 @@ function downloadCharacter(): void {
             </button>
 
             <div ref="menuRoot" class="char-menu">
-              <button class="char-action"
+              <button ref="moreBtn" class="char-action"
                       :aria-expanded="menuOpen"
                       aria-controls="char-more-menu"
                       :aria-label="t.characters.more"
@@ -204,7 +231,7 @@ function downloadCharacter(): void {
           <template v-else>
             <span class="char-actions-confirm">{{ t.characters.confirmDelete }}</span>
             <button class="char-action char-action--danger" @click="removeCharacter">{{ t.characters.delete }}</button>
-            <button class="char-action" @click="confirmDelete = false">{{ t.characters.cancel }}</button>
+            <button ref="cancelDeleteBtn" class="char-action" @click="cancelDelete">{{ t.characters.cancel }}</button>
           </template>
         </div>
       </div>
@@ -225,7 +252,7 @@ function downloadCharacter(): void {
         autocomplete="off"
         :placeholder="t.characters.namePlaceholder"
         @keydown.enter.prevent="saveEdit"
-        @keydown.esc="editing = false"
+        @keydown.esc="stopEdit"
       />
 
       <label class="char-form-label font-title" for="char-edit-gen">{{ t.characters.generation }}</label>
@@ -239,7 +266,7 @@ function downloadCharacter(): void {
       <ClanPicker v-model="draftClan" />
 
       <div class="char-form-actions">
-        <button class="settings-option" type="button" @click="editing = false">{{ t.characters.cancel }}</button>
+        <button class="settings-option" type="button" @click="stopEdit">{{ t.characters.cancel }}</button>
         <button class="settings-option char-form-primary" type="button"
                 :disabled="!canSaveEdit" @click="saveEdit">
           {{ t.characters.save }}

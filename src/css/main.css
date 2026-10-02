@@ -184,6 +184,15 @@ button,
 .page-enter-from { opacity: 0; transform: translateY(12px); }
 .page-leave-to   { opacity: 0; transform: translateY(-8px); }
 
+/* Reduced motion: no smooth scrolling, no slide between pages, no lift on hover.
+   Durations go to near zero rather than `none` so Vue's <transition> still gets its
+   transitionend and swaps the page. The dice keep their own rule further down. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 0.01ms !important; }
+  .page-enter-from, .page-leave-to { transform: none; }
+}
+
 /* ─── Search input ─── */
 .search-input {
   width: 100%;
@@ -974,6 +983,11 @@ button,
   color: var(--gold);
   border-color: var(--gold-dim);
   background: var(--void-card2);
+}
+/* Opening the menu puts focus on an item, so the ring has to read on both themes. */
+.app-menu-item:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 /* Section headings inside the overlay menu, matching the home page's own
    (.home-section-title). The panel is a flex column with a 0.5rem gap, so the

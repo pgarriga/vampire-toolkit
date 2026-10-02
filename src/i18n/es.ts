@@ -12,6 +12,7 @@ export const es = {
     settings:    'Ajustes',
     openMenu:    'Abrir menú',
     closeMenu:   'Cerrar menú',
+    breadcrumb:  'Ruta de navegación',
   },
   home: {
     compendium:        'Compendio',
@@ -208,7 +209,7 @@ export const es = {
     langEn:      'English',
     langCa:      'Català',
     cache:       'Caché',
-    cacheDesc:   'Vuelve a descargar los ficheros de la aplicación. Úsalo si algo se ve desactualizado tras una nueva versión. Tus poderes guardados y tus ajustes no se tocan.',
+    cacheDesc:   'Vuelve a descargar los ficheros de la aplicación. Úsalo si algo se ve desactualizado tras una nueva versión. Tus personajes y tus ajustes no se tocan.',
     cacheButton: 'Vaciar caché y recargar',
     cacheBusy:   'Vaciando…',
     repo:        'Repositorio',

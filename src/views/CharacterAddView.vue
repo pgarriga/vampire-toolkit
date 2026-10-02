@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { computed } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { DISCIPLINE_ICONS } from '../icons/disciplines'
 import { shortCost, shortDuration } from '../helpers'
 import { useI18n } from '../composables/useI18n'
@@ -9,14 +9,26 @@ import { useCharacters } from '../composables/useCharacters'
 import { useRouteCharacter } from '../composables/useRouteCharacter'
 import PageNav from '../components/PageNav.vue'
 
+const route  = useRoute()
 const router = useRouter()
 const { t } = useI18n()
 const { disciplines, disciplineById } = useData()
 const { togglePower, hasPower } = useCharacters()
 const { charId, character } = useRouteCharacter()
 
-/** null = choosing a Discipline; otherwise the Discipline whose powers are listed. */
-const picked = ref<string | null>(null)
+/**
+ * null = choosing a Discipline; otherwise the Discipline whose powers are listed.
+ * It lives in the URL (`?d=`), so the phone's Back gesture returns to the list of
+ * Disciplines instead of leaving the picker, and a reload stays on the same step.
+ */
+const picked = computed(() => {
+  const d = route.query['d']
+  return typeof d === 'string' && disciplineById(d) ? d : null
+})
+
+function pick(id: string): void {
+  router.push({ query: { d: id } })
+}
 const discipline = computed(() => (picked.value ? disciplineById(picked.value) : undefined))
 
 /** How many of a Discipline's powers this character already has. */
@@ -36,8 +48,10 @@ function toggle(powerId: string): void {
 }
 
 function goBack(): void {
-  if (picked.value) picked.value = null
-  else router.push(`/character/${charId.value}`)
+  if (!picked.value) { router.push(`/character/${charId.value}`); return }
+  // Pop the entry `pick()` pushed when there is one; a reloaded `?d=` link has none.
+  if (window.history.state?.back) router.back()
+  else router.replace({ query: {} })
 }
 </script>
 
@@ -61,7 +75,7 @@ function goBack(): void {
             type="button"
             class="disc-mini-card"
             :style="{ '--card-color': d.color, '--card-glow': d.colorGlow }"
-            @click="picked = d.id"
+            @click="pick(d.id)"
           >
             <span class="disc-mini-art" aria-hidden="true">
               <span class="disc-mini-icon sigil" v-html="DISCIPLINE_ICONS[d.iconType]"></span>
