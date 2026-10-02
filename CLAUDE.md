@@ -35,6 +35,8 @@ Vampire Toolkit/
     │                            #   colorGradient, parseAmalgama
     ├── storage.ts               # Guarded localStorage access (get/set/remove/keys, JSON)
     ├── renderPowerCard.ts       # Canvas 2D renderer — draws a power card and returns a PNG Blob
+    ├── dice.ts                  # V5 dice rules: roll, evaluate, Willpower reroll, Rouse check
+    ├── d10.ts                   # d10 geometry for CSS 3D: face matrices, rest poses, shading
     ├── content/                 # Game content — the `game-content` chunk
     │   ├── disciplines.ts       # DISCIPLINES_DATA: 12 disciplines and 152 powers (Spanish source)
     │   ├── disciplines.en.ts    # English overlay for disciplines and powers
@@ -47,7 +49,8 @@ Vampire Toolkit/
     │   ├── disciplines.ts       # DISCIPLINE_ICONS: traced diamond badge per discipline
     │   ├── clans.ts             # CLAN_ICONS + THIN_BLOOD_ICON / THIN_BLOOD_NAMES
     │   ├── traits.ts            # TRAIT_ICONS: one diamond sigil per trait category
-    │   └── nav.ts               # NAV_ICONS: stroked line icons for the menu and home cards
+    │   ├── nav.ts               # NAV_ICONS: stroked line icons for the menu and home cards
+    │   └── dice.ts              # DICE_ICONS (ankh, critical, messy, skull) + diceSymbol()
     ├── i18n/
     │   ├── es.ts                # Spanish UI strings — the shape source (`Messages`)
     │   ├── en.ts                # English UI strings, typed as `Messages`
@@ -58,6 +61,9 @@ Vampire Toolkit/
     │   ├── PageNav.vue          # Breadcrumb bar on detail pages: back button › current page
     │   ├── PageHeader.vue       # Title band of the index pages and Settings
     │   ├── SearchInput.vue      # The search box under an index page's title
+    │   ├── ToolCard.vue         # One tool card on the home page
+    │   ├── NumberStepper.vue    # A number picked with − / + buttons (the dice roller)
+    │   ├── D10Die.vue           # One d10 in CSS 3D that tumbles in and rests on its value
     │   └── PowerCard.vue        # One power on a grid (Discipline page + character sheet)
     ├── composables/
     │   ├── useCharacters.ts     # Characters: storage, CRUD, powers, import/export
@@ -71,7 +77,7 @@ Vampire Toolkit/
     ├── css/
     │   └── main.css             # Custom gothic styles + Bootstrap overrides + light theme vars
     └── views/
-        ├── HomeView.vue         # Landing page — Compendium section + My Characters section
+        ├── HomeView.vue         # Landing page — At the Table, Compendium and My Characters sections
         ├── DisciplinesView.vue  # Discipline grid with search
         ├── DisciplineView.vue   # Power grid for a discipline (reference only — no editing)
         ├── PowerView.vue        # Power detail card + mobile Share button
@@ -79,6 +85,7 @@ Vampire Toolkit/
         ├── ClanView.vue         # Clan detail — description, in-clan Disciplines, Bane, Compulsion
         ├── TraitsView.vue       # Core Traits index — Attributes, then Skills
         ├── TraitView.vue        # One Attribute or Skill in full
+        ├── DiceView.vue         # Dice roller — pool, Hunger, Willpower, Rouse
         ├── CharacterCreateView.vue # Two-step wizard: name + generation, then clan
         ├── CharacterView.vue    # Character sheet — identity, actions, powers by discipline
         ├── CharacterAddView.vue # Power picker: choose a Discipline, then tick its powers
@@ -99,6 +106,7 @@ language change re-applies each overlay once rather than once per component.
 | `#/discipline/:id/power/:powerId` | `PowerView` | Detail card for a specific power |
 | `#/traits` | `TraitsView` | Core Traits — the 9 Attributes, then the 27 Skills |
 | `#/trait/:id` | `TraitView` | One Attribute or Skill in full |
+| `#/dice` | `DiceView` | Dice roller: pool + Hunger, Willpower rerolls, Rouse checks |
 | `#/clans` | `ClansView` | Grid of all 14 clans with search |
 | `#/clan/:id` | `ClanView` | Clan detail — description, in-clan Disciplines, Bane, Compulsion |
 | `#/character/new` | `CharacterCreateView` | Create a character: name + generation, then clan |
@@ -115,7 +123,8 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
 - Left: "Vampire V5 Toolkit" brand — clicking it goes home
 - Right: hamburger button (always visible, on every viewport)
 - Clicking it opens a full-screen overlay menu **laid out like the home page**: a plain
-  Home item, then a **Compendium** section (Clans, Disciplines, Core Traits) and a **My Characters**
+  Home item, then an **At the Table** section (Dice — "Dados" / "Daus"), a **Compendium**
+  section (Clans, Disciplines, Core Traits) and a **My Characters**
   section listing every character by name with their own clan sigil, then the create-
   character row, then a divider and **Settings** last
 - Section headings reuse the home page's look (`.app-menu-heading` ≈ `.home-section-title`).
@@ -318,6 +327,119 @@ grounds.
   optional note), the five dot levels as V5 dots with the number in a `.visually-hidden`
   label, the rolls as linked rows, and the Specialties as chips. Every roll row
   navigates to the trait on the other side of the `+`.
+
+## Dice roller (`src/dice.ts` + `views/DiceView.vue`)
+
+The first tool for the session itself rather than for reference, so it sits in its own
+**At the Table** section on the home page and in the menu (`t.home.table`), first —
+ahead of the Compendium, then My Characters.
+
+- **The rules live in `dice.ts`, with no Vue in it**, so they can be read and checked on
+  their own: 6–9 and a lone 10 are one success; each *pair* of 10s is a critical worth
+  four; Hunger dice **replace** dice in the pool (`min(hunger, pool)` of them), never
+  add; a critical with a 10 on a Hunger die is a **messy critical** if the roll wins; a
+  1 on a Hunger die is a **bestial failure** if it fails. A Rouse check is one die — 6+
+  and nothing happens, otherwise Hunger +1.
+- **Use the translated books' own terms**, which are also the ones the content overlays
+  use: Hunger is **Ansia** in Spanish and **Ànsia** in Catalan (not "Hambre" / "Fam"),
+  and a Rouse check is **Enardecimiento** / **Enardiment** (not "Despertar la Sangre"),
+  the same word the power costs print. English keeps Hunger and Rouse the Blood.
+  "Frenesí de hambre" in `content/clans.ts` is the name of a frenzy, not the mechanic,
+  and stays as it is.
+- **There is no Difficulty, on purpose.** It was tried and removed: many tables keep the
+  Difficulty behind the screen, so the roller reports what the dice say — successes,
+  then the messy/bestial warnings phrased conditionally (`ifWinCritical`, `ifWinMessy`,
+  `ifLoseBestial`) — and leaves winning or losing to the Storyteller. `evaluate()` takes
+  only the dice for that reason.
+- **Willpower** rerolls up to `WILLPOWER_REROLL` (3) regular dice, once per roll. It
+  preselects the failed regular dice (`defaultReroll`), and the player can change the
+  pick — rerolling a lone 10 to chase a critical is legal. Hunger dice are never
+  pickable: they render as spans, not buttons, and `rerollDice` skips them regardless.
+- `rollD10` uses `crypto.getRandomValues` with rejection sampling above 250, so the ten
+  faces stay uniform; `Math.random` is only the fallback.
+- The Rouse check raises the Hunger stepper itself, capped at 5 (`rouseMax` says so).
+- **Blood Surge.** Beside the Rouse button, on one row at every width, a stepper sets
+  the **dice the Rouse adds** (`surge`, 0–`MAX_SURGE` = 6, default 2). It is labelled by
+  what it does ("Dados que suma"), **not as Blood Potency** — the user asked for that, so
+  the player enters the dice directly rather than the app deriving them. Every Rouse check
+  adds them to the Pool stepper itself (capped at `MAX_POOL`), whatever the Rouse die
+  shows. It persists in `v5-dice` with the other two numbers.
+- **Order on the page:** Pool and Hunger, then the Rouse row and its result, then
+  **Roll** and its result — a Rouse feeds the pool, so it comes before the roll.
+- **Pool, Hunger and the Rouse's dice persist** in `v5-dice` (read back range-checked, so a hand-edited
+  value falls back to the default; a `difficulty` left there by an earlier build is
+  ignored and dropped on the next write). The result does not: a stale roll on
+  return would read as one that just happened.
+- **One live region** (`announcement`) reads out whichever came last, a roll or a Rouse
+  check. It is always in the page, because a live region that arrives with its content
+  is often not announced; the visible result stays readable on its own.
+- **The dice are real d10s in CSS 3D** (`d10.ts` + `D10Die.vue`), no canvas or WebGL.
+  The solid is a pentagonal trapezohedron: two apexes and a zigzag ring of ten vertices,
+  with the apex height fixed by `H = z0·(1+cos36°)/(1−cos36°)` — the only height at which
+  every kite is flat. Each face is a `div` clipped to a kite and placed with a `matrix3d`
+  built from the face's own axes; each face also has a *rest* matrix (the rows of that
+  frame) that turns the die so the face looks at the viewer, apex up.
+- **Faces are numbered as a real d10 is** (`numberFaces()`, after the net the user
+  supplied — this layout is a requirement, not a detail): round one apex the evens,
+  clockwise seen from outside, 10 8 2 6 4; round the other the odds, clockwise, 5 9 3 1
+  7; the 5 against the 10's lower-left edge. Opposite faces then add to 11, which the
+  code **checks and throws on**. It is derived from the geometry, not tabled. The trap:
+  CSS's axes are left-handed (y down), so the cross-product "anticlockwise" is
+  clockwise on screen — reading it the other way shifts the odd ring by one face, and
+  the sum check is what caught it. Resting on the 10 you see 8 upper left, 4 upper
+  right, 5 lower left, 9 lower right.
+- **Faces carry the V5 symbols, not numbers** (`icons/dice.ts`, `diceSymbol()`): 1–5
+  blank, except the **skull** on a Hunger 1; the **ankh** on 6–9; on a 10 the ankh with
+  two stars on a regular die and the ankh with **fangs** (messy) on a Hunger die. They
+  are traced from a fan-made *V5 Dice Cheat Sheet* the user supplied, with the same
+  pipeline as the sigils; where a crop caught a neighbouring face's ankh, blobs touching
+  the crop border were dropped before potrace. All four share one scale so the ankhs
+  match. The numbers survive only in each die's `aria-label`.
+- **Dice colours are fixed in both themes** — regular dice **black** (`--d10-face`, like
+  the Modiphius set; the cheat sheet's grey was tried first) and Hunger dice a dark
+  blood red (`--d10-face-hunger`), with pale symbols (`--d10-sym`): the dice are
+  objects, like the level badge, not chrome. Front-face symbol contrast: 11:1 on black,
+  8:1 on red. `brightness()` multiplies, so on near-black the sheet's shading would not
+  show: black faces take `--shade-gain: 2.6` (red keeps 1), and in the dark theme a
+  faint pale `drop-shadow` rims every die so a blank black one still reads as a solid.
+- **Faces are supersampled.** Chrome rasterises each face at its 2D size before the 3D
+  transform, which left the traced symbols soft. `D10_SUPERSAMPLE` (2) builds the faces
+  at twice the size and `--d10-ss: scale(0.5)` shrinks the solid back — keep the two in
+  step, and `.d10-sym` sizes are in supersampled px too.
+- **The tumble only shows a result already decided.** `D10Die` animates from a random
+  1–3 turns round each axis to `var(--d10-ss) rotate…(0) var(--rest)`; the transform
+  lists match function for function, so the spins interpolate as whole turns and the
+  matrices stay put.
+- **At rest it copies the V5 dice cheat sheet's drawing** (the user's reference, the
+  same sheet the symbols are traced from). That look was reached by trial and several
+  versions were rejected, so move it only on request:
+  - **Straight from above, orthographic.** `D10_TILT_DEG` is 0 (34–40°, a die seen
+    across the table, was tried and set aside) and `.d10`'s perspective is a near-flat
+    2400px — a strong one turned the silhouette into a pyramid.
+  - **Proportions.** `z0 = 0.12·r` puts the front kite's side corners and far point
+    where the sheet's are. `--d10-ss` then stretches the resting die 20% upright and 8%
+    across (`scale(0.54, 0.6)` on top of the 0.5 supersample), to a 1.04 height-to-
+    width — the sheet's own 1.12 read as squashed — growing into it as it lands so the
+    tumble is undistorted.
+  - **Flat three-tone shading** (`sheetShade()`): relative to the front face, the face
+    on its left ×1.25, the one on its right ×0.5, faces turned down darker still — no
+    gradients. The front face is pinned at 1, so its symbol keeps full contrast.
+  - The tilt, whatever it is, is folded into each face's rest matrix *and* its shading,
+    and `.d10`'s `top` nudge recentres the silhouette; re-check it if the tilt, `z0` or
+    the stretch moves.
+- **A die rolls by remounting.** Each die is keyed (`dieKeys`); a roll gives every die a
+  new key, a Willpower reroll only the picked ones. That is also why the tile stays the
+  same `<span>` in pick mode and the pick control is a `.die-pick` button laid over it —
+  swapping the tile for a `<button>` would remount the die and roll it again.
+- **Nothing gives the roll away mid-air.** Until the dice land (`TUMBLE_MS` + stagger)
+  the headline is `visibility: hidden` (`.dice-pending`, so the layout does not jump),
+  the tiles are `.die--rolling` (no success border), the Willpower button waits
+  and the live region stays empty. `prefers-reduced-motion` drops the animation and the
+  wait altogether.
+- A die's state never rests on colour: the face's symbol is a shape (blank, ankh,
+  starred or fanged ankh, skull), the tile's border is solid for a success and dashed
+  for a failure, and each die has an `aria-label` ("10, Hunger die"). Hunger tiles are
+  ringed in `--bane-accent` so they clear 3:1 against the card.
 
 ## Clans (`src/content/clans.ts` + `src/icons/clans.ts` + `composables/useClans.ts`)
 
@@ -648,7 +770,25 @@ Relevant classes:
   neighbour to crowd, so the target needs no `::before`
 - `.home-section` / `.home-section-title` — the home page's two sections (Compendium, My
   Characters), whose headings the overlay menu mirrors
-- `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width.
+- `.dice-wrap` / `.dice-controls` / `.dice-actions` / `.dice-roll-btn` / `.dice-result` /
+  `.dice-headline` / `.dice-count` / `.dice-margin` /
+  `.dice-note` / `.dice-hint` / `.dice-row` (+ `--picking`) / `.dice-reroll` / `.dice-rules` —
+  the dice roller. `.dice-note` is the bane accent (a warning), `.dice-hint` the dim one
+  (an instruction)
+- `.dice-rouse` / `.dice-rouse-text` / `.dice-rouse-label` — the Rouse check's result: one
+  die, so one compact line (a 44px `.die--small` tile, a small gold caption and the
+  result), not a full `.dice-result` card
+- `.die` (+ `--success`, `--fail`, `--hunger`, `--rolling`, `--picked`, `--small`) /
+  `.die-pick` — the 64px tile (`--small`: 44px, the same die scaled down rather than
+  rebuilt, so it still shares `D10_FACES`) a d10 sits in. See the Dice roller section for why every state
+  has a shape as well as a colour
+- `.d10` / `.d10-body` / `.d10-face` (+ `--front`) / `.d10-sym` — the CSS 3D die, with
+  fixed `--d10-face` / `--d10-face-hunger` / `--d10-sym` colours in both themes
+- `.num-stepper` / `.num-stepper-label` / `.num-stepper-controls` / `.num-stepper-btn` /
+  `.num-stepper-value` — `NumberStepper.vue`. The row is `flex-wrap`, so where a Cinzel
+  label and the buttons cannot share a line at 320px the buttons drop under it, pushed
+  right; from `sm` the label sits over the centred buttons
+- `.tool-card` / `.tool-card-head` / `.tool-card-icon` / `.tool-card-title` / `.tool-card-desc` — Home tool cards (accent driven by `--tool-accent`). `.tools-grid` is one card per row at every width. Below `sm` `.tool-card-desc` clamps at 2 lines.
 - `.char-row` (+ `--new`) / `.char-row-medallion` (+ `--new`) / `.char-row-sigil` /
   `.char-row-text` / `.char-row-name` / `.char-row-meta` — a character
   on the index: clan sigil left, name and `clan · Gen. N` right. The clan colour only reaches
@@ -755,7 +895,7 @@ Relevant classes:
   `--void-card` ground in both themes (4.8:1 / 5.0:1); `--parchment-faint` would measure
   2.1:1
 
-`--card-color` and `--card-glow` are injected inline from Vue; `--tool-accent` is set inline per tool card while the underlying accent value is read from the theme vars `--tool-disciplines` / `--tool-clans` / `--tool-my-powers`.
+`--card-color` and `--card-glow` are injected inline from Vue; `--tool-accent` is set inline per tool card while the underlying accent value is read from the theme vars `--tool-disciplines` / `--tool-clans` / `--tool-traits` / `--tool-dice` / `--tool-my-powers`.
 
 `--content-width` (44rem) is the width of the single-column pages — home, settings and the
 overlay menu that mirrors home. It is shared so the menu and the page behind it cannot drift
@@ -769,7 +909,7 @@ apart; the overlay's side padding matches the pages' `px-4` for the same reason.
 |-------|-------|-------------|
 | `index` | app code — views, composables, router | ~64 kB |
 | `game-content` | everything under `src/content/` — the three data files and their six overlays | ~118 kB |
-| `game-icons` | `icons/disciplines.ts`, `icons/clans.ts` (traced sigils) | ~105 kB |
+| `game-icons` | `icons/disciplines.ts`, `icons/clans.ts`, `icons/dice.ts` (traced sigils and dice symbols) | ~112 kB |
 
 The content is ~80% of the bundle and almost never changes, while the app code changes every
 release. Split, a release only invalidates the small chunk, so the service worker

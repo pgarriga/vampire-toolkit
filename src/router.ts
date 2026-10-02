@@ -5,6 +5,7 @@ import DisciplineView   from './views/DisciplineView.vue'
 import PowerView        from './views/PowerView.vue'
 import TraitsView       from './views/TraitsView.vue'
 import TraitView        from './views/TraitView.vue'
+import DiceView         from './views/DiceView.vue'
 import ClansView        from './views/ClansView.vue'
 import ClanView         from './views/ClanView.vue'
 import CharacterCreateView from './views/CharacterCreateView.vue'
@@ -21,6 +22,7 @@ const router = createRouter({
     { path: '/discipline/:id/power/:powerId',     component: PowerView       },
     { path: '/traits',                            component: TraitsView      },
     { path: '/trait/:id',                         component: TraitView       },
+    { path: '/dice',                              component: DiceView        },
     { path: '/clans',                             component: ClansView       },
     { path: '/clan/:id',                          component: ClanView        },
     { path: '/character/new',                     component: CharacterCreateView },

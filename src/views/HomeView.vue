@@ -7,6 +7,7 @@ import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
 import type { Character } from '../types'
 import { useCharacters, parseCharacter } from '../composables/useCharacters'
+import ToolCard from '../components/ToolCard.vue'
 
 const router = useRouter()
 const { t } = useI18n()
@@ -84,6 +85,18 @@ const tools = computed(() => [
   },
 ])
 
+/** Tools for the session itself, as opposed to reference material. */
+const tableTools = computed(() => [
+  {
+    key: 'dice',
+    icon: NAV_ICONS.dice,
+    title: t.value.home.diceTitle,
+    description: t.value.home.diceDesc,
+    accent: 'var(--tool-dice)',
+    onClick: () => router.push('/dice'),
+  },
+])
+
 /** One row per saved character, each carrying its clan's sigil and colour. */
 const rows = computed(() =>
   characters.value.map(c => {
@@ -107,24 +120,35 @@ const rows = computed(() =>
 
     <main class="tools-wrap mx-auto px-4 pt-5 pb-5">
 
+      <!-- ── At the table ── -->
+      <section class="home-section" aria-labelledby="home-table">
+        <h2 id="home-table" class="home-section-title font-title">{{ t.home.table }}</h2>
+        <div class="tools-grid">
+          <ToolCard
+            v-for="tool in tableTools"
+            :key="tool.key"
+            :icon="tool.icon"
+            :title="tool.title"
+            :description="tool.description"
+            :accent="tool.accent"
+            @click="tool.onClick"
+          />
+        </div>
+      </section>
+
       <!-- ── Compendium ── -->
       <section class="home-section" aria-labelledby="home-compendium">
         <h2 id="home-compendium" class="home-section-title font-title">{{ t.home.compendium }}</h2>
         <div class="tools-grid">
-          <button
+          <ToolCard
             v-for="tool in tools"
             :key="tool.key"
-            type="button"
-            class="tool-card"
-            :style="{ '--tool-accent': tool.accent }"
+            :icon="tool.icon"
+            :title="tool.title"
+            :description="tool.description"
+            :accent="tool.accent"
             @click="tool.onClick"
-          >
-            <div class="tool-card-head">
-              <span class="tool-card-icon" v-html="tool.icon" aria-hidden="true"></span>
-              <span class="tool-card-title font-title">{{ tool.title }}</span>
-            </div>
-            <p class="tool-card-desc">{{ tool.description }}</p>
-          </button>
+          />
         </div>
       </section>
 

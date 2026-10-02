@@ -20,6 +20,7 @@ const isHome        = computed(() => route.path === '/')
 const isDisciplines = computed(() => route.path === '/disciplines' || route.path.startsWith('/discipline'))
 const isClans       = computed(() => route.path === '/clans' || route.path.startsWith('/clan/'))
 const isTraits      = computed(() => route.path === '/traits' || route.path.startsWith('/trait/'))
+const isDice        = computed(() => route.path === '/dice')
 const isSettings    = computed(() => route.path === '/settings')
 
 /** One entry per character, mirroring the home page's own list. */
@@ -101,8 +102,24 @@ watch(menuOpen, (open) => {
         {{ t.nav.home }}
       </button>
 
-      <!-- ── Compendium. A role="menu" takes only menuitems, so each section is a
-               role="group" carrying the name and the visible heading is decorative. ── -->
+      <!-- ── At the table: the tools used mid-session. A role="menu" takes only
+               menuitems, so each section is a role="group" carrying the name and the
+               visible heading is decorative. ── -->
+      <div class="app-menu-group" role="group" :aria-label="t.home.table">
+        <p class="app-menu-heading font-title" aria-hidden="true">{{ t.home.table }}</p>
+
+        <button
+          class="app-menu-item"
+          :class="{ active: isDice }"
+          role="menuitem"
+          @click="go('/dice')"
+        >
+          <span class="app-menu-icon" v-html="NAV_ICONS.dice"></span>
+          {{ t.nav.dice }}
+        </button>
+      </div>
+
+      <!-- ── Compendium ── -->
       <div class="app-menu-group" role="group" :aria-label="t.home.compendium">
         <p class="app-menu-heading font-title" aria-hidden="true">{{ t.home.compendium }}</p>
 

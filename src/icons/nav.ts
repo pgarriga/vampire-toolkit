@@ -7,7 +7,7 @@
  * by the caller through CSS.
  */
 export type NavIconType =
-  | 'home' | 'clans' | 'disciplines' | 'traits' | 'characters' | 'settings'
+  | 'home' | 'clans' | 'disciplines' | 'traits' | 'dice' | 'characters' | 'settings'
 
 const OPEN = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true">'
 
@@ -33,6 +33,12 @@ export const NAV_ICONS: Record<NavIconType, string> = {
     <circle cx="12" cy="8" r="2.2" fill="currentColor" stroke="none"/>
     <circle cx="19" cy="8" r="2.2"/>
     <path d="M4 15h16M4 19h10"/>
+  </svg>`,
+
+  // A d10 seen from above: the kite outline and the facets meeting at the near point.
+  dice: `${OPEN}
+    <path d="M12 2.2 3 9.4l9 12.4 9-12.4z"/>
+    <path d="M3 9.4 12 13l9-3.6M12 13v8.8"/>
   </svg>`,
 
   characters: `${OPEN}
