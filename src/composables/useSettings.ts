@@ -38,6 +38,9 @@ function applyTheme(t: Theme) {
 
 watch(theme, (t) => { applyTheme(t); storageSet('v5-theme', t) }, { immediate: true })
 watch(lang,  (l) => { storageSet('v5-lang', l) })
+// `index.html` ships `lang="en"`; left there, a screen reader reads the Spanish and
+// Catalan pages with an English voice, and the browser hyphenates them as English.
+watch(resolvedLang, (l) => { document.documentElement.lang = l }, { immediate: true })
 
 prefersDark.addEventListener('change', () => {
   if (theme.value === 'auto') applyTheme('auto')

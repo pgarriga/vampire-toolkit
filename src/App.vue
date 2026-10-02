@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onBeforeUnmount } from 'vue'
+import { ref, computed, watch, nextTick, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { NAV_ICONS } from './icons/nav'
 import { CLAN_ICONS } from './icons/clans'
@@ -7,6 +7,7 @@ import { useI18n } from './composables/useI18n'
 import { useClans } from './composables/useClans'
 import { useCharacters } from './composables/useCharacters'
 import AppFooter from './components/AppFooter.vue'
+import { pageEntering } from './router'
 
 const route  = useRoute()
 const router = useRouter()
@@ -15,6 +16,8 @@ const { clanById } = useClans()
 const { characters } = useCharacters()
 
 const menuOpen = ref(false)
+const toggler  = ref<HTMLButtonElement | null>(null)
+const menuEl   = ref<HTMLElement | null>(null)
 
 const isHome        = computed(() => route.path === '/')
 const isDisciplines = computed(() => route.path === '/disciplines' || route.path.startsWith('/discipline'))
@@ -42,10 +45,23 @@ function go(path: string) {
 // Close on route change
 watch(() => route.path, () => { menuOpen.value = false })
 
-// Close on Escape
+// Close on Escape, and hand focus back to the button that opened the menu — the
+// item that had it is gone with the overlay, which would drop focus to <body>.
 function onKey(e: KeyboardEvent) {
-  if (e.key === 'Escape') menuOpen.value = false
+  if (e.key !== 'Escape' || !menuOpen.value) return
+  menuOpen.value = false
+  toggler.value?.focus()
 }
+
+// Opening moves focus into the menu — onto the current page's entry when there is
+// one — so a keyboard user does not have to tab past the page behind the overlay.
+watch(menuOpen, async (open) => {
+  if (!open) return
+  await nextTick()
+  const items = menuEl.value?.querySelectorAll<HTMLElement>('[role="menuitem"]')
+  const target = menuEl.value?.querySelector<HTMLElement>('[role="menuitem"].active') ?? items?.[0]
+  target?.focus()
+})
 onMounted(() => document.addEventListener('keydown', onKey))
 onBeforeUnmount(() => document.removeEventListener('keydown', onKey))
 
@@ -66,6 +82,7 @@ watch(menuOpen, (open) => {
     </a>
 
     <button
+      ref="toggler"
       class="app-menu-toggler"
       type="button"
       :aria-expanded="menuOpen"
@@ -86,6 +103,7 @@ watch(menuOpen, (open) => {
   <div
     v-if="menuOpen"
     id="app-menu"
+    ref="menuEl"
     class="app-menu-overlay"
     role="menu"
     :aria-label="t.nav.home"
@@ -202,7 +220,7 @@ watch(menuOpen, (open) => {
   </div>
 
   <router-view v-slot="{ Component }">
-    <transition name="page" mode="out-in">
+    <transition name="page" mode="out-in" @enter="pageEntering">
       <component :is="Component" />
     </transition>
   </router-view>

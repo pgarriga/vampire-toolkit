@@ -10,6 +10,7 @@ export const en: Messages = {
     settings:    'Settings',
     openMenu:    'Open menu',
     closeMenu:   'Close menu',
+    breadcrumb:  'Breadcrumb',
   },
   home: {
     compendium:        'Compendium',
@@ -206,7 +207,7 @@ export const en: Messages = {
     langEn:     'English',
     langCa:     'Català',
     cache:      'Cache',
-    cacheDesc:  'Re-downloads the app\'s files. Use it if something looks out of date after a new release. Your saved powers and settings are left alone.',
+    cacheDesc:  'Re-downloads the app\'s files. Use it if something looks out of date after a new release. Your characters and settings are left alone.',
     cacheButton: 'Clear cache and reload',
     cacheBusy:  'Clearing…',
     repo:       'Repository',

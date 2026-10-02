@@ -115,7 +115,9 @@ function goSibling(step: number): void {
   const target = siblings.value[i + step]
   if (!target) return
   const query = fromCharacter.value ? '?from=character' : ''
-  router.push(`/discipline/${target.disciplineId}/power/${target.powerId}${query}`)
+  // Replace, not push: stepping through ten powers should not take ten presses of
+  // Back to return to the list they came from.
+  router.replace(`/discipline/${target.disciplineId}/power/${target.powerId}${query}`)
 }
 
 /** Travel before a drag counts as a swipe, and how much it must beat the vertical

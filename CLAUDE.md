@@ -117,6 +117,13 @@ language change re-applies each overlay once rather than once per component.
 Anything unmatched redirects to `/`. `#/my-powers` is **gone** — powers belong to a
 character now, so there is no global saved-powers screen.
 
+**Scroll.** A new page opens at the top; Back and Forward return to the saved position.
+Because pages swap with an out-in `<transition>`, the returning page is not in the DOM
+when `scrollBehavior` runs, so it waits for `App.vue`'s `@enter` (`pageEntering()` in
+`router.ts`), with a 600ms timer for navigations that do not transition. The scroll is
+`behavior: 'instant'` — `html` has `scroll-behavior: smooth`, which would otherwise glide
+down in front of the reader.
+
 ## Navigation (`App.vue`)
 
 Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
@@ -133,6 +140,9 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
 - Menu and home-card icons both come from `src/icons/nav.ts`, so a tool's card always
   shows the same icon as its menu entry
 - Menu closes on route change, on Escape, and on click outside the panel
+- Opening it moves focus onto the current page's item (or the first); Escape hands focus
+  back to the hamburger. The character sheet's "More options" menu, delete confirmation
+  and edit panel do the same, because each swap removes the control that had focus
 - Body scroll is locked while the menu is open
 - `.app-menu-panel` and the home page share `--content-width` (44rem) and the same side
   padding, so the menu column lines up with the page behind it at every width. The type
@@ -197,12 +207,13 @@ There is **no star on the Discipline or Power pages** — the compendium is refe
 From the sheet, **+ Add** opens `#/character/:id/add`: pick a Discipline (each row shows its
 type, power count and, in gold, how many the character already has), then tick its powers.
 Ticking and un-ticking are the same control, so the picker is also how a power is removed.
-Changes save immediately.
+Changes save immediately. The chosen Discipline lives in the URL (`?d=<id>`), so a phone's
+Back gesture returns to the Discipline list instead of leaving the picker.
 
 ### Export and import
 
 - **Export** (in the sheet's "More options" menu) writes the character's own localStorage
-  entry to a file, byte for byte — a saved file and a stored character are the same JSON.
+  entry to a file, pretty-printed — a saved file and a stored character are the same JSON.
 - **Load character** on the home page reads one back. `parseCharacter()` is more forgiving
   than the storage sanitiser in exactly two ways: a file with no `id` or no `createdAt` gets
   fresh ones, so a hand-written sheet loads. Everything else is rejected outright — a bad
@@ -490,7 +501,8 @@ On the power sheet a horizontal drag steps to a sibling power, carousel-style: *
 left pulls the next power in, dragging right goes back**. The list it steps through is the
 one the reader came from — `discipline.powers` in `content/disciplines.ts` order, or the active character's
 flattened power list when the route carries `?from=character`. It stops at both ends rather
-than wrapping.
+than wrapping. Each step `router.replace`s, so Back returns to the list in one press however
+many powers were stepped through.
 
 - The ordering lives in `useCharacterPowers()` because `CharacterView` renders the groups and
   `PowerView` walks the flattened version; if they disagreed, swiping would skip powers.
@@ -514,14 +526,16 @@ Reactive singleton exposing `theme` (`auto | dark | light`), `lang` (`auto | es 
 - Theme `auto` follows `window.matchMedia('(prefers-color-scheme: dark)')`.
 - Language `auto` detects the browser language: Catalan (`/^ca\b/i`) resolves to `ca`, other Iberian Peninsula languages (`/^(es|gl|eu|pt)/i`) resolve to `es`, everything else to `en`.
 - Both preferences persist in `localStorage` (`v5-theme`, `v5-lang`).
+- `<html lang>` follows `resolvedLang` (`index.html` ships `en`), so screen readers use
+  the right voice and the browser hyphenates in the right language.
 - Theme is applied via `data-theme` attribute on `<html>`.
 - `SettingsView` also has a Cache section and a Repository section that links to the GitHub repo.
 
 ### Clear cache (`SettingsView.clearAppCache`)
 
 Unregisters every service worker registration, deletes every Cache Storage entry, then
-reloads. It is the **precached app files** that go — `localStorage` is untouched, so saved
-powers, theme and language survive; that is the whole point of the button and the section's
+reloads. It is the **precached app files** that go — `localStorage` is untouched, so characters,
+dice numbers, theme and language survive; that is the whole point of the button and the section's
 copy says so. Unregistering comes before deleting, because a live worker would refill the
 caches it owns, and the reload runs from a `finally` so a partial failure still lands the
 app on network files.
@@ -907,7 +921,7 @@ apart; the overlay's side padding matches the pages' `px-4` for the same reason.
 
 | Chunk | Holds | Size (gzip) |
 |-------|-------|-------------|
-| `index` | app code — views, composables, router | ~64 kB |
+| `index` | app code — views, composables, router | ~71 kB |
 | `game-content` | everything under `src/content/` — the three data files and their six overlays | ~118 kB |
 | `game-icons` | `icons/disciplines.ts`, `icons/clans.ts`, `icons/dice.ts` (traced sigils and dice symbols) | ~112 kB |
 
@@ -948,6 +962,9 @@ These are non-negotiable for any change to the codebase.
    that must look smaller keeps the floor with a `::before` that pads the hit area out —
    but expand it only in a direction with no neighbour, or the two targets overlap and the
    later one in the DOM steals the taps (see `.char-action`, which grows vertically only).
+8. **Respect `prefers-reduced-motion`.** One block in `main.css` turns off smooth scrolling,
+   the page slide and hover lifts by shrinking every transition to `0.01ms` — not `none`,
+   so Vue's `<transition>` still gets its `transitionend`. The dice have their own rule.
 
 ### Translations
 

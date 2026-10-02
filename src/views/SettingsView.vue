@@ -18,7 +18,7 @@ const clearing = ref(false)
 /**
  * Throw away the precached copy of the app and reload onto fresh files.
  *
- * This is the *service worker's* cache, not `localStorage`: saved powers, theme
+ * This is the *service worker's* cache, not `localStorage`: characters, theme
  * and language live there and are deliberately left alone. Unregistering comes
  * first — a live worker would just refill the caches it owns — and the reload
  * runs even when something failed, since a reload is what actually puts the app

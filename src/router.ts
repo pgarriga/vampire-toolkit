@@ -13,6 +13,21 @@ import CharacterView    from './views/CharacterView.vue'
 import CharacterAddView from './views/CharacterAddView.vue'
 import SettingsView     from './views/SettingsView.vue'
 
+/**
+ * Back and forward return the reader to where they were — a power's sheet back to
+ * the same row of the grid. `App.vue` swaps pages with an out-in transition, so the
+ * page being returned to is not in the DOM until the old one has left; scrolling
+ * before then lands on the wrong page. The scroll therefore waits for `App.vue` to
+ * report the new page going in (`pageEntering`), with a timer behind it for the
+ * navigations that do not transition at all (same view, new params).
+ */
+let onPageEnter: (() => void) | null = null
+const PAGE_ENTER_FALLBACK_MS = 600
+
+export function pageEntering(): void {
+  onPageEnter?.()
+}
+
 const router = createRouter({
   history: createWebHashHistory(),
   routes: [
@@ -31,8 +46,19 @@ const router = createRouter({
     { path: '/settings',                          component: SettingsView    },
     { path: '/:pathMatch(.*)*',                   redirect: '/'              },
   ],
-  scrollBehavior() {
-    return { top: 0 }
+  scrollBehavior(_to, _from, savedPosition) {
+    if (!savedPosition) return { top: 0 }
+    return new Promise(resolve => {
+      const done = () => {
+        clearTimeout(timer)
+        onPageEnter = null
+        // `instant`: main.css sets `scroll-behavior: smooth`, which would otherwise
+        // glide down from the top in front of the reader.
+        resolve({ ...savedPosition, behavior: 'instant' })
+      }
+      const timer = setTimeout(done, PAGE_ENTER_FALLBACK_MS)
+      onPageEnter = done
+    })
   },
 })
 

@@ -10,6 +10,7 @@ export const ca: Messages = {
     settings:    'Ajustaments',
     openMenu:    'Obrir menú',
     closeMenu:   'Tancar menú',
+    breadcrumb:  'Ruta de navegació',
   },
   home: {
     compendium:        'Compendi',
@@ -206,7 +207,7 @@ export const ca: Messages = {
     langEn:     'English',
     langCa:     'Català',
     cache:      'Memòria cau',
-    cacheDesc:  'Torna a descarregar els fitxers de l\'aplicació. Fes-lo servir si alguna cosa es veu desactualitzada després d\'una versió nova. Els teus poders desats i els teus ajustaments no es toquen.',
+    cacheDesc:  'Torna a descarregar els fitxers de l\'aplicació. Fes-lo servir si alguna cosa es veu desactualitzada després d\'una versió nova. Els teus personatges i els teus ajustaments no es toquen.',
     cacheButton: 'Buida la memòria cau i recarrega',
     cacheBusy:  'Buidant…',
     repo:       'Repositori',

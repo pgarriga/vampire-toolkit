@@ -55,10 +55,12 @@ watch(nameInput, el => el?.focus(), { immediate: true })
 
       <!-- Step indicator -->
       <ol class="char-steps" :aria-label="t.characters.newTitle">
-        <li class="char-step" :class="{ active: step === 1, done: step > 1 }">
+        <li class="char-step" :class="{ active: step === 1, done: step > 1 }"
+            :aria-current="step === 1 ? 'step' : undefined">
           <span class="char-step-num" aria-hidden="true">1</span>{{ t.characters.nameStep }}
         </li>
-        <li class="char-step" :class="{ active: step === 2 }">
+        <li class="char-step" :class="{ active: step === 2 }"
+            :aria-current="step === 2 ? 'step' : undefined">
           <span class="char-step-num" aria-hidden="true">2</span>{{ t.characters.clanStep }}
         </li>
       </ol>
