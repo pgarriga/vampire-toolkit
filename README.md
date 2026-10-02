@@ -22,7 +22,7 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 
 ## Features
 
-- **Two-part home** — a **Compendium** section (Clans, Disciplines, Core Traits) for reference, and **My Characters** with a row per character showing their clan sigil, name, clan and generation.
+- **Three-part home** — an **At the Table** section with the dice roller, a **Compendium** section (Clans, Disciplines, Core Traits) for reference, and **My Characters** with a row per character showing their clan sigil, name, clan and generation.
 - **Characters** — create one with a name, a generation (1–16) and a clan, then build their power list. Edit the name, generation and clan at any time. Everything is stored locally; no account, nothing leaves the device.
 - **Export and import a character** — save a character to a `.json` file and load it back on any device. Re-importing your own file restores that character in place, after a confirmation.
 - **Pick powers by Discipline** — from a character's sheet, choose a Discipline and tick the powers they know. Each Discipline shows its rating as V5 dots, derived from how many of its powers the character has.
@@ -30,6 +30,7 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 - **152 powers** with dice pool, cost, duration, description and (when present) the amalgam requirement.
 - **14 clans** — each with its real clan sigil (traced from the official clan sheet, not redrawn), archetype, description, in-clan Disciplines (linked through to the discipline pages), Bane and Compulsion.
 - **Core Traits** — the 9 Attributes and 27 Skills: what each one measures, what every dot from 1 to 5 means, the corebook's example Specialties, and the three **Attribute + Skill** rolls each Skill turns up in. Every roll is a link, so an Attribute's page lists the Skills that roll off it and vice versa. The index keeps the cards quiet — name and blurb only; the rolls live on the trait's own page.
+- **Dice roller with Hunger** — real d10s in CSS 3D that tumble and land showing the V5 dice symbols (ankh, starred ankh on a critical, fanged ankh on a Hunger 10, skull on a Hunger 1). Set the pool and Hunger and roll: it counts successes and criticals, warns of a possible **messy critical** or **bestial failure**, rerolls up to three regular dice with **Willpower**, and makes **Rouse checks** that raise your Hunger for you. Pool and Hunger are remembered between visits.
 - **Search** the discipline catalogue by name, clan or type, the clan catalogue by name, archetype or Discipline, and the Core Traits by name, blurb, Specialty or the Attributes a Skill rolls with — so `Destreza` lists every Skill that pairs with it. Accent-insensitive, so `hecata` finds Hécata.
 - **Swipe between powers** — on a power sheet, drag left or right (or use the arrow keys) to step through the Discipline's powers, or through the character's own list when you arrived from their sheet.
 - **Share a power as an image** — on mobile browsers with the Web Share API, a share button renders the power card as a PNG and hands it off to WhatsApp, Mail, Messages, etc.
@@ -74,6 +75,7 @@ Vampire Toolkit/
     ├── helpers.ts            # Pure functions (shortCost, artGradient, foldForSearch…)
     ├── storage.ts            # Guarded localStorage access
     ├── renderPowerCard.ts    # Canvas renderer — draws a power card to a PNG Blob for sharing
+    ├── dice.ts               # V5 dice rules — successes, criticals, messy/bestial, Rouse
     ├── content/              # Game content, Spanish source + EN/CA overlays
     │   ├── disciplines.ts    # The 12 disciplines and 152 powers
     │   ├── clans.ts          # The 14 clans
@@ -83,7 +85,8 @@ Vampire Toolkit/
     │   ├── disciplines.ts    # Discipline badges traced from the official legend
     │   ├── clans.ts          # SVG sigil per clan
     │   ├── traits.ts         # One sigil per trait category (Physical/Social/Mental)
-    │   └── nav.ts            # Line icons shared by the menu and the home cards
+    │   ├── nav.ts            # Line icons shared by the menu and the home cards
+    │   └── dice.ts           # V5 dice symbols, traced
     ├── i18n/                 # UI strings: es.ts (shape source), en.ts, ca.ts
     ├── components/
     │   ├── AppFooter.vue     # Site footer — unofficial-tool notice + version
@@ -91,6 +94,8 @@ Vampire Toolkit/
     │   ├── PageNav.vue       # Breadcrumb bar on detail pages
     │   ├── PageHeader.vue    # Title band of the index pages and Settings
     │   ├── SearchInput.vue   # Search box on the index pages
+    │   ├── ToolCard.vue      # One tool card on the home page
+    │   ├── NumberStepper.vue # − / + number picker (dice roller)
     │   └── PowerCard.vue     # One power on a grid
     ├── composables/
     │   ├── useCharacters.ts  # Characters: storage, CRUD, powers, import/export
@@ -107,6 +112,7 @@ Vampire Toolkit/
         ├── HomeView.vue      # Landing page — Compendium + My Characters
         ├── ClansView.vue     # Clan grid with search
         ├── ClanView.vue      # Clan detail (disciplines, Bane, Compulsion)
+        ├── DiceView.vue      # Dice roller
         ├── TraitsView.vue    # Core Traits index — Attributes, then Skills
         ├── TraitView.vue     # One Attribute or Skill in full
         ├── DisciplinesView.vue # Discipline grid with search
@@ -128,6 +134,7 @@ Vampire Toolkit/
 | `#/discipline/:id/power/:powerId` | PowerView | Power detail card + mobile Share button |
 | `#/traits` | TraitsView | Core Traits — the 9 Attributes, then the 27 Skills |
 | `#/trait/:id` | TraitView | One Attribute or Skill in full |
+| `#/dice` | DiceView | Dice roller — Hunger dice, Willpower rerolls, Rouse checks |
 | `#/clans` | ClansView | Grid of all 14 clans with search |
 | `#/clan/:id` | ClanView | Clan detail — Disciplines, Bane and Compulsion |
 | `#/character/new` | CharacterCreateView | Create a character: name + generation, then clan |
@@ -184,6 +191,7 @@ Nothing leaves your device and there is no account. Everything lives in the brow
 |-----|-------|
 | `v5-character:<id>` | One character — name, clan, generation and their powers. One entry each. |
 | `v5-active-character` | The last character sheet you opened. |
+| `v5-dice` | The dice roller's last pool and Hunger. |
 | `v5-theme` · `v5-lang` | Your theme and language preferences. |
 
 Each character is a self-contained JSON, which is exactly what **Export** writes to a file

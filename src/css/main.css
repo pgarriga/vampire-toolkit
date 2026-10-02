@@ -38,6 +38,7 @@
   --tool-disciplines:  #c94a4a;
   --tool-clans:        #d08a3c;
   --tool-traits:       #5f9ea0;
+  --tool-dice:         #e06a8c;
   --tool-my-powers:    #b371e0;
   /* Core Traits: one accent per column of the sheet. Used for sigils, the medallion
      tint and card edges only — like the clan palette these are saturated mid-tones
@@ -68,6 +69,7 @@
   --tool-disciplines:  #8b0000;
   --tool-clans:        #8a4a08;
   --tool-traits:       #2c6b6d;
+  --tool-dice:         #8b1a45;
   --tool-my-powers:    #6a2a8a;
   --trait-fisico:      #8b2f22;
   --trait-social:      #7a5406;
@@ -1098,6 +1100,17 @@ button,
   color: var(--parchment-dim);
   line-height: 1.45;
   margin: 0;
+}
+/* Two lines on a phone, so the home page's cards stay one short slab each; from `sm`
+   there is room for the whole blurb. */
+@media (max-width: 575.98px) {
+  .tool-card-desc {
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    display: -webkit-box;
+    line-clamp: 2;
+    overflow: hidden;
+  }
 }
 
 /* ─── Settings view ─── */
@@ -2186,4 +2199,330 @@ button.disc-mini-card:focus-visible {
   color: var(--parchment-dim);
   font-size: 0.88rem;
   line-height: 1.35;
+}
+
+/* ─── Dice roller ─── */
+/* A single column like Settings, so it lines up with the home page's. */
+.dice-wrap {
+  max-width: var(--content-width);
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.dice-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0.75rem;
+}
+@media (min-width: 576px) {
+  .dice-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* NumberStepper */
+.num-stepper {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem 0.75rem;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 12px;
+  padding: 0.6rem 0.75rem;
+}
+@media (min-width: 576px) {
+  .num-stepper { flex-direction: column; flex-wrap: nowrap; align-items: stretch; text-align: center; }
+  /* Scoped under .num-stepper: this block sits above the base rule, which would win. */
+  .num-stepper .num-stepper-controls { margin-left: 0; justify-content: center; }
+}
+.num-stepper-label {
+  color: var(--gold);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.num-stepper-controls {
+  /* Pushed right on its own line when the label and the buttons cannot share one:
+     Cinzel is a wide face, and a long label beside the buttons overflows at 320px. */
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+.num-stepper-btn {
+  width: 44px;
+  height: 44px;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 1px solid var(--void-border);
+  background: var(--void-card2);
+  color: var(--parchment);
+  cursor: pointer;
+  transition: border-color var(--transition), color var(--transition);
+}
+.num-stepper-btn svg { width: 20px; height: 20px; }
+@media (hover: hover) {
+  .num-stepper-btn:hover:not(:disabled) { border-color: var(--gold-dim); color: var(--gold); }
+}
+.num-stepper-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.num-stepper-btn:disabled { color: var(--parchment-faint); cursor: not-allowed; }
+.num-stepper-value {
+  min-width: 3.2rem;
+  text-align: center;
+  font-family: var(--font-title);
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--parchment);
+  line-height: 1;
+}
+
+.dice-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+.dice-actions .settings-option { flex: 1 1 12rem; justify-content: center; }
+.dice-actions svg { width: 20px; height: 20px; }
+.dice-roll-btn { font-size: 1.15rem; font-weight: 600; }
+
+/* The Rouse button and the dice it adds, on one row at every width: the button takes
+   the slack, the stepper keeps a compact column (caption over − N +). */
+.dice-rouse-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.6rem;
+}
+.dice-rouse-row .num-stepper {
+  flex-direction: column;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.3rem;
+  padding: 0.45rem 0.6rem;
+  text-align: center;
+}
+.dice-rouse-row .num-stepper-label { font-size: 0.7rem; }
+.dice-rouse-row .num-stepper-controls { margin-left: 0; justify-content: center; gap: 0.3rem; }
+.dice-rouse-row .num-stepper-value { min-width: 2rem; font-size: 1.4rem; }
+.dice-rouse-btn { min-width: 0; flex-wrap: wrap; justify-content: center; text-align: center; }
+.dice-rouse-btn svg { width: 20px; height: 20px; flex-shrink: 0; }
+
+.dice-result {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 12px;
+  padding: 1.1rem 1.1rem 1.25rem;
+}
+.dice-headline {
+  margin: 0;
+  color: var(--parchment);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  overflow-wrap: break-word;
+}
+.dice-count { font-size: 2.2rem; line-height: 1; margin-right: 0.15em; }
+.dice-margin { margin: 0.2rem 0 0; color: var(--parchment-dim); }
+.dice-note   { margin: 0.2rem 0 0; color: var(--bane-accent); font-style: italic; }
+/* Instructions, not a warning — so not in the bane accent. */
+.dice-hint   { margin: 0; color: var(--parchment-dim); font-style: italic; }
+
+/* One die. Success reads by shape as well as colour: a solid border for a success,
+   a dashed one for a failure. Hunger dice are white on --blood in both themes (10:1),
+   ringed in --bane-accent so the tile still clears 3:1 against the dark card. */
+.dice-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin: 0;
+}
+.die {
+  position: relative;
+  width: 64px;
+  height: 64px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 10px;
+  border: 2px solid var(--void-border);
+  background: var(--void-card2);
+  color: var(--parchment);
+  font-family: var(--font-title);
+  font-size: 1.25rem;
+  font-weight: 700;
+  line-height: 1;
+}
+.die--success { border-color: var(--gold); color: var(--gold); }
+.die--fail    { border-style: dashed; color: var(--parchment-dim); }
+.die--hunger  {
+  background: var(--void-card2);
+  border-color: var(--bane-accent);
+  color: #fff;
+}
+
+/* Still in the air: no success border, ✦ or ☠ yet — they would give the roll away. */
+.die--rolling { border-style: solid; border-color: var(--void-border); }
+.die--hunger.die--rolling { border-color: var(--bane-accent); }
+/* The Willpower pick control, laid over the tile so the die underneath never
+   remounts (a remount would roll it again). */
+.die-pick {
+  position: absolute;
+  inset: -2px;
+  z-index: 2;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+.die-pick:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.die--picked {
+  box-shadow: 0 0 0 3px var(--void-card), 0 0 0 5px var(--parchment);
+  transform: translateY(-3px);
+}
+.dice-row--picking .die--hunger { opacity: 0.55; }
+
+.dice-reroll {
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.dice-rules {
+  color: var(--parchment-dim);
+  font-size: 0.95rem;
+}
+.dice-rules summary {
+  color: var(--gold);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.dice-rules summary:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.dice-rules ul { margin: 0.25rem 0 0; padding-left: 1.2rem; }
+.dice-rules li + li { margin-top: 0.35rem; }
+
+/* ─── d10 in CSS 3D (D10Die.vue, geometry in src/d10.ts) ─── */
+/* The dice are objects, not chrome, so like the level badge their colours are fixed in
+   both themes: the cheat sheet's grey and blood red for the front face (the others are
+   shaded from it), with pale symbols — 11:1 on the black front face, 8.0:1 on red.
+   Regular dice are black like the Modiphius set, not the cheat sheet's grey. */
+:root {
+  --d10-face:        #2a2a2a;
+  --d10-face-hunger: #850404;
+  --d10-sym:         #e2e2e2;
+}
+.d10 {
+  position: relative;
+  /* Nudges the resting silhouette to the tile's centre. It depends on D10_TILT_DEG,
+     z0 and the upright stretch, so re-check it when any of them moves. */
+  top: 2px;
+  width: 100%;
+  height: 100%;
+  display: block;
+  /* Next to no perspective: the cheat sheet draws its dice orthographically, and a
+     strong one turned the silhouette into a pyramid. */
+  perspective: 2400px;
+}
+/* A zero-size point at the tile's centre that the faces hang off; the whole solid
+   turns about it. */
+.d10-body {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  /* The inverse of D10_SUPERSAMPLE in src/d10.ts: faces are built twice as large and
+     scaled back here, so they rasterise with twice the detail. Keep the two in step.
+     At rest the die is also stretched to a 1.04 height-to-width: 20% upright, after the
+     cheat sheet, and 8% across, since at the sheet's own 1.12 it read as squashed. It
+     grows into that as it lands, so the tumble itself is undistorted. */
+  --d10-ss: scale(0.54, 0.6);
+  transform: var(--d10-ss) var(--rest);
+  animation: d10-tumble 0.95s cubic-bezier(0.15, 0.7, 0.25, 1) both;
+}
+@keyframes d10-tumble {
+  from { transform: scale(0.5, 0.5) rotateX(var(--sx)) rotateY(var(--sy)) rotateZ(var(--sz)) var(--rest); }
+  to   { transform: var(--d10-ss) rotateX(0deg) rotateY(0deg) rotateZ(0deg) var(--rest); }
+}
+.d10-face {
+  position: absolute;
+  left: 0;
+  top: 0;
+  transform-origin: 0 0;
+  backface-visibility: hidden;
+  /* Flat, like the cheat sheet: each face is one tone, set by --lit. */
+  background-color: var(--d10-face);
+  /* Each face is shaded for where it sits when the die is at rest — the one read-out
+     that matters. The front face is always 1, so its symbol keeps full contrast.
+     --shade-gain scales the light and dark away from it: brightness() multiplies, and
+     on near-black the cheat sheet's ×1.25 highlight would not show, so black dice
+     push it further. Floored at 0.3 so the far side never goes to a flat void. */
+  filter: brightness(max(0.3, calc(1 + (var(--lit, 1) - 1) * var(--shade-gain, 1))));
+}
+.d10-sym {
+  position: absolute;
+  left: 50%;
+  /* 26px on screen, at D10_SUPERSAMPLE. */
+  width: 52px;
+  height: 52px;
+  transform: translate(-50%, -50%);
+  color: var(--d10-sym);
+}
+.d10-sym svg { display: block; width: 100%; height: 100%; }
+.d10-face { --shade-gain: 2.6; }
+.die--hunger .d10-face { background-color: var(--d10-face-hunger); --shade-gain: 1; }
+/* A black die on the dark card needs an edge to read as a solid: a faint pale rim
+   round the whole silhouette. */
+.d10 { filter: drop-shadow(0 0 0.6px rgba(255, 255, 255, 0.45)); }
+[data-theme="light"] .d10 { filter: none; }
+@media (prefers-reduced-motion: reduce) {
+  .d10-body { animation: none; }
+}
+
+/* The read-out waits for the dice to land; it keeps its space so nothing jumps. */
+.dice-pending { visibility: hidden; }
+
+/* The Rouse check is one die: a single compact line, not a full result card. */
+.dice-rouse {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  background: var(--void-card);
+  border: 1px solid var(--void-border);
+  border-radius: 10px;
+  padding: 0.45rem 0.8rem 0.45rem 0.45rem;
+}
+.dice-rouse-text { margin: 0; font-size: 0.95rem; line-height: 1.3; }
+/* A small caption over the result, so the result keeps a line of its own. */
+.dice-rouse-label {
+  display: block;
+  color: var(--gold);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+/* A smaller tile: the 64px die is scaled down as a whole rather than rebuilt, so it
+   shares D10_FACES with the others. */
+.die--small { width: 44px; height: 44px; flex-shrink: 0; border-radius: 8px; }
+.die--small .d10 {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -48%) scale(0.68);
 }
