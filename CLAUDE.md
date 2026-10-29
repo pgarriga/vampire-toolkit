@@ -4,7 +4,11 @@ A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions.
 
 ## Stack
 
-- **Vue 3** + **TypeScript** — SFCs with Composition API (`<script setup>`)
+- **Vue 3** + **TypeScript 7** — SFCs with Composition API (`<script setup>`). TypeScript 7
+  is the native (Go) compiler and has **no JavaScript API**, which `vue-tsc` needs, so
+  `npm run typecheck` runs `vue-tsc` on TypeScript 6 from the official compatibility package
+  `@typescript/typescript6` (`scripts/typecheck.mjs`). Keep both devDependencies; the build
+  itself does not touch either, since Vite only strips types
 - **Vue Router 5** with hash history (`#/route`)
 - **Bootstrap 5** — responsive grid and CSS utilities. **CSS only**: `main.ts` does not import
   `bootstrap.bundle.min.js`. Every overlay in the app (menu, dropdown) is hand-written, so
@@ -23,7 +27,8 @@ Vampire Toolkit/
 ├── tsconfig.json
 ├── package.json                 # Scripts: dev / build / preview / typecheck
 ├── scripts/
-│   └── generate-icons.mjs       # Regenerates PWA PNGs from public/favicon.svg (sharp)
+│   ├── generate-icons.mjs       # Regenerates PWA PNGs from public/favicon.svg (sharp)
+│   └── typecheck.mjs            # vue-tsc on the TypeScript 6 compatibility package
 └── src/
     ├── main.ts                  # Imports Bootstrap CSS (no JS bundle), main.css, mounts app
     ├── env.d.ts                 # Vite client types (CSS side-effect imports, import.meta.env)
