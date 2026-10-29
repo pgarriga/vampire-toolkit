@@ -45,6 +45,12 @@ function validGeneration(g: unknown): g is number {
 }
 
 /**
+ * The id is the route (`#/character/<id>`), so it may only hold what a path segment
+ * can carry as-is. Both forms `newId()` makes — a UUID or `c` + base36 — fit.
+ */
+const VALID_ID = /^[A-Za-z0-9-]{1,64}$/
+
+/**
  * Storage is user-editable, survives across releases and — now that a character is a
  * file you can save and put back — may have been hand-edited, so every field is
  * re-checked. Returns null for anything that is not a usable character.
@@ -55,8 +61,10 @@ function sanitize(raw: unknown): Character | null {
   if (typeof c.id !== 'string' || !c.id) return null
   if (typeof c.name !== 'string' || !c.name.trim()) return null
   if (typeof c.clanId !== 'string' || !VALID_CLAN_IDS.has(c.clanId)) return null
+  // Deduplicated: with a power listed twice, un-ticking it would remove one copy and
+  // leave it on the sheet.
   const powers = Array.isArray(c.powers)
-    ? c.powers.filter((k): k is string => typeof k === 'string' && VALID_POWER_KEYS.has(k))
+    ? [...new Set(c.powers.filter((k): k is string => typeof k === 'string' && VALID_POWER_KEYS.has(k)))]
     : []
   return {
     id: c.id,
@@ -70,8 +78,8 @@ function sanitize(raw: unknown): Character | null {
 
 /**
  * A character read back from a saved file. More forgiving than the storage sanitiser
- * in exactly two ways — a file with no `id` or no `createdAt` is given fresh ones, so
- * a hand-written sheet still loads. Everything else must be valid or the file is
+ * in exactly two ways — a file with no usable `id` (missing, or one that cannot be a
+ * route) or no `createdAt` is given fresh ones, so a hand-written sheet still loads. Everything else must be valid or the file is
  * rejected outright: a bad clan or a generation of 17 is a broken file, not a default
  * to guess at.
  */
@@ -84,7 +92,7 @@ export function parseCharacter(text: string): Character | null {
   // sanitiser only drops the field — right there, since rejecting would cost the
   // whole character — but on load, dropping it would silently lose what the file said.
   if (draft['generation'] !== undefined && !validGeneration(draft['generation'])) return null
-  const id        = typeof draft['id'] === 'string' && draft['id'] ? draft['id'] : newId()
+  const id        = typeof draft['id'] === 'string' && VALID_ID.test(draft['id']) ? draft['id'] : newId()
   const createdAt = typeof draft['createdAt'] === 'number' && draft['createdAt'] > 0
     ? draft['createdAt'] : Date.now()
   return sanitize({ ...draft, id, createdAt })
@@ -120,7 +128,18 @@ if (Array.isArray(legacyList)) {
 function loadAll(): Character[] {
   return storageKeys()
     .filter(key => key.startsWith(KEY_PREFIX))
-    .flatMap(key => sanitize(readJSON(key)) ?? [])
+    .flatMap(key => {
+      const c = sanitize(readJSON(key))
+      if (!c) return []
+      // Imports used to accept any id, and one that cannot be a route leaves the sheet
+      // unreachable. Re-keyed rather than dropped, so the character itself survives.
+      if (!VALID_ID.test(c.id)) {
+        storageRemove(key)
+        c.id = newId()
+        writeJSON(KEY_PREFIX + c.id, c)
+      }
+      return [c]
+    })
     .sort(byCreated)
 }
 
