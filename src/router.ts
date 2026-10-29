@@ -22,6 +22,9 @@ import SettingsView     from './views/SettingsView.vue'
  * navigations that do not transition at all (same view, new params).
  */
 let onPageEnter: (() => void) | null = null
+/** Drops a restore still waiting when the reader navigates again — otherwise the new
+ *  page's `@enter` (or the old timer) would scroll it to the previous page's position. */
+let cancelPending: (() => void) | null = null
 const PAGE_ENTER_FALLBACK_MS = 600
 
 export function pageEntering(): void {
@@ -47,17 +50,21 @@ const router = createRouter({
     { path: '/:pathMatch(.*)*',                   redirect: '/'              },
   ],
   scrollBehavior(_to, _from, savedPosition) {
+    cancelPending?.()
     if (!savedPosition) return { top: 0 }
     return new Promise(resolve => {
-      const done = () => {
+      const settle = (position: Parameters<typeof resolve>[0]) => {
         clearTimeout(timer)
         onPageEnter = null
-        // `instant`: main.css sets `scroll-behavior: smooth`, which would otherwise
-        // glide down from the top in front of the reader.
-        resolve({ ...savedPosition, behavior: 'instant' })
+        cancelPending = null
+        resolve(position)
       }
+      // `instant`: main.css sets `scroll-behavior: smooth`, which would otherwise
+      // glide down from the top in front of the reader.
+      const done = () => settle({ ...savedPosition, behavior: 'instant' })
       const timer = setTimeout(done, PAGE_ENTER_FALLBACK_MS)
       onPageEnter = done
+      cancelPending = () => settle(false)
     })
   },
 })

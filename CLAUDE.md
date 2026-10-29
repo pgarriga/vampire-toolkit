@@ -172,7 +172,11 @@ ever touches its own character's key. `v5-active-character` holds the id of the 
 opened, which is what the power detail's swipe list follows.
 
 - `sanitize()` re-checks every field on load: storage is user-editable, survives releases,
-  and a character is now a file that can be hand-edited and put back.
+  and a character is now a file that can be hand-edited and put back. It also drops
+  duplicate powers — with one listed twice, un-ticking it left the other copy on the sheet.
+- **The id is the route**, so it must match `VALID_ID` (`[A-Za-z0-9-]`, up to 64 — what
+  `newId()` makes). A stored character whose id does not is **re-keyed** on load rather
+  than dropped: imports once accepted any id, and the character should survive the fix.
 - **Generation is optional on purpose.** Characters created before the field existed have
   none, and nothing backfills one — the sheet just omits the row until you edit it, where
   the select offers V5's standard 13th for you to confirm by saving. Valid range is 1–16:
@@ -215,8 +219,8 @@ Back gesture returns to the Discipline list instead of leaving the picker.
 - **Export** (in the sheet's "More options" menu) writes the character's own localStorage
   entry to a file, pretty-printed — a saved file and a stored character are the same JSON.
 - **Load character** on the home page reads one back. `parseCharacter()` is more forgiving
-  than the storage sanitiser in exactly two ways: a file with no `id` or no `createdAt` gets
-  fresh ones, so a hand-written sheet loads. Everything else is rejected outright — a bad
+  than the storage sanitiser in exactly two ways: a file with no usable `id` (missing, or not a
+  valid route segment) or no `createdAt` gets fresh ones, so a hand-written sheet loads. Everything else is rejected outright — a bad
   clan or a generation of 17 is a broken file, not a default to guess at. Note the asymmetry
   with `sanitize()`, which only *drops* an invalid generation: dropping is right for storage,
   where rejecting would cost the whole character, but on load it would silently lose what the
