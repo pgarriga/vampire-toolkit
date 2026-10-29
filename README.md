@@ -15,7 +15,7 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 ![Vue](https://img.shields.io/badge/Vue-3.5-4FC08D?style=flat-square&logo=vue.js&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-5.3-7952B3?style=flat-square&logo=bootstrap&logoColor=white)
 ![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?style=flat-square&logo=vite&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-6.0-3178C6?style=flat-square&logo=typescript&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?style=flat-square&logo=typescript&logoColor=white)
 ![PWA](https://img.shields.io/badge/PWA-installable-5A0FC8?style=flat-square)
 
 ---
@@ -54,7 +54,7 @@ A toolkit to speed up your **Vampire: The Masquerade 5th Edition** tabletop sess
 | Bootstrap | 5.3 | Responsive grid and CSS utilities (CSS only — its JS bundle is not shipped) |
 | Vite | 8.3 | Bundler and dev server |
 | vite-plugin-pwa | 1.3 | Service worker + web manifest |
-| TypeScript | 6.0 | Static typing |
+| TypeScript | 7.0 | Static typing |
 
 ## Project Structure
 
