@@ -1,6 +1,6 @@
 {
   "name": "vampire-toolkit",
-  "version": "4.1.0",
+  "version": "4.1.1",
   "type": "module",
   "description": "A toolkit to speed up your Vampire: The Masquerade 5th Edition sessions — look up disciplines and powers, save the ones your character has, and more.",
   "scripts": {
