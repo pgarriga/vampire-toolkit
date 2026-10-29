@@ -65,7 +65,7 @@ function goTo(id: string): void {
 
     <SearchInput v-model="search" :placeholder="t.traitsList.searchPlaceholder" :label="t.traitsList.searchAriaLabel" />
 
-    <main v-if="attributeGroups.length || skillGroups.length"
+    <div v-if="attributeGroups.length || skillGroups.length"
           class="container-fluid px-3 px-sm-4 py-4 pb-5 max-content mx-auto">
 
       <!-- ── Attributes first, then Skills: the order the chapter is written in ── -->
@@ -109,11 +109,11 @@ function goTo(id: string): void {
         </div>
       </section>
 
-    </main>
+    </div>
 
     <!-- Empty state -->
     <div v-else class="text-center py-5 px-4 text-parchment-dim">
-      <div class="fs-1 mb-3" style="opacity:.4;">🩸</div>
+      <div class="fs-1 mb-3" style="opacity:.4;" aria-hidden="true">🩸</div>
       <p>{{ t.traitsList.noResults }} «{{ search }}»</p>
     </div>
 

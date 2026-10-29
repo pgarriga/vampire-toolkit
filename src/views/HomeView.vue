@@ -118,7 +118,7 @@ const rows = computed(() =>
 <template>
   <div class="min-vh-100 bg-void font-body text-parchment">
 
-    <main class="tools-wrap mx-auto px-4 pt-5 pb-5">
+    <div class="tools-wrap mx-auto px-4 pt-5 pb-5">
 
       <!-- ── At the table ── -->
       <section class="home-section" aria-labelledby="home-table">
@@ -228,7 +228,7 @@ const rows = computed(() =>
                accept="application/json,.json" @change="onFilePicked" />
       </section>
 
-    </main>
+    </div>
 
   </div>
 </template>

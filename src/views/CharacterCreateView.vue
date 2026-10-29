@@ -3,7 +3,7 @@ import { computed, nextTick, ref, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import ClanPicker from '../components/ClanPicker.vue'
 import { useI18n } from '../composables/useI18n'
-import { useCharacters, GENERATIONS, DEFAULT_GENERATION } from '../composables/useCharacters'
+import { useCharacters, GENERATIONS, DEFAULT_GENERATION, NAME_MAX } from '../composables/useCharacters'
 import type { ClanIconType } from '../types'
 import PageNav from '../components/PageNav.vue'
 
@@ -51,7 +51,7 @@ watch(nameInput, el => el?.focus(), { immediate: true })
     <PageNav :back-label="step === 1 ? t.characters.back : t.characters.previous"
              :current="t.characters.newTitle" @back="step === 1 ? cancel() : goStep1()" />
 
-    <main class="char-form-wrap mx-auto px-4 py-4 pb-5">
+    <div class="char-form-wrap mx-auto px-4 py-4 pb-5">
 
       <!-- Step indicator -->
       <ol class="char-steps" :aria-label="t.characters.newTitle">
@@ -74,7 +74,7 @@ watch(nameInput, el => el?.focus(), { immediate: true })
           v-model="name"
           class="field-input"
           type="text"
-          maxlength="60"
+          :maxlength="NAME_MAX"
           autocomplete="off"
           :placeholder="t.characters.namePlaceholder"
           @keydown.enter.prevent="goStep2"
@@ -111,7 +111,7 @@ watch(nameInput, el => el?.focus(), { immediate: true })
         </div>
       </section>
 
-    </main>
+    </div>
 
   </div>
 </template>

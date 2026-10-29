@@ -11,6 +11,7 @@ export const ca: Messages = {
     openMenu:    'Obrir menú',
     closeMenu:   'Tancar menú',
     breadcrumb:  'Ruta de navegació',
+    skipToContent: 'Saltar al contingut',
   },
   home: {
     compendium:        'Compendi',

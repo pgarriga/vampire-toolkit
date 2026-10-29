@@ -92,7 +92,7 @@ function goTrait(id: string): void { router.push(`/trait/${id}`) }
     </header>
 
     <!-- ── Body ── -->
-    <main class="max-content mx-auto px-3 px-sm-4 py-4 pb-5" :style="{ '--card-color': accent }">
+    <div class="max-content mx-auto px-3 px-sm-4 py-4 pb-5" :style="{ '--card-color': accent }">
 
       <!-- Dot levels -->
       <section class="clan-section">
@@ -135,7 +135,7 @@ function goTrait(id: string): void { router.push(`/trait/${id}`) }
         </div>
       </section>
 
-    </main>
+    </div>
   </div>
 
   <!-- ── Not found ── -->

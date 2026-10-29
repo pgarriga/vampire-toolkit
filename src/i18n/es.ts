@@ -13,6 +13,7 @@ export const es = {
     openMenu:    'Abrir menú',
     closeMenu:   'Cerrar menú',
     breadcrumb:  'Ruta de navegación',
+    skipToContent: 'Saltar al contenido',
   },
   home: {
     compendium:        'Compendio',

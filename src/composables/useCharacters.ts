@@ -37,6 +37,17 @@ const VALID_CLAN_IDS = new Set<string>(CLANS_DATA.clans.map(c => c.id))
  */
 export const GENERATIONS: number[] = Array.from({ length: 16 }, (_, i) => i + 1)
 
+/**
+ * The longest name the forms accept. Exported so both name fields share it, and
+ * enforced on load too — a hand-edited file is not bound by an input's `maxlength`.
+ */
+export const NAME_MAX = 60
+
+/** Trimmed and capped at `NAME_MAX`; empty when there is no name at all. */
+function cleanName(name: string): string {
+  return name.trim().slice(0, NAME_MAX).trim()
+}
+
 /** V5's standard starting Generation for a newly Embraced fledgling. */
 export const DEFAULT_GENERATION = 13
 
@@ -59,7 +70,8 @@ function sanitize(raw: unknown): Character | null {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return null
   const c = raw as Partial<Character>
   if (typeof c.id !== 'string' || !c.id) return null
-  if (typeof c.name !== 'string' || !c.name.trim()) return null
+  const name = typeof c.name === 'string' ? cleanName(c.name) : ''
+  if (!name) return null
   if (typeof c.clanId !== 'string' || !VALID_CLAN_IDS.has(c.clanId)) return null
   // Deduplicated: with a power listed twice, un-ticking it would remove one copy and
   // leave it on the sheet.
@@ -68,7 +80,7 @@ function sanitize(raw: unknown): Character | null {
     : []
   return {
     id: c.id,
-    name: c.name.trim(),
+    name,
     clanId: c.clanId as ClanIconType,
     ...(validGeneration(c.generation) ? { generation: c.generation } : {}),
     powers,
@@ -172,6 +184,25 @@ function persistActive(): void {
   else storageRemove(STORAGE_KEY_ACTIVE)
 }
 
+// Another tab wrote a character. Without this, each tab keeps the copy it loaded and
+// writes the whole of it back on its next edit, so the last tab to save silently wins
+// and the other's changes are lost. `storage` only fires in the *other* tabs, so a
+// tab never re-reads its own writes. The active id stays per tab on purpose: two tabs
+// may well have two different sheets open.
+window.addEventListener('storage', e => {
+  if (e.key === null) { characters.value = loadAll(); return }   // storage.clear()
+  if (!e.key.startsWith(KEY_PREFIX)) return
+  const id = e.key.slice(KEY_PREFIX.length)
+  const i  = characters.value.findIndex(c => c.id === id)
+  const c  = e.newValue === null ? null : sanitize(readJSON(e.key))
+  if (!c || c.id !== id) {
+    if (i >= 0) characters.value.splice(i, 1)
+    return
+  }
+  if (i >= 0) characters.value.splice(i, 1, c)
+  else { characters.value.push(c); characters.value.sort(byCreated) }
+})
+
 export function useCharacters() {
   const activeCharacter = computed<Character | null>(
     () => characters.value.find(c => c.id === activeId.value) ?? null,
@@ -189,7 +220,7 @@ export function useCharacters() {
   function createCharacter(name: string, clanId: ClanIconType, generation?: number): Character {
     const character: Character = {
       id: newId(),
-      name: name.trim(),
+      name: cleanName(name),
       clanId,
       ...(validGeneration(generation) ? { generation } : {}),
       powers: [],
@@ -221,7 +252,7 @@ export function useCharacters() {
     const c = characterById(id)
     if (!c) return
     if (patch.name !== undefined) {
-      const name = patch.name.trim()
+      const name = cleanName(patch.name)
       if (name) c.name = name
     }
     if (patch.clanId !== undefined && VALID_CLAN_IDS.has(patch.clanId)) c.clanId = patch.clanId

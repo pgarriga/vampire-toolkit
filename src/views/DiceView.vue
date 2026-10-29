@@ -181,7 +181,7 @@ function dieLabel(d: Die): string {
 
     <PageHeader :title="t.dice.title" />
 
-    <main class="dice-wrap mx-auto px-4 py-4 pb-5">
+    <div class="dice-wrap mx-auto px-4 py-4 pb-5">
 
       <!-- ── The two numbers ── -->
       <section class="dice-controls">
@@ -292,6 +292,6 @@ function dieLabel(d: Die): string {
         </ul>
       </details>
 
-    </main>
+    </div>
   </div>
 </template>
