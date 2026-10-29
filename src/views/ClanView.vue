@@ -76,7 +76,7 @@ function goDiscipline(id: string): void { router.push(`/discipline/${id}`) }
     </header>
 
     <!-- ── Body ── -->
-    <main class="max-content mx-auto px-3 px-sm-4 py-4 pb-5">
+    <div class="max-content mx-auto px-3 px-sm-4 py-4 pb-5">
 
       <!-- In-clan Disciplines -->
       <section class="clan-section">
@@ -125,7 +125,7 @@ function goDiscipline(id: string): void { router.push(`/discipline/${id}`) }
         </div>
       </section>
 
-    </main>
+    </div>
   </div>
 
   <!-- ── Not found ── -->

@@ -49,7 +49,7 @@ function clanGradient(c: Clan): string {
     <SearchInput v-model="search" :placeholder="t.clansList.searchPlaceholder" :label="t.clansList.searchAriaLabel" />
 
     <!-- ── Clans grid ── -->
-    <main v-if="clans.length"
+    <div v-if="clans.length"
           class="container-fluid px-3 px-sm-4 py-4 pb-5 max-content mx-auto">
       <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-2 g-sm-3">
 
@@ -99,14 +99,14 @@ function clanGradient(c: Clan): string {
         </div>
 
       </div>
-    </main>
+    </div>
 
     <!-- ── Empty state ── -->
-    <main v-else class="text-center px-4 py-5">
+    <div v-else class="text-center px-4 py-5">
       <p class="text-parchment-dim fst-italic mb-0">
         {{ t.clansList.noResults }} “{{ search }}”.
       </p>
-    </main>
+    </div>
 
   </div>
 </template>

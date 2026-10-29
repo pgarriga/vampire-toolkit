@@ -150,6 +150,36 @@ button,
   min-height: 0 !important;
 }
 
+/* The one <main> (App.vue), between the navbar and the footer. It flexes so the view
+   inside can keep filling the screen. It takes focus only programmatically — after a
+   page swap or from the skip link — and is not a control, so it draws no ring: the
+   reader's next Tab lands on the page's first control, which does. */
+.app-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.app-main:focus { outline: none; }
+
+/* Off-screen until focused, then over the navbar's left corner. --gold on --void-card
+   is 8.2:1 dark / 5.4:1 light, as in the footer. */
+.skip-link {
+  position: absolute;
+  top: 0.5rem;
+  left: 0.5rem;
+  z-index: 1040;
+  padding: 0.6rem 1rem;
+  min-height: 44px;
+  background: var(--void-card);
+  color: var(--gold);
+  border: 1px solid var(--gold);
+  border-radius: 4px;
+  text-decoration: none;
+  transform: translateY(-200%);
+}
+.skip-link:focus { transform: none; }
+.skip-link:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
 /* ─── Line clamp ─── */
 .line-clamp-3 {
   display: -webkit-box;

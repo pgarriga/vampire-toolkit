@@ -272,7 +272,7 @@ onBeforeUnmount(() => window.removeEventListener('keydown', onKeydown))
 
   <!-- Not found -->
   <div v-else class="min-vh-100 bg-void text-parchment-dim d-flex flex-column align-items-center justify-content-center gap-3 p-5">
-    <div class="fs-1" style="opacity:.4;">⚰️</div>
+    <div class="fs-1" style="opacity:.4;" aria-hidden="true">⚰️</div>
     <p>{{ t.power.notFound }}</p>
     <button class="back-btn" @click="$router.push('/')">{{ t.power.backHome }}</button>
   </div>

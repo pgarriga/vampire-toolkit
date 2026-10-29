@@ -8,7 +8,7 @@ import { CLAN_ICONS } from '../icons/clans'
 import { DISCIPLINE_ICONS } from '../icons/disciplines'
 import { useI18n } from '../composables/useI18n'
 import { useClans } from '../composables/useClans'
-import { useCharacters, GENERATIONS, DEFAULT_GENERATION } from '../composables/useCharacters'
+import { useCharacters, GENERATIONS, DEFAULT_GENERATION, NAME_MAX } from '../composables/useCharacters'
 import { useCharacterPowers } from '../composables/useCharacterPowers'
 import { useRouteCharacter } from '../composables/useRouteCharacter'
 import { artGradient, levelDots } from '../helpers'
@@ -248,7 +248,7 @@ function downloadCharacter(): void {
         v-model="draftName"
         class="field-input"
         type="text"
-        maxlength="60"
+        :maxlength="NAME_MAX"
         autocomplete="off"
         :placeholder="t.characters.namePlaceholder"
         @keydown.enter.prevent="saveEdit"

@@ -121,7 +121,7 @@ function goPower(pid: string): void { router.push(`/discipline/${route.params['i
 
   <!-- Not found -->
   <div v-else class="min-vh-100 bg-void text-parchment-dim d-flex flex-column align-items-center justify-content-center gap-3 p-5">
-    <div class="fs-1" style="opacity:.4;">⚰️</div>
+    <div class="fs-1" style="opacity:.4;" aria-hidden="true">⚰️</div>
     <p>{{ t.discipline.notFound }}</p>
     <button class="back-btn" @click="$router.push('/')">{{ t.discipline.backHome }}</button>
   </div>

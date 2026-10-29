@@ -18,16 +18,21 @@ const { clanSigil } = useClans()
 
 /** In-clan Disciplines are shown as sigils — the names are long (six of them on
  *  Dominate) and the marks are already traced. Anything with no mark at all would
- *  fall back to a text chip; nothing in the data does today. */
-function clanSigils(d: Discipline) {
-  return d.clanes.flatMap(name => {
+ *  fall back to a text chip; nothing in the data does today. Resolved once per
+ *  language rather than on every render of every card. */
+const clanMarks = computed(() => new Map(allDisciplines.value.map(d => {
+  const sigils: Array<{ name: string; svg: string }> = []
+  const plain: string[] = []
+  for (const name of d.clanes) {
     const sigil = clanSigil(name)
-    return sigil ? [{ name, svg: sigil.svg }] : []
-  })
-}
-function clanPlain(d: Discipline): string[] {
-  return d.clanes.filter(name => !clanSigil(name))
-}
+    if (sigil) sigils.push({ name, svg: sigil.svg })
+    else plain.push(name)
+  }
+  return [d.id, { sigils, plain }]
+})))
+
+function clanSigils(d: Discipline) { return clanMarks.value.get(d.id)?.sigils ?? [] }
+function clanPlain(d: Discipline)  { return clanMarks.value.get(d.id)?.plain ?? [] }
 
 const disciplines = computed<Discipline[]>(() => {
   const q = foldForSearch(search.value).trim()
@@ -52,7 +57,7 @@ function goTo(id: string) {
     <SearchInput v-model="search" :placeholder="t.disciplinesList.searchPlaceholder" :label="t.disciplinesList.searchAriaLabel" />
 
     <!-- ── Disciplines grid ── -->
-    <main v-if="disciplines.length"
+    <div v-if="disciplines.length"
           class="container-fluid px-3 px-sm-4 py-4 pb-5 max-content mx-auto">
       <div class="row row-cols-2 row-cols-sm-3 row-cols-md-4 row-cols-lg-5 g-2 g-sm-3">
 
@@ -113,11 +118,11 @@ function goTo(id: string) {
         </div>
 
       </div>
-    </main>
+    </div>
 
     <!-- Empty state -->
     <div v-else class="text-center py-5 px-4 text-parchment-dim">
-      <div class="fs-1 mb-3" style="opacity:.4;">🩸</div>
+      <div class="fs-1 mb-3" style="opacity:.4;" aria-hidden="true">🩸</div>
       <p>{{ t.disciplinesList.noResults }} «{{ search }}»</p>
     </div>
 

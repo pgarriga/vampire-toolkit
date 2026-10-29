@@ -47,10 +47,41 @@ watch(() => route.path, () => { menuOpen.value = false })
 
 // Close on Escape, and hand focus back to the button that opened the menu — the
 // item that had it is gone with the overlay, which would drop focus to <body>.
+// The arrow keys, Home and End move between the items, which is what a role="menu"
+// promises a screen reader user; Tab still works as well.
 function onKey(e: KeyboardEvent) {
-  if (e.key !== 'Escape' || !menuOpen.value) return
-  menuOpen.value = false
-  toggler.value?.focus()
+  if (!menuOpen.value) return
+  if (e.key === 'Escape') {
+    menuOpen.value = false
+    toggler.value?.focus()
+    return
+  }
+  const items = [...(menuEl.value?.querySelectorAll<HTMLElement>('[role="menuitem"]') ?? [])]
+  if (!items.length) return
+  const at = items.indexOf(document.activeElement as HTMLElement)
+  let next: number
+  if (e.key === 'ArrowDown')    next = at === -1 ? 0 : (at + 1) % items.length
+  else if (e.key === 'ArrowUp') next = at <= 0 ? items.length - 1 : at - 1
+  else if (e.key === 'Home')    next = 0
+  else if (e.key === 'End')     next = items.length - 1
+  else return
+  e.preventDefault()
+  items[next]?.focus()
+}
+
+// A page swap removes whatever had focus — the card or menu item that was used to
+// navigate — which drops it to <body> and leaves a keyboard or screen reader user at
+// the top of the document. Moving it onto <main> starts them at the new page instead.
+// Only when focus was actually lost: a page that focuses its own field on arrival
+// (the create wizard's name) keeps it.
+const mainEl = ref<HTMLElement | null>(null)
+
+function onPageEnter(): void {
+  pageEntering()
+  nextTick(() => {
+    const active = document.activeElement
+    if (!active || active === document.body) mainEl.value?.focus({ preventScroll: true })
+  })
 }
 
 // Opening moves focus into the menu — onto the current page's entry when there is
@@ -72,7 +103,10 @@ watch(menuOpen, (open) => {
 </script>
 
 <template>
-  <nav class="app-navbar" role="navigation" :aria-label="t.nav.home">
+  <!-- First in the tab order: past the navbar, straight to the page. -->
+  <a class="skip-link" href="#main" @click.prevent="mainEl?.focus()">{{ t.nav.skipToContent }}</a>
+
+  <nav class="app-navbar" :aria-label="t.nav.home">
     <a
       class="app-navbar-brand font-title"
       href="#/"
@@ -219,11 +253,15 @@ watch(menuOpen, (open) => {
     </div>
   </div>
 
-  <router-view v-slot="{ Component }">
-    <transition name="page" mode="out-in" @enter="pageEntering">
-      <component :is="Component" />
-    </transition>
-  </router-view>
+  <!-- The one <main> in the app, so every page has exactly one main landmark. A view
+       must not add its own. -->
+  <main id="main" ref="mainEl" class="app-main" tabindex="-1">
+    <router-view v-slot="{ Component }">
+      <transition name="page" mode="out-in" @enter="onPageEnter">
+        <component :is="Component" />
+      </transition>
+    </router-view>
+  </main>
 
   <AppFooter />
 </template>

@@ -11,6 +11,7 @@ export const en: Messages = {
     openMenu:    'Open menu',
     closeMenu:   'Close menu',
     breadcrumb:  'Breadcrumb',
+    skipToContent: 'Skip to content',
   },
   home: {
     compendium:        'Compendium',

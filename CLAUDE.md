@@ -14,7 +14,8 @@ A toolkit to speed up **Vampire: The Masquerade 5th Edition** tabletop sessions.
   `bootstrap.bundle.min.js`. Every overlay in the app (menu, dropdown) is hand-written, so
   nothing used it, and dropping the import cut 79 kB from the bundle. Do not add `data-bs-*`
   attributes or Bootstrap JS components without re-adding the import.
-- **Vite 8** — bundler and dev server
+- **Vite 8** — bundler and dev server. `package.json` is `"type": "module"`, which Vite's
+  native config loader (a future default) needs to load `vite.config.ts` as ESM
 - **vite-plugin-pwa** — service worker + `manifest.webmanifest`
 - **Google Fonts**: Cinzel Decorative (headings) + Cormorant Garamond (body)
 
@@ -131,6 +132,13 @@ down in front of the reader.
 
 ## Navigation (`App.vue`)
 
+**`App.vue` owns the one `<main>`** (`#main`, `.app-main`), wrapping the `<router-view>`,
+so every page has exactly one main landmark — **a view must not add its own** (they used
+to, and four pages had none). A **skip link** ("Saltar al contenido", `t.nav.skipToContent`)
+comes first in the tab order. After a page swap, if focus was lost to `<body>` (the card or
+menu item that was used is gone), it moves onto `<main>` with `preventScroll`, so the
+scroll restore is not disturbed; a page that focuses its own field on arrival keeps it.
+
 Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
 - Left: "Vampire V5 Toolkit" brand — clicking it goes home
 - Right: hamburger button (always visible, on every viewport)
@@ -145,6 +153,8 @@ Custom sticky top bar (56px) — Bootstrap's navbar collapse is not used:
 - Menu and home-card icons both come from `src/icons/nav.ts`, so a tool's card always
   shows the same icon as its menu entry
 - Menu closes on route change, on Escape, and on click outside the panel
+- ↑ / ↓ move between the items (wrapping), Home / End jump to the ends — what a
+  `role="menu"` promises a screen reader user. Tab still works too
 - Opening it moves focus onto the current page's item (or the first); Escape hands focus
   back to the hamburger. The character sheet's "More options" menu, delete confirmation
   and edit panel do the same, because each swap removes the control that had focus
@@ -187,7 +197,11 @@ opened, which is what the power detail's swipe list follows.
   the select offers V5's standard 13th for you to confirm by saving. Valid range is 1–16:
   the 1st is Caine, the 3rd the Antediluvians, and 14th–16th are the Thin-Bloods.
 - `GENERATIONS` and `DEFAULT_GENERATION` are exported so the create and edit forms offer
-  exactly that range.
+  exactly that range. `NAME_MAX` (60) is the name fields' `maxlength`, and `sanitize()`
+  caps a loaded name to it too, since a hand-edited file is not bound by the input.
+- **Tabs stay in step.** A `storage` listener re-reads a character another tab wrote (or
+  drops one it deleted); otherwise each tab writes back its stale copy and the last to save
+  wins. The active id is deliberately *not* synced — two tabs may have two sheets open.
 
 ### Migrations and dead keys
 
@@ -767,6 +781,9 @@ Custom gothic styles on top of Bootstrap's grid + utilities. CSS custom properti
 
 Relevant classes:
 
+- `.app-main` / `.skip-link` — the app's single `<main>` (flexes so the view inside still
+  fills the screen; no focus ring, since it is only focused programmatically and the next
+  Tab lands on a control that has one) and the skip link, off-screen until focused
 - `.app-navbar` / `.app-menu-toggler` / `.app-menu-overlay` / `.app-menu-panel` /
   `.app-menu-group` / `.app-menu-heading` / `.app-menu-item` (+ `--new`) / `.app-menu-sigil` /
   `.app-menu-divider` — custom top bar and sectioned overlay menu. The gap between sections

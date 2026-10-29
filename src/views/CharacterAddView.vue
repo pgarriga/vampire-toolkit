@@ -62,7 +62,7 @@ function goBack(): void {
              :current="discipline ? discipline.name : t.characters.addTitle"
              truncate @back="goBack" />
 
-    <main class="char-form-wrap mx-auto px-3 px-sm-4 py-4 pb-5">
+    <div class="char-form-wrap mx-auto px-3 px-sm-4 py-4 pb-5">
 
       <!-- ── Step 1 — which Discipline ── -->
       <template v-if="!discipline">
@@ -139,7 +139,7 @@ function goBack(): void {
         </div>
       </template>
 
-    </main>
+    </div>
   </div>
 
   <!-- ── Not found ── -->
